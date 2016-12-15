@@ -29,7 +29,7 @@ void MainWindow::on_addMPSoCButton_clicked()
     ui->widget->setMPSoC(m);
 
     ci = 0;
-    timer->start(10000);
+    timer->start(1000);
 }
 
 void MainWindow::increment() {
@@ -46,12 +46,12 @@ void MainWindow::increment() {
         x1 = qrand() % ui->widget->getGridWidth();
         y1 = qrand() % ui->widget->getGridHeight();
     } while (!ui->widget->getMpsoc()->getCore(x1,y1)->isIdle());
-    ui->widget->getMpsoc()->getCore(x1,y1)->run(new Core::AppNode(5,colors[ci]));
+    ui->widget->getMpsoc()->getCore(x1,y1)->run(new Core::AppNode(5,colors[ci%6]));
     do {
         x2 = qrand() % ui->widget->getGridWidth();
         y2 = qrand() % ui->widget->getGridHeight();
     } while (!ui->widget->getMpsoc()->getCore(x2,y2)->isIdle());
-    ui->widget->getMpsoc()->getCore(x2,y2)->run(new Core::AppNode(5,colors[ci]));
+    ui->widget->getMpsoc()->getCore(x2,y2)->run(new Core::AppNode(5,colors[ci%6]));
 
     qreal atob, btoa;
     atob = (qreal)(qrand() % 400) / 10.0;
@@ -68,6 +68,6 @@ void MainWindow::increment() {
     }
 
     ci++;
-    if (ci >= 6) timer->stop();
+    if (ci >= ui->widget->getGridWidth() * ui->widget->getGridHeight()) timer->stop();
 
 }
