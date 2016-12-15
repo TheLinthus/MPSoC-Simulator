@@ -63,7 +63,7 @@ QVector<Channel *> MPSoC::getPatch(int x1, int y1, int x2, int y2) {
     if (x1 > width || y1 > height || x2 > width || y2 > height) {
         return QVector<Channel *>();
     }
-    int lenght = std::abs(x1 - x2) + std::abs(y1 - y2);
+    int lenght = abs(x1 - x2) + abs(y1 - y2);
     QVector<Channel *> patch(lenght);
 
     int count = 0;
