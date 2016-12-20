@@ -2,7 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <mpsoc.h>
+#include <QInputDialog>
+#include <QTimer>
+#include <QVector>
+#include <Core/mpsoc.h>
 
 namespace Ui {
 class MainWindow;
@@ -20,8 +23,6 @@ public:
     QTimer *timer;
 
 private slots:
-    void on_pushButton_2_clicked();
-
     void on_addMPSoCButton_clicked();
 
     void increment();

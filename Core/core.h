@@ -2,8 +2,8 @@
 #define CORE_CORE_H
 
 #include <QObject>
-#include <channel.h>
-#include <appnode.h>
+#include <Core/channel.h>
+#include <Core/appnode.h>
 
 namespace Core {
 

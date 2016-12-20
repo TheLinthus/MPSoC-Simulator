@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QPainter>
-#include <mpsoc.h>
+#include <Core/mpsoc.h>
 
 namespace Ui {
 class GraphicalMPSoC;

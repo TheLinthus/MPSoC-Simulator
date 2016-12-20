@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <core.h>
-#include <channel.h>
+#include <Core/channel.h>
 
 namespace Core {
 

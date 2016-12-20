@@ -1,8 +1,6 @@
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QInputDialog>
-#include <QTimer>
-#include <QVector>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -15,9 +13,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow() {
     delete ui;
-}
-
-void MainWindow::on_pushButton_2_clicked() {
 }
 
 void MainWindow::on_addMPSoCButton_clicked()
@@ -68,6 +63,6 @@ void MainWindow::increment() {
     }
 
     ci++;
-    if (ci >= ui->widget->getGridWidth() * ui->widget->getGridHeight()) timer->stop();
+    if (ci * 2 >= ui->widget->getGridWidth() * ui->widget->getGridHeight()) timer->stop();
 
 }
