@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QVector>
 #include <Core/mpsoc.h>
+#include <View/mpsoc.h>
 
 namespace Ui {
 class MainWindow;

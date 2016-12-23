@@ -2,7 +2,7 @@
 
 namespace View {
 
-mpsoc::mpsoc()
+MPSoC::MPSoC()
 {
 
 }

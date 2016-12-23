@@ -2,14 +2,21 @@
 #define VIEW_MPSOC_H
 
 #include <QObject>
+#include <QGraphicsItem>
 
 namespace View {
 
-class mpsoc : public QGraphicsItem {
+class MPSoC : public QGraphicsItem {
 public:
-    mpsoc();
+    MPSoC();
 
+    QRectF boundingRect() const;
 
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+protected:
+
+    // TODO - add event handlers
 };
 
 } // namespace View
