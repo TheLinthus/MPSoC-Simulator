@@ -14,14 +14,22 @@ public:
 
     QColor *getColor();
 
+    int getThread() const;
+    void setThread(int value);
+
+    qreal getLifespan() const;
+
 private:
     QColor* color;
     qreal lifespan;
-
+    int thread;
 
 signals:
+    void finished(int thread);
+    void changed();
 
 public slots:
+    void tick();
 };
 
 } // namespace Core

@@ -5,8 +5,8 @@
 #include <QInputDialog>
 #include <QTimer>
 #include <QVector>
-#include <Core/mpsoc.h>
-#include <View/mpsoc.h>
+#include "Core/mpsoc.h"
+#include "View/viewmpsoc.h"
 
 namespace Ui {
 class MainWindow;

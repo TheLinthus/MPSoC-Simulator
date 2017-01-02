@@ -24,11 +24,11 @@ void MainWindow::on_addMPSoCButton_clicked()
     ui->widget->setMPSoC(m);
 
     ci = 0;
-    timer->start(1000);
+    timer->start(350);
 }
 
 void MainWindow::increment() {
-    int x1, x2, y1, y2;
+    int x1, y1;
     QColor *colors[6] = {
         new QColor("blue"),
         new QColor("cyan"),
@@ -37,32 +37,28 @@ void MainWindow::increment() {
         new QColor("red"),
         new QColor("magenta")
     };
-    do {
-        x1 = qrand() % ui->widget->getGridWidth();
-        y1 = qrand() % ui->widget->getGridHeight();
-    } while (!ui->widget->getMpsoc()->getCore(x1,y1)->isIdle());
-    ui->widget->getMpsoc()->getCore(x1,y1)->run(new Core::AppNode(5,colors[ci%6]));
-    do {
-        x2 = qrand() % ui->widget->getGridWidth();
-        y2 = qrand() % ui->widget->getGridHeight();
-    } while (!ui->widget->getMpsoc()->getCore(x2,y2)->isIdle());
-    ui->widget->getMpsoc()->getCore(x2,y2)->run(new Core::AppNode(5,colors[ci%6]));
+    x1 = qrand() % ui->widget->getGridWidth();
+    y1 = qrand() % ui->widget->getGridHeight();
+    if (!ui->widget->getMpsoc()->getCore(x1,y1)->isIdle())
+        return;
+    Core::AppNode *node = new Core::AppNode(qrand() % 80 + 5,colors[ci%6]);
+    connect(timer, SIGNAL(timeout()), node, SLOT(tick()));
+    connect(timer, SIGNAL(timeout()), ui->widget, SLOT(repaint()));
+    ui->widget->getMpsoc()->getCore(x1,y1)->run(node);
 
-    qreal atob, btoa;
-    atob = (qreal)(qrand() % 400) / 10.0;
-    btoa = (qreal)(qrand() % 400) / 10.0;
+    //qreal atob, btoa;
+    //atob = (qreal)(qrand() % 400) / 10.0;
+    //btoa = (qreal)(qrand() % 400) / 10.0;
 
-    QVector<Core::Channel *> patch = ui->widget->getMpsoc()->getPatch(x1,y1,x2,y2);
-    foreach (Core::Channel *c, patch) {
-        c->add(atob);
-    }
+    //QVector<Core::Channel *> patch = ui->widget->getMpsoc()->getPatch(x1,y1,x2,y2);
+    //foreach (Core::Channel *c, patch) {
+    //    c->add(atob);
+    //}
 
-    patch = ui->widget->getMpsoc()->getPatch(x2,y2,x1,y1);
-    foreach (Core::Channel *c, patch) {
-        c->add(btoa);
-    }
+    //patch = ui->widget->getMpsoc()->getPatch(x2,y2,x1,y1);
+    //foreach (Core::Channel *c, patch) {
+    //    c->add(btoa);
+    //}
 
     ci++;
-    if (ci * 2 >= ui->widget->getGridWidth() * ui->widget->getGridHeight()) timer->stop();
-
 }

@@ -49,10 +49,12 @@ void GraphicalMPSoC::paintEvent(QPaintEvent *)
         for (int i = 0; i < gridWidth; i++) {
             for (int j = 0; j < gridHeight; j++) {
                 p.setPen(QColor(220,220,220));
+                qreal lifespan = 0;
                 if (mpsoc->getCore(i,j)->isIdle()) {
                     p.setBrush(Qt::transparent);
                 } else {
                     p.setBrush(QColor(mpsoc->getCore(i,j)->runningNode()->getColor()->rgb()));
+                    lifespan = mpsoc->getCore(i,j)->runningNode()->getLifespan();
                 }
                 p.drawRoundedRect(QRectF(
                                border.x() + (i * coreSize + i * channelLenght),
@@ -60,6 +62,13 @@ void GraphicalMPSoC::paintEvent(QPaintEvent *)
                                coreSize, coreSize
                                ),coreSize/8,coreSize/8);
                 QColor channelColor(1.0,1.0,1.0);
+                p.setPen(Qt::white);
+                p.drawText(
+                            border.x() + (i * coreSize + i * channelLenght),
+                            border.y() + (j * coreSize + j * channelLenght),
+                            coreSize, coreSize,
+                            Qt::AlignVCenter | Qt::AlignHCenter,
+                            QString::number(lifespan));
                 if (mpsoc->getCore(i,j)->getChannel(Core::South)) {
                     qreal chVal = mpsoc->getCore(i,j)->getChannel(Core::South)->val();
                     if (chVal == 0) {

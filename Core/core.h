@@ -40,6 +40,7 @@ signals:
     void changed();
 
 public slots:
+    void kill(int thread);
 };
 
 } // namespace Core

@@ -9,33 +9,29 @@ TARGET = MPSoC-Emulator
 TEMPLATE = app
 
 
-HEADERS = \
-   $$PWD/Core/appnode.h \
-   $$PWD/Core/channel.h \
-   $$PWD/Core/core.h \
-   $$PWD/Core/mpsoc.h \
-   $$PWD/View/mpsoc.h \
-   $$PWD/graphicalmpsoc.h \
-   $$PWD/mainwindow.h
+HEADERS = Core/appnode.h \
+   Core/channel.h \
+   Core/core.h \
+   Core/mpsoc.h \
+   graphicalmpsoc.h \
+   mainwindow.h \
+    View/viewmpsoc.h
 
-SOURCES = \
-   $$PWD/Core/appnode.cpp \
-   $$PWD/Core/channel.cpp \
-   $$PWD/Core/core.cpp \
-   $$PWD/Core/mpsoc.cpp \
-   $$PWD/View/mpsoc.cpp \
-   $$PWD/graphicalmpsoc.cpp \
-   $$PWD/main.cpp \
-   $$PWD/mainwindow.cpp
+SOURCES = Core/appnode.cpp \
+   Core/channel.cpp \
+   Core/core.cpp \
+   Core/mpsoc.cpp \
+   graphicalmpsoc.cpp \
+   main.cpp \
+   mainwindow.cpp \
+    View/viewmpsoc.cpp
 
-INCLUDEPATH = \
-    $$PWD/. \
-    $$PWD/Core \
-    $$PWD/View
+INCLUDEPATH = . \
+    Core \
+    View
 	
-FORMS = \
-   $$PWD/graphicalmpsoc.ui \
-   $$PWD/mainwindow.ui
+FORMS = graphicalmpsoc.ui \
+   mainwindow.ui
 
 #DEFINES = 
 

@@ -43,6 +43,8 @@ bool Core::run(AppNode *node, int thread) {
         return false;
     }
     if (cores[thread] == nullptr) {
+        node->setThread(thread);
+        connect(node, SIGNAL(finished(int)), this, SLOT(kill(int)));
         cores[thread] = node;
         emit changed();
         return true;
@@ -63,6 +65,17 @@ int Core::getX() {
 
 int Core::getY() {
     return y;
+}
+
+void Core::kill(int thread) {
+    if (thread < 0 || thread >= threads) {
+        return;
+    }
+    if (cores[thread] != nullptr) {
+        delete cores[thread];
+        cores[thread] = nullptr;
+        emit changed();
+    }
 }
 
 void Core::setChannel(Direction direction, Channel *channel)
