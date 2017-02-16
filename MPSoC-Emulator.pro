@@ -15,7 +15,9 @@ HEADERS = Core/appnode.h \
    Core/mpsoc.h \
    graphicalmpsoc.h \
    mainwindow.h \
-    View/viewmpsoc.h
+    View/viewmpsoc.h \
+    Core/application.h \
+    Core/appload.h
 
 SOURCES = Core/appnode.cpp \
    Core/channel.cpp \
@@ -24,7 +26,9 @@ SOURCES = Core/appnode.cpp \
    graphicalmpsoc.cpp \
    main.cpp \
    mainwindow.cpp \
-    View/viewmpsoc.cpp
+    View/viewmpsoc.cpp \
+    Core/application.cpp \
+    Core/appload.cpp
 
 INCLUDEPATH = . \
     Core \

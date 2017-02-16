@@ -53,7 +53,7 @@ void GraphicalMPSoC::paintEvent(QPaintEvent *)
                 if (mpsoc->getCore(i,j)->isIdle()) {
                     p.setBrush(Qt::transparent);
                 } else {
-                    p.setBrush(QColor(mpsoc->getCore(i,j)->runningNode()->getColor()->rgb()));
+                    p.setBrush(mpsoc->getCore(i,j)->runningNode()->getColor());
                     lifespan = mpsoc->getCore(i,j)->runningNode()->getLifespan();
                 }
                 p.drawRoundedRect(QRectF(

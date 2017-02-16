@@ -15,10 +15,12 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::on_addMPSoCButton_clicked()
-{
-    int x = QInputDialog::getInt(this,"X","Entre o tamanho X:",1,2,16);;
-    int y = QInputDialog::getInt(this,"Y","Entre o tamanho Y:",1,2,16);;
+void MainWindow::on_addMPSoCButton_clicked() {
+    bool ok = false;
+    int x = QInputDialog::getInt(this,windowTitle(),"Entre o tamanho X:",2,2,16,1,&ok);
+    if (!ok) return;
+    int y = QInputDialog::getInt(this,windowTitle(),"Entre o tamanho Y:",2,2,16,1,&ok);
+    if (!ok) return;
 
     Core::MPSoC* m = new Core::MPSoC(x,y);
     ui->widget->setMPSoC(m);
@@ -29,19 +31,20 @@ void MainWindow::on_addMPSoCButton_clicked()
 
 void MainWindow::increment() {
     int x1, y1;
-    QColor *colors[6] = {
-        new QColor("blue"),
-        new QColor("cyan"),
-        new QColor("green"),
-        new QColor("yellow"),
-        new QColor("red"),
-        new QColor("magenta")
+    QColor colors[6] = {
+        QColor("blue"),
+        QColor("cyan"),
+        QColor("green"),
+        QColor("yellow"),
+        QColor("red"),
+        QColor("magenta")
     };
     x1 = qrand() % ui->widget->getGridWidth();
     y1 = qrand() % ui->widget->getGridHeight();
     if (!ui->widget->getMpsoc()->getCore(x1,y1)->isIdle())
         return;
-    Core::AppNode *node = new Core::AppNode(qrand() % 80 + 5,colors[ci%6]);
+    Core::AppNode *node = new Core::AppNode(qrand() % 80 + 5);
+    node->setColor(colors[ci%6]);
     connect(timer, SIGNAL(timeout()), node, SLOT(tick()));
     connect(timer, SIGNAL(timeout()), ui->widget, SLOT(repaint()));
     ui->widget->getMpsoc()->getCore(x1,y1)->run(node);
@@ -61,4 +64,11 @@ void MainWindow::increment() {
     //}
 
     ci++;
+}
+
+void MainWindow::on_pushButton_clicked() {
+    QString osInfo = QSysInfo::prettyProductName();
+    QString path = QStandardPaths::locate(QStandardPaths::AppDataLocation, "", QStandardPaths::LocateDirectory);
+    qDebug() << "You are running on " << osInfo << "\nThis application's data folder is in " << path;
+    QDesktopServices::openUrl(QUrl("file:///"+path));
 }

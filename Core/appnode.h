@@ -10,17 +10,22 @@ class AppNode : public QObject
 {
     Q_OBJECT
 public:
-    explicit AppNode(qreal lifespan = 200, QColor* color = new QColor(Qt::red), QObject *parent = 0);
+    explicit AppNode(qreal lifespan, QObject *parent = 0);
+    ~AppNode();
 
-    QColor *getColor();
+    QColor getColor();
+    void setColor(QColor color);
 
     int getThread() const;
     void setThread(int value);
 
+    bool isDone();
     qreal getLifespan() const;
+    qreal getCycles() const;
 
 private:
-    QColor* color;
+    QColor color;
+    qreal cycles;
     qreal lifespan;
     int thread;
 

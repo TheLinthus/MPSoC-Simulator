@@ -3,8 +3,12 @@
 
 #include <QMainWindow>
 #include <QInputDialog>
+#include <QMessageBox>
 #include <QTimer>
+#include <QDesktopServices>
 #include <QVector>
+#include <QDebug>
+#include <QUrl>
 #include "Core/mpsoc.h"
 #include "View/viewmpsoc.h"
 
@@ -27,6 +31,8 @@ private slots:
     void on_addMPSoCButton_clicked();
 
     void increment();
+
+    void on_pushButton_clicked();
 
 private:
     Ui::MainWindow *ui;
