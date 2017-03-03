@@ -17,7 +17,8 @@ HEADERS = Core/appnode.h \
    mainwindow.h \
     View/viewmpsoc.h \
     Core/application.h \
-    Core/appload.h
+    Core/appload.h \
+    View/mpsocbox.h
 
 SOURCES = Core/appnode.cpp \
    Core/channel.cpp \
@@ -28,14 +29,20 @@ SOURCES = Core/appnode.cpp \
    mainwindow.cpp \
     View/viewmpsoc.cpp \
     Core/application.cpp \
-    Core/appload.cpp
+    Core/appload.cpp \
+    View/mpsocbox.cpp
 
 INCLUDEPATH = . \
     Core \
     View
 	
 FORMS = graphicalmpsoc.ui \
-   mainwindow.ui
+   mainwindow.ui \
+    View/mpsocbox.ui
 
 #DEFINES = 
 
+RESOURCES += \
+    resources.qrc
+
+DISTFILES +=

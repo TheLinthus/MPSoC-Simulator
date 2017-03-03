@@ -10,7 +10,8 @@
 #include <QDebug>
 #include <QUrl>
 #include "Core/mpsoc.h"
-#include "View/viewmpsoc.h"
+#include "View/mpsocbox.h"
+#include "graphicalmpsoc.h"
 
 namespace Ui {
 class MainWindow;
@@ -30,7 +31,7 @@ public:
 private slots:
     void on_addMPSoCButton_clicked();
 
-    void increment();
+    //void increment();
 
     void on_pushButton_clicked();
 

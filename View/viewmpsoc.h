@@ -3,12 +3,16 @@
 
 #include <QObject>
 #include <QGraphicsItem>
+#include <QPainter>
+#include <QtGui>
+#include <QStyle>
+#include <QGraphicsEffect>
 
 namespace View {
 
 class MPSoC : public QGraphicsItem {
 public:
-    MPSoC();
+    MPSoC(int x, int y);
 
     QRectF boundingRect() const;
 
@@ -17,6 +21,14 @@ public:
 protected:
 
     // TODO - add event handlers
+
+private:
+    int x;
+    int y;
+    bool over;
+
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 };
 
 } // namespace View

@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     timer(new QTimer(this))
 {
-    connect(timer, SIGNAL(timeout()), this, SLOT(increment()));
+    //connect(timer, SIGNAL(timeout()), this, SLOT(increment()));
     ui->setupUi(this);
 }
 
@@ -23,13 +23,22 @@ void MainWindow::on_addMPSoCButton_clicked() {
     if (!ok) return;
 
     Core::MPSoC* m = new Core::MPSoC(x,y);
-    ui->widget->setMPSoC(m);
+
+    QHBoxLayout* layout =  ui->mpsocsLayout;
+
+    View::MPSoCBox* newmpsoc = new View::MPSoCBox();
+    newmpsoc->setMPSoC(m);
+
+    layout->insertWidget(layout->count() - 1, newmpsoc);
+
+
+    //ui->widget->setMPSoC(m);
 
     ci = 0;
-    timer->start(350);
+    //timer->start(350);
 }
 
-void MainWindow::increment() {
+/*void MainWindow::increment() {
     int x1, y1;
     QColor colors[6] = {
         QColor("blue"),
@@ -64,7 +73,7 @@ void MainWindow::increment() {
     //}
 
     ci++;
-}
+}*/
 
 void MainWindow::on_pushButton_clicked() {
     QString osInfo = QSysInfo::prettyProductName();

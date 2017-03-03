@@ -7,6 +7,7 @@ GraphicalMPSoC::GraphicalMPSoC(QWidget *parent)
     , gridHeight(1)
     , mpsoc(nullptr)
 {
+
 }
 
 GraphicalMPSoC::~GraphicalMPSoC()
@@ -14,7 +15,7 @@ GraphicalMPSoC::~GraphicalMPSoC()
     delete mpsoc;
 }
 
-void GraphicalMPSoC::paintEvent(QPaintEvent *)
+/*void GraphicalMPSoC::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
 
@@ -130,7 +131,7 @@ void GraphicalMPSoC::paintEvent(QPaintEvent *)
         p.setFont(QFont("Helvetica", 40));
         p.drawText(border, "No MPSoC", Qt::AlignVCenter | Qt::AlignHCenter);
     }
-}
+}*/
 
 Core::MPSoC *GraphicalMPSoC::getMpsoc() const
 {

@@ -27,7 +27,7 @@ public:
     Core::MPSoC *getMpsoc() const;
 
 protected:
-    void paintEvent(QPaintEvent *);
+    //void paintEvent(QPaintEvent *);
 
 private:
     int gridWidth;
