@@ -6,6 +6,7 @@
 #include <QtCore>
 #include <QtGui>
 #include <View/viewmpsoc.h>
+#include <View/viewchannel.h>
 #include <Core/mpsoc.h>
 
 #include <QDebug>

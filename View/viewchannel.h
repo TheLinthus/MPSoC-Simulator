@@ -1,5 +1,5 @@
-#ifndef VIEW_MPSOC_H
-#define VIEW_MPSOC_H
+#ifndef VIEW_CHANNEL_H
+#define VIEW_CHANNEL_H
 
 #include <QObject>
 #include <QGraphicsItem>
@@ -10,21 +10,17 @@
 
 namespace View {
 
-class MPSoC : public QGraphicsItem {
+class Channel : public QGraphicsItem {
 public:
-    MPSoC(int x, int y);
+    Channel(int x, int y, bool v);
 
     QRectF boundingRect() const override;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-protected:
-
-    // TODO - add event handlers
-
 private:
-    int x;
-    int y;
+    bool vertical;
+    int x, y, w, h;
     bool over;
 
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
@@ -33,4 +29,4 @@ private:
 
 } // namespace View
 
-#endif // VIEW_MPSOC_H
+#endif // VIEW_CHANNEL_H

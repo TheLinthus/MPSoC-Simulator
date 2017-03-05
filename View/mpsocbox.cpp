@@ -55,7 +55,14 @@ void View::MPSoCBox::setMPSoC(Core::MPSoC *value) {
     // Desenha MPSoC na scene;
     for (int i = 0; i < gridWidth; i++) {
         for (int j = 0; j < gridHeight; j++) {
-            mpsocScene->addItem(new View::MPSoC(i,j));
+            mpsocScene->addItem(new MPSoC(i,j));
+            if (mpsoc->getCore(i,j)->getChannel(Core::South)) {
+                mpsocScene->addItem(new Channel(i,j,true));
+            }
+            if (mpsoc->getCore(i,j)->getChannel(Core::East)) {
+                mpsocScene->addItem(new Channel(i,j,false));
+            }
+
 
 //            p.setPen(QColor(220,220,220));
 //            qreal lifespan = 0;

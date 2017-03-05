@@ -11,7 +11,6 @@ class Core : public QObject
 {
     Q_OBJECT
 public:
-
     explicit Core(int x, int y, int threads = 1, QObject *parent = 0);
 
     void setChannel(Direction direction, Channel *channel);

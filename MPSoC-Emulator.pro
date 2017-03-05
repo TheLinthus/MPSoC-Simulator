@@ -18,7 +18,8 @@ HEADERS = Core/appnode.h \
     View/viewmpsoc.h \
     Core/application.h \
     Core/appload.h \
-    View/mpsocbox.h
+    View/mpsocbox.h \
+    View/viewchannel.h
 
 SOURCES = Core/appnode.cpp \
    Core/channel.cpp \
@@ -30,7 +31,8 @@ SOURCES = Core/appnode.cpp \
     View/viewmpsoc.cpp \
     Core/application.cpp \
     Core/appload.cpp \
-    View/mpsocbox.cpp
+    View/mpsocbox.cpp \
+    View/viewchannel.cpp
 
 INCLUDEPATH = . \
     Core \
