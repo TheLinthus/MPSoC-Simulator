@@ -19,10 +19,10 @@ public:
     int isIdle(int i = 0);
     bool run(AppNode *node, int thread = 0);
     AppNode *runningNode(int thread = 0);
-    int nOfThreads();
+    int nOfThreads() const;
 
-    int getX();
-    int getY();
+    int getX() const;
+    int getY() const;
 
 private:
     Channel* north;

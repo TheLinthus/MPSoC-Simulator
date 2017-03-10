@@ -7,12 +7,13 @@
 #include <QtGui>
 #include <QStyle>
 #include <QGraphicsEffect>
+#include <Core/core.h>
 
 namespace View {
 
-class MPSoC : public QGraphicsItem {
+class Processor : public QGraphicsItem {
 public:
-    MPSoC(int x, int y);
+    Processor(Core::Core *core);
 
     QRectF boundingRect() const override;
 
@@ -26,6 +27,8 @@ private:
     int x;
     int y;
     bool over;
+
+    Core::Core *core;
 
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;

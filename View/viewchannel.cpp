@@ -4,10 +4,9 @@ namespace View {
 
 Channel::Channel(int x, int y, bool v)
     : x((v ? 10 : 100) + (x * 200))
-    , y((v ? 100 : 10) + (y * 2
-                          00))
-    , w(v ? 10 : 100)
-    , h(v ? 100 : 10)
+    , y((v ? 100 : 70) + (y * 200))
+    , w(v ? 20 : 100)
+    , h(v ? 100 : 20)
     , vertical(v)
     , over(false)
 {
@@ -35,8 +34,6 @@ void Channel::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 
 void Channel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     QRectF rect = boundingRect();
-
-    painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
 
     QPainterPath path;
     path.addRect(rect);

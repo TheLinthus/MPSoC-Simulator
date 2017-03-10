@@ -56,14 +56,14 @@ AppNode* Core::runningNode(int thread) {
     return cores[thread];
 }
 
-int Core::nOfThreads() {
+int Core::nOfThreads() const {
     return threads;
 }
-int Core::getX() {
+int Core::getX() const {
     return x;
 }
 
-int Core::getY() {
+int Core::getY() const {
     return y;
 }
 

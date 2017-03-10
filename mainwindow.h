@@ -7,8 +7,10 @@
 #include <QTimer>
 #include <QDesktopServices>
 #include <QVector>
-#include <QDebug>
+#include <QtDebug>
 #include <QUrl>
+#include <QFile>
+#include <QtScript/qscriptengine.h>
 #include "Core/mpsoc.h"
 #include "View/mpsocbox.h"
 #include "graphicalmpsoc.h"
@@ -31,12 +33,15 @@ public:
 private slots:
     void on_addMPSoCButton_clicked();
 
-    //void increment();
+    void increment();
 
     void on_pushButton_clicked();
+    void on_timerSpinBox_valueChanged(int val);
+    void on_stepSlider_valueChanged(int value);
 
 private:
     Ui::MainWindow *ui;
+    QStringListModel *applicationsList;
 };
 
 #endif // MAINWINDOW_H
