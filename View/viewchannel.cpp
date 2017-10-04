@@ -14,6 +14,8 @@ Channel::Channel(int x, int y, bool v, Core::Channel *c)
 {
     setAcceptHoverEvents(true);
     connect(channel, SIGNAL(loadChanged(int)), this, SLOT(change()));
+
+    setToolTip(QString("channel load: %1").arg(channel->val()));
 }
 
 QRectF Channel::boundingRect() const {
@@ -41,8 +43,6 @@ void Channel::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
 void Channel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     QRectF rect = boundingRect();
-
-    painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
 
     QPainterPath path;
     path.addRect(rect);
