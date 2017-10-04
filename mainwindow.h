@@ -9,9 +9,11 @@
 #include <QVector>
 #include <QDebug>
 #include <QUrl>
+#include <QFileDialog>
+#include <QFile>
+#include <QtScript/qscriptengine.h>
 #include "Core/mpsoc.h"
 #include "View/mpsocbox.h"
-#include "graphicalmpsoc.h"
 
 namespace Ui {
 class MainWindow;
@@ -34,9 +36,13 @@ private slots:
     //void increment();
 
     void on_pushButton_clicked();
+    void on_timerSpinBox_valueChanged(int val);
+    void on_stepSlider_valueChanged(int value);
+    void on_pushButton_2_clicked();
 
 private:
     Ui::MainWindow *ui;
+    QStringListModel *applicationsList;
 };
 
 #endif // MAINWINDOW_H

@@ -2,7 +2,7 @@
 #define CORE_MPSOC_H
 
 #include <QObject>
-#include <core.h>
+#include <Core/processor.h>
 #include <Core/channel.h>
 
 namespace Core {
@@ -14,11 +14,11 @@ public:
     explicit MPSoC(int h, int w, QObject *parent = 0);
     ~MPSoC();
 
-    Core *getCore(int x, int y);
+    Processor *getCore(int x, int y);
 
     int getHeight() const;
     int getWidth() const;
-    QVector<Channel *> getPatch(Core a, Core b);
+    QVector<Channel *> getPatch(Processor a, Processor b);
     QVector<Channel *> getPatch(int x1, int y1, int x2, int y2);
 
 protected:
@@ -26,7 +26,7 @@ protected:
     int width;
 
 private:
-    Core*** cores;
+    Processor*** processors;
 
 signals:
     void changed();

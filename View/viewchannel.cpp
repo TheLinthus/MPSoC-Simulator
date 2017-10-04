@@ -2,7 +2,7 @@
 
 namespace View {
 
-Channel::Channel(int x, int y, bool v)
+Channel::Channel(int x, int y, bool v, Core::Channel *c)
     : x((v ? 10 : 100) + (x * 200))
     , y((v ? 100 : 10) + (y * 2
                           00))
@@ -10,8 +10,10 @@ Channel::Channel(int x, int y, bool v)
     , h(v ? 100 : 10)
     , vertical(v)
     , over(false)
+    , channel(c)
 {
     setAcceptHoverEvents(true);
+    connect(channel, SIGNAL(loadChanged(int)), this, SLOT(change()));
 }
 
 QRectF Channel::boundingRect() const {
@@ -33,6 +35,10 @@ void Channel::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     graphicsEffect()->deleteLater();
 }
 
+void Channel::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+    channel->add(2);
+}
+
 void Channel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     QRectF rect = boundingRect();
 
@@ -47,8 +53,24 @@ void Channel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 
     painter->setPen(Qt::NoPen);
 
-    painter->setBrush(QBrush(Qt::white)); // Branco ao vermelho, percentual da carga no canal
+    int g, b;
+
+    if (channel->val() >= 100) {
+        g = b = 0;
+    } else if (channel->val() <= 50) {
+        g = 255;
+        b = (50 - channel->val()) * 5.1;
+    } else {
+        g = 255 - (channel->val() - 50) * 5.1;
+        b = 0;
+    }
+    painter->setBrush(QBrush(QColor(255,g,b))); // Branco ao vermelho, percentual da carga no canal
     painter->drawPath(path);
+}
+
+void Channel::change() {
+    this->update();
+    setToolTip(QString("channel load: %1").arg(channel->val()));
 }
 
 } // namespace View

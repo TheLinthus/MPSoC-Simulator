@@ -5,7 +5,11 @@
 #include <QMessageBox>
 #include <QtCore>
 #include <QtGui>
-#include <View/viewmpsoc.h>
+#include <QtScript/QScriptEngine>
+#include <QtScript/QScriptValue>
+#include <QtScript/QtScriptDepends>
+#include <QDebug>
+#include <View/viewprocessor.h>
 #include <View/viewchannel.h>
 #include <Core/mpsoc.h>
 
@@ -31,6 +35,7 @@ public:
 
 public slots:
     void setMPSoC(Core::MPSoC *value);
+    void setHeuristic(QString heuristic);
 
 private slots:
     void on_closeButton_clicked();
@@ -42,6 +47,7 @@ private:
     int gridWidth;
     int gridHeight;
     Core::MPSoC *mpsoc;
+    QScriptEngine engine;
 
     QGraphicsScene *mpsocScene;
     Ui::MPSoCBox *ui;

@@ -60,7 +60,7 @@
        </property>
        <property name="icon">
         <iconset resource="../resources.qrc">
-         <normaloff>:/icons/images/close.png</normaloff>:/icons/images/close.png</iconset>
+         <normaloff>:/icons/images/error.png</normaloff>:/icons/images/error.png</iconset>
        </property>
       </widget>
      </item>

@@ -14,6 +14,10 @@ public:
 signals:
 
 public slots:
+
+private:
+    int income;
+    int outcome;
 };
 
 } // namespace Core

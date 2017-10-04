@@ -2,7 +2,6 @@
 #define CHANNEL_H
 
 #include <QObject>
-//#include <core.h>
 
 namespace Core {
 

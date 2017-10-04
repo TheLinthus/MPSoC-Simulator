@@ -1,8 +1,8 @@
-#include "core.h"
+#include "processor.h"
 
 namespace Core {
 
-Core::Core(int x, int y, int threads, QObject *parent)
+Processor::Processor(int x, int y, int threads, QObject *parent)
     : QObject(parent)
     , north(nullptr)
     , west(nullptr)
@@ -15,7 +15,7 @@ Core::Core(int x, int y, int threads, QObject *parent)
     cores = new AppNode*[threads]();
 }
 
-Channel *Core::getChannel(Direction direction) {
+Channel *Processor::getChannel(Direction direction) {
     switch (direction) {
         case North : return north;
         case West : return west;
@@ -25,7 +25,7 @@ Channel *Core::getChannel(Direction direction) {
     }
 }
 
-int Core::firstIdle() {
+int Processor::firstIdle() {
     for (int i = 0; i < threads; i++) {
         if (cores[i] != nullptr)
             return i;
@@ -33,12 +33,12 @@ int Core::firstIdle() {
     return -1;
 }
 
-int Core::isIdle(int i)
+int Processor::isIdle(int i)
 {
     return cores[i] == nullptr;
 }
 
-bool Core::run(AppNode *node, int thread) {
+bool Processor::run(AppNode *node, int thread) {
     if (thread < 0 || thread >= threads) {
         return false;
     }
@@ -52,22 +52,33 @@ bool Core::run(AppNode *node, int thread) {
     return false;
 }
 
-AppNode* Core::runningNode(int thread) {
+AppNode* Processor::runningNode(int thread) {
     return cores[thread];
 }
 
-int Core::nOfThreads() {
+<<<<<<< HEAD:Core/processor.cpp
+int Processor::nOfThreads() {
     return threads;
 }
-int Core::getX() {
+int Processor::getX() {
     return x;
 }
 
-int Core::getY() {
+int Processor::getY() {
+=======
+int Core::nOfThreads() const {
+    return threads;
+}
+int Core::getX() const {
+    return x;
+}
+
+int Core::getY() const {
+>>>>>>> origin/dev:Core/core.cpp
     return y;
 }
 
-void Core::kill(int thread) {
+void Processor::kill(int thread) {
     if (thread < 0 || thread >= threads) {
         return;
     }
@@ -78,7 +89,7 @@ void Core::kill(int thread) {
     }
 }
 
-void Core::setChannel(Direction direction, Channel *channel)
+void Processor::setChannel(Direction direction, Channel *channel)
 {
     switch (direction) {
         case North : north = channel; break;

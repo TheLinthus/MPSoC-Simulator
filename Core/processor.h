@@ -7,11 +7,11 @@
 
 namespace Core {
 
-class Core : public QObject
+class Processor : public QObject
 {
     Q_OBJECT
 public:
-    explicit Core(int x, int y, int threads = 1, QObject *parent = 0);
+    explicit Processor(int x, int y, int threads = 1, QObject *parent = 0);
 
     void setChannel(Direction direction, Channel *channel);
     Channel *getChannel(Direction direction);
@@ -19,10 +19,10 @@ public:
     int isIdle(int i = 0);
     bool run(AppNode *node, int thread = 0);
     AppNode *runningNode(int thread = 0);
-    int nOfThreads();
+    int nOfThreads() const;
 
-    int getX();
-    int getY();
+    int getX() const;
+    int getY() const;
 
 private:
     Channel* north;
