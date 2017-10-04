@@ -80,12 +80,11 @@ void View::MPSoCBox::setHeuristic(QString heuristic) {
     text = file.readAll();
     file.close();
 
-    engine = new QScriptEngine();
-    engine->evaluate(text);
-    qInfo() << "Loaded Heuristic" << engine->evaluate("name").toString() << ". From" << engine->evaluate("author").toString();
-    qInfo() << "Test chossing a core:" << engine->evaluate("selectCore()").toString();
+    engine.evaluate(text);
+    qInfo() << "Loaded Heuristic" << engine.evaluate("name").toString() << ". From" << engine.evaluate("author").toString();
+    qInfo() << "Test chossing a core:" << engine.evaluate("selectCore()").toString();
 
-    ui->titleLabel->setText(QString("%1x%2 MPSoC, %3").arg(gridWidth).arg(gridHeight).arg(engine->evaluate("name").toString()));
+    ui->titleLabel->setText(QString("%1x%2 MPSoC, %3").arg(gridWidth).arg(gridHeight).arg(engine.evaluate("name").toString()));
 }
 
 void View::MPSoCBox::resizeEvent(QResizeEvent *) {

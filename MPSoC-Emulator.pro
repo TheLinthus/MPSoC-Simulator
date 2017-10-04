@@ -1,7 +1,7 @@
 # Created by and for Qt Creator. This file was created for editing the project sources only.
 # You may attempt to use it for building too, by modifying this file here.
 
-QT       += core gui script
+QT       += script core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -61,32 +61,6 @@ applications.path = $$OUT_PWD/Applications
 applications.files += $$files(Applications/*)
 
 message("Found applications for installation: "$$applications.files)
-message("Will instal those applications in: "$$applications.path)
-
-#linux-g++{
-#    for(FILE,heuristics.files){
-#        QMAKE_POST_LINK += $$quote(cp $${FILE} $${heuristics.path}$$escape_expand(\n\t))
-#    }
-#    for(FILE,applications.files){
-#        QMAKE_POST_LINK += $$quote(cp $${FILE} $${applications.path}$$escape_expand(\n\t))
-#    }
-#}
-
-#win32 {
-#    EXTRA_BINFILES_WIN = $${heuristics.files}
-#    EXTRA_BINFILES_WIN ~= s,/,\\,g
-#    DESTDIR_WIN = $${heuristics.path}
-#    DESTDIR_WIN ~= s,/,\\,g
-#    for(FILE,EXTRA_BINFILES_WIN){
-#        QMAKE_POST_LINK +=$$quote(cmd /c copy /y $${FILE} $${DESTDIR_WIN}$$escape_expand(\n\t))
-#    }
-#    EXTRA_BINFILES_WIN = $${applications.files}
-#    EXTRA_BINFILES_WIN ~= s,/,\\,g
-#    DESTDIR_WIN = $${applications.path}
-#    DESTDIR_WIN ~= s,/,\\,g
-#    for(FILE,EXTRA_BINFILES_WIN){
-#        QMAKE_POST_LINK +=$$quote(cmd /c copy /y $${FILE} $${DESTDIR_WIN}$$escape_expand(\n\t))
-#    }
-#}
+message("Will install those applications in: "$$applications.path)
 
 INSTALLS += \ heuristics \ applications

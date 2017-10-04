@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QVector>
+#include <QDebug>
 #include "appload.h"
 #include "appnode.h"
 
@@ -26,7 +27,8 @@ public:
      * @param to Index of AppNode to append at
      * @return integer Index of inserted AppNode in the Application
      */
-    int addNode(AppNode *node, AppLoad *load, int to);
+    int addNode(AppNode *node);
+    void addNodeConnection(qreal load, int from, int to);
     int indexOf(AppNode *node);
     QVector<AppNode *> connectedNodes();
     AppNode *getNode(int index);

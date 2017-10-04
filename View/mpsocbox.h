@@ -6,6 +6,8 @@
 #include <QtCore>
 #include <QtGui>
 #include <QtScript/QScriptEngine>
+#include <QtScript/QScriptValue>
+#include <QtScript/QtScriptDepends>
 #include <QDebug>
 #include <View/viewprocessor.h>
 #include <View/viewchannel.h>
@@ -45,7 +47,7 @@ private:
     int gridWidth;
     int gridHeight;
     Core::MPSoC *mpsoc;
-    QScriptEngine *engine;
+    QScriptEngine engine;
 
     QGraphicsScene *mpsocScene;
     Ui::MPSoCBox *ui;
