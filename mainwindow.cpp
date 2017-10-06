@@ -128,5 +128,9 @@ void MainWindow::on_emulationPushButton_clicked() {
 }
 
 void MainWindow::on_heuristicsPushButton_clicked() {
-    //TODO!
+    ui->emulationPushButton->setChecked(false);
+    ui->applicationsPushButton->setChecked(false);
+    ui->heuristicsPushButton->setChecked(true);
+
+    //TODO
 }

@@ -7,20 +7,23 @@
 #include <QtGui>
 #include <QStyle>
 #include <QGraphicsEffect>
-#include <Core/core.h>
+#include <Core/processor.h>
 
 namespace View {
 
-class Processor : public QGraphicsItem {
+class Processor : public QGraphicsObject {
+    Q_OBJECT
 public:
-    Processor(Core::Core *core);
+    Processor(int x, int y, Core::Processor* m);
 
     QRectF boundingRect() const override;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-protected:
+public slots:
+    void change();
 
+protected:
     // TODO - add event handlers
 
 private:
@@ -28,7 +31,7 @@ private:
     int y;
     bool over;
 
-    Core::Core *core;
+    Core::Processor *processor;
 
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
