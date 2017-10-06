@@ -5,7 +5,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    timer(new QTimer(this))
+    thread(new QTimer(this))
 {
     QSettings settings;
     restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
@@ -16,51 +16,21 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->setupUi(this);
 
-    applicationsList = new QStringListModel();
-    qDebug() << "Reading applications files...";
-    QDir applications("Applications");
-    applications.setNameFilters(QStringList()<<"*.json");
-    foreach (QString s, applications.entryList()) {
-        QString text;
-        QFile file("Applications\\"+s);
-        qDebug() << s << "...";
-        file.open(QIODevice::ReadOnly | QIODevice::Text);
-        text = file.readAll();
-        file.close();
-        QJsonDocument json = QJsonDocument::fromJson(text.toUtf8());
-        if (json.isNull()) {
-            qWarning() << "Error File";
-        }
-        QJsonObject obj = json.object();
-        QString appsName = obj.value("name").toString();
-        qDebug() << "Application set name: " << appsName;
-        qDebug() << "Application set date: " << obj.value("date").toString();
-        qDebug() << "Application set author: " << obj.value("author").toString();
-        QJsonArray array = obj.value("applications").toArray();
-        qDebug() << "Found" << array.size() << "applications";
-        for (int i = 0; i < array.size(); i++) {
-            qDebug() << array.at(i).toObject().value("name").toString();
-            int index = applicationsList->rowCount();
-            applicationsList->insertRow(index);
-            applicationsList->setData(applicationsList->index(index), "[" + appsName + "]" + array.at(i).toObject().value("name").toString());
-        }
-    }
-    ui->applicationsList->setModel(applicationsList);
-    connect(ui->applicationsList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(on_applicationsList_changed(QItemSelection)));
-    connect(ui->runningList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(on_runningList_changed(QItemSelection)));
-
-    statusProgress = new QProgressBar(this);
+    statusProgress = new QProgressBar(this->statusBar());
     statusProgress->setMaximumSize(242,16);
-    statusProgress->setTextVisible(false);
 
+    statusLabel = new QLabel(this->statusBar());
+
+    statusProgress->setTextVisible(false);
     statusProgress->setValue(0);
     statusProgress->setMinimum(0);
     statusProgress->setMaximum(0);
-    statusProgress->setVisible(false);
 
-    this->statusBar()->setContentsMargins(8,0,8,0);
+    this->statusBar()->setContentsMargins(8,0,0,0);
+    this->statusBar()->addPermanentWidget(statusLabel);
     this->statusBar()->addPermanentWidget(statusProgress);
-    this->statusBar()->showMessage("Inicializando",2000);
+
+    QTimer::singleShot(0, this,  SLOT(loadApplications()));
 
     restoreState(settings.value("mainWindowState").toByteArray());
 }
@@ -69,10 +39,76 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::closeEvent(QCloseEvent *) {
-    QSettings settings;
-    settings.setValue("mainWindowGeometry", saveGeometry());
-    settings.setValue("mainWindowState", saveState());
+
+void MainWindow::loadApplications() {
+    QStringListModel *applicationsListModel = new QStringListModel();
+    QStringListModel *runningListModel = new QStringListModel();
+
+    this->statusBar()->showMessage("Loading applications files...");
+
+    QDir applications("Applications");
+    applications.setNameFilters(QStringList()<<"*.json");
+
+    int loadMax = applications.count();
+    int loadValue = 0;
+
+    statusProgress->setMaximum(loadMax);
+    statusProgress->setValue(loadValue);
+
+    foreach (QString s, applications.entryList()) {
+        loadValue++;
+        statusProgress->setValue(loadValue);
+
+        QString text;
+        QFile file("Applications\\"+s);
+        file.open(QIODevice::ReadOnly | QIODevice::Text);
+        text = file.readAll();
+        file.close();
+
+        QJsonDocument json = QJsonDocument::fromJson(text.toUtf8());
+        if (json.isNull()) {
+            qWarning() << "Error File";
+            continue;
+        }
+
+        QJsonObject obj = json.object();
+        QString appsName = obj.value("name").toString();
+        QJsonArray array = obj.value("applications").toArray();
+
+        loadMax += array.size();
+        statusProgress->setMaximum(loadMax);
+
+        int index = applicationsListModel->rowCount();
+        applicationsListModel->insertRows(index, array.size());
+        for (int i = 0; i < array.size(); i++) {
+            // TODO Add to real applications Object List
+            loadValue++;
+            statusProgress->setValue(loadValue);
+            applicationsListModel->setData(applicationsListModel->index(index + i), "[" + appsName + "] " + array.at(i).toObject().value("name").toString());
+        }
+    }
+    ui->applicationsList->setModel(applicationsListModel);
+    ui->runningList->setModel(runningListModel);
+    connect(ui->applicationsList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(on_applicationsList_changed(QItemSelection)));
+    connect(ui->runningList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(on_runningList_changed(QItemSelection)));
+
+    statusProgress->setVisible(false);
+    this->statusBar()->showMessage("Read applications done...", 2000);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, windowTitle(), "Are you sure you want to close MPSoC Emulator?",
+                                QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        QSettings settings;
+        settings.setValue("mainWindowGeometry", saveGeometry());
+        settings.setValue("mainWindowState", saveState());
+
+        event->accept();
+    } else {
+        event->ignore();
+    }
 }
 
 void MainWindow::on_addMPSoCButton_clicked() {
@@ -106,7 +142,7 @@ void MainWindow::on_runningList_changed(const QItemSelection& selection) {
 }
 
 void MainWindow::on_timerSpinBox_valueChanged(int val) {
-    timer->setInterval(val);
+    thread->setInterval(val);
 }
 
 void MainWindow::on_stepSlider_valueChanged(int val) {

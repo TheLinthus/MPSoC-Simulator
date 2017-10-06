@@ -31,10 +31,12 @@ public:
 private slots:
     //void increment();
 
+    void loadApplications();
+
     void on_applicationsList_changed(const QItemSelection &selection);
     void on_runningList_changed(const QItemSelection &selection);
 
-    void closeEvent(QCloseEvent *) override;
+    void closeEvent(QCloseEvent *event) override;
 
     void on_timerSpinBox_valueChanged(int val);
     void on_stepSlider_valueChanged(int val);
@@ -45,12 +47,12 @@ private slots:
     void on_heuristicsPushButton_clicked();
 
 private:
-    QTimer *timer;
+    QTimer *thread;
 
     Ui::MainWindow *ui;
-    QStringListModel *applicationsList;
 
     QProgressBar *statusProgress;
+    QLabel *statusLabel;
 };
 
 #endif // MAINWINDOW_H
