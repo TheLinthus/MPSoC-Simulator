@@ -56,25 +56,14 @@ AppNode* Processor::runningNode(int thread) {
     return cores[thread];
 }
 
-<<<<<<< HEAD:Core/processor.cpp
-int Processor::nOfThreads() {
+int Processor::nOfThreads() const {
     return threads;
 }
-int Processor::getX() {
+int Processor::getX() const {
     return x;
 }
 
-int Processor::getY() {
-=======
-int Core::nOfThreads() const {
-    return threads;
-}
-int Core::getX() const {
-    return x;
-}
-
-int Core::getY() const {
->>>>>>> origin/dev:Core/core.cpp
+int Processor::getY() const {
     return y;
 }
 

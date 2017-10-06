@@ -11,7 +11,7 @@
 
 namespace View {
 
-class Channel : public QObject, public QGraphicsItem {
+class Channel : public QGraphicsObject {
     Q_OBJECT
 
 public:
@@ -19,7 +19,7 @@ public:
 
     QRectF boundingRect() const override;
 
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override;
 
 public slots:
     void change();
@@ -31,9 +31,9 @@ private:
 
     Core::Channel* channel;
 
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
-    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *) override;
 };
 
 } // namespace View

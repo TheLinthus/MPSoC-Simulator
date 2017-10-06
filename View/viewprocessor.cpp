@@ -2,16 +2,9 @@
 
 namespace View {
 
-<<<<<<< HEAD:View/viewprocessor.cpp
 Processor::Processor(int x, int y, Core::Processor* m)
     : x(x*200)
     , y(y*200)
-=======
-Processor::Processor(Core::Core *core)
-    : core(core)
-    , x(core->getX()*200)
-    , y(core->getY()*200)
->>>>>>> origin/dev:View/viewprocessor.cpp
     , over(false)
     , processor(m)
 {
@@ -23,7 +16,7 @@ QRectF Processor::boundingRect() const {
     return QRectF(x,y,100,100);
 }
 
-void Processor::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
+void Processor::hoverEnterEvent(QGraphicsSceneHoverEvent *) {
     over = true;
     QGraphicsDropShadowEffect * effect = new QGraphicsDropShadowEffect();
     effect->setBlurRadius(50);
@@ -33,12 +26,12 @@ void Processor::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     setGraphicsEffect(effect);
 }
 
-void Processor::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+void Processor::hoverLeaveEvent(QGraphicsSceneHoverEvent *) {
     over = false;
     graphicsEffect()->deleteLater();
 }
 
-void Processor::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+void Processor::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     QRectF rect = boundingRect();
 
     QPainterPath path;
@@ -56,7 +49,6 @@ void Processor::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
     painter->setPen(QPen(Qt::black, 1));
     painter->setBrush(QBrush(Qt::red));
-<<<<<<< HEAD:View/viewprocessor.cpp
     int cores = processor->nOfThreads();
     if (cores > 1) {
         // multicore paint
@@ -74,21 +66,6 @@ void Processor::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
         else
             painter->setBrush(QBrush(processor->runningNode()->getColor()));
         painter->drawPath(path);
-=======
-    int threads = core->nOfThreads();
-    if (threads > 1) {
-        // multicore paint
-        for (int i = 0; i < threads; i++) {
-            if (core->runningNode(i) == nullptr)
-                painter->setBrush(Qt::white);
-            else
-                painter->setBrush(QBrush(core->runningNode(i)->getColor()));
-            painter->drawPie(x-25,y-25,150,150,5760/threads*i,5760/threads);
-        }
-    } else {
-        // single core paint
-
->>>>>>> origin/dev:View/viewprocessor.cpp
     }
 
     painter->setClipping(false);

@@ -14,7 +14,6 @@ MPSoCBox::MPSoCBox(QWidget *parent) :
     mpsocScene = new QGraphicsScene(this);
     ui->mpsocGV->setScene(mpsocScene);
     ui->mpsocGV->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
-    
 }
 
 MPSoCBox::~MPSoCBox() {
@@ -62,16 +61,11 @@ void View::MPSoCBox::setMPSoC(Core::MPSoC *value) {
             if (Core::Channel * cc = mpsoc->getCore(i,j)->getChannel(Core::South)) {
                 View::Channel * vc = new View::Channel(i,j,true,cc);
                 mpsocScene->addItem(vc);
-            Processor *processor = new Processor(mpsoc->getCore(i,j));
-            mpsocScene->addItem(processor);
-            if (mpsoc->getCore(i,j)->getChannel(Core::South)) {
-                mpsocScene->addItem(new Channel(i,j,true));
             }
             if (Core::Channel * cc = mpsoc->getCore(i,j)->getChannel(Core::East)) {
                 View::Channel * vc = new View::Channel(i,j,false,cc);
                 mpsocScene->addItem(vc);
             }
-
         }
     }
 }
@@ -95,6 +89,11 @@ void View::MPSoCBox::setHeuristic(QString heuristic) {
 }
 
 void View::MPSoCBox::resizeEvent(QResizeEvent *) {
+    ui->mpsocGV->setMaximumHeight(ui->mpsocGV->width());
+    ui->mpsocGV->fitInView(mpsocScene->sceneRect(),Qt::KeepAspectRatio);
+}
+
+void View::MPSoCBox::showEvent(QShowEvent *){
     ui->mpsocGV->setMaximumHeight(ui->mpsocGV->width());
     ui->mpsocGV->fitInView(mpsocScene->sceneRect(),Qt::KeepAspectRatio);
 }

@@ -1,0 +1,40 @@
+QMenuBar {
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgb(170, 170, 170), stop:1 rgb(191, 191, 191));
+}
+#leftPanel, #rightPanel, #centralPanel {
+    color: rgb(255, 255, 255);
+    background-color: rgb(88, 88, 88);
+}
+#leftPanel QPushButton, #leftPanel QLabel, #rightPanel QPushButton, #rightPanel QLabel, #centralPanel QPushButton, #centralPanel QLabel {
+    color: rgb(255, 255, 255);
+}
+QPushButton:flat {
+    border: none;
+}
+QPushButton:flat:hover {
+    background-color: rgb(110, 110, 110);
+}
+QPushButton:flat:checked {
+    background-color: rgb(66, 66, 66);
+}
+QPushButton:flat:checked:hover {
+    background-color: rgb(77, 77, 77);
+}
+QPushButton:flat:pressed {
+    background-color: rgb(55, 55, 55);
+}
+#mpsocsArea {
+    background-color: rgb(127, 127, 127);
+}
+#mpsocsArea QLabel, #mpsocsArea QPushButton {
+    color: #000;
+}
+QStatusBar {
+    border-top: 1px solid rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
+    background-color: rgb(88, 88, 88);
+}
+QStatusBar QProgressBar {
+    border: 1px solid #000;
+    background-color: #fff;
+}

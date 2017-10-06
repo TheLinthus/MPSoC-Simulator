@@ -42,6 +42,7 @@ private slots:
 
 protected:
     void resizeEvent(QResizeEvent *) override;
+    void showEvent(QShowEvent *) override;
 
 private:
     int gridWidth;

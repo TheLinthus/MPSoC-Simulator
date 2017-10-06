@@ -11,6 +11,7 @@
 #include <QUrl>
 #include <QFileDialog>
 #include <QFile>
+#include <QProgressBar>
 #include <QtScript/qscriptengine.h>
 #include "Core/mpsoc.h"
 #include "View/mpsocbox.h"
@@ -27,22 +28,29 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    int ci = 0;
-    QTimer *timer;
-
 private slots:
-    void on_addMPSoCButton_clicked();
-
     //void increment();
 
-    void on_pushButton_clicked();
+    void on_applicationsList_changed(const QItemSelection &selection);
+    void on_runningList_changed(const QItemSelection &selection);
+
+    void closeEvent(QCloseEvent *) override;
+
     void on_timerSpinBox_valueChanged(int val);
-    void on_stepSlider_valueChanged(int value);
-    void on_pushButton_2_clicked();
+    void on_stepSlider_valueChanged(int val);
+    void on_addMPSoCButton_clicked();
+    void on_applicationsPushButton_clicked();
+    void on_emulationPushButton_clicked();
+
+    void on_heuristicsPushButton_clicked();
 
 private:
+    QTimer *timer;
+
     Ui::MainWindow *ui;
     QStringListModel *applicationsList;
+
+    QProgressBar *statusProgress;
 };
 
 #endif // MAINWINDOW_H

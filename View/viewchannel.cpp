@@ -4,10 +4,9 @@ namespace View {
 
 Channel::Channel(int x, int y, bool v, Core::Channel *c)
     : x((v ? 10 : 100) + (x * 200))
-    , y((v ? 100 : 10) + (y * 2
-                          00))
-    , w(v ? 10 : 100)
-    , h(v ? 100 : 10)
+    , y((v ? 100 : 10) + (y * 200))
+    , w(v ? 25 : 100)
+    , h(v ? 100 : 25)
     , vertical(v)
     , over(false)
     , channel(c)
@@ -22,7 +21,7 @@ QRectF Channel::boundingRect() const {
     return QRectF(x,y,w,h);
 }
 
-void Channel::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
+void Channel::hoverEnterEvent(QGraphicsSceneHoverEvent *) {
     over = true;
     QGraphicsDropShadowEffect * effect = new QGraphicsDropShadowEffect();
     effect->setBlurRadius(50);
@@ -32,16 +31,16 @@ void Channel::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     setGraphicsEffect(effect);
 }
 
-void Channel::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+void Channel::hoverLeaveEvent(QGraphicsSceneHoverEvent *) {
     over = false;
     graphicsEffect()->deleteLater();
 }
 
-void Channel::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-    channel->add(2);
+void Channel::mousePressEvent(QGraphicsSceneMouseEvent *) {
+
 }
 
-void Channel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+void Channel::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     QRectF rect = boundingRect();
 
     QPainterPath path;
