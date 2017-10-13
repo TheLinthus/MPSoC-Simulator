@@ -37,21 +37,18 @@ MPSoC::~MPSoC()
     qDebug("MPSoC %dx%d sendo destruida", width, height);
 }
 
-Processor* MPSoC::getCore(int x, int y)
-{
+Processor* MPSoC::getCore(int x, int y) {
     if (x > width || y > height) {
         return nullptr;
     }
     return processors[x][y];
 }
 
-int MPSoC::getHeight() const
-{
+int MPSoC::getHeight() const {
     return height;
 }
 
-int MPSoC::getWidth() const
-{
+int MPSoC::getWidth() const {
     return width;
 }
 
@@ -85,9 +82,18 @@ QVector<Channel *> MPSoC::getPatch(int x1, int y1, int x2, int y2) {
     return patch;
 }
 
-void MPSoC::update()
-{
-    emit changed();
+// Prototipe, dynamic modify mpsoc
+//void MPSoC::setWidth(int w) {
+//    width = w;
+//    // destroy or create new processors
+//    emit changed();
+//}
+//
+//void MPSoC::destroyPorcessor(int x, int y) {
+//  emit changed();
+//}
+
+void MPSoC::update() {
 }
 
 } // namespace Core

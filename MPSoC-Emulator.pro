@@ -1,6 +1,8 @@
 # Created by and for Qt Creator. This file was created for editing the project sources only.
 # You may attempt to use it for building too, by modifying this file here.
 
+CONFIG += qt
+
 QT       += script core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -8,37 +10,52 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = MPSoC-Emulator
 TEMPLATE = app
 
+RC_FILE = mpsoc.rc
 
 HEADERS = Core/appnode.h \
     Core/channel.h \
     Core/mpsoc.h \
-    mainwindow.h \
     Core/application.h \
     Core/appload.h \
     View/mpsocbox.h \
     View/viewchannel.h \
     Core/processor.h \
-    View/viewprocessor.h
+    View/viewprocessor.h \
+    Core/applicationcontroller.h \
+    Core/mpsoccontroller.h \
+    singleton.h \
+    call_once.h \
+    mpsoc_emulator.h \
+    View/newmpsocdialog.h \
+    Core/heuristic.h \
+    Core/heuristiccontroller.h \
+    Exception/badheuristicimplementationexception.h
 
 SOURCES = Core/appnode.cpp \
     Core/channel.cpp \
     Core/mpsoc.cpp \
     main.cpp \
-    mainwindow.cpp \
     Core/application.cpp \
     Core/appload.cpp \
     View/mpsocbox.cpp \
     View/viewchannel.cpp \
     Core/processor.cpp \
-    View/viewprocessor.cpp
+    View/viewprocessor.cpp \
+    Core/applicationcontroller.cpp \
+    Core/mpsoccontroller.cpp \
+    mpsoc_emulator.cpp \
+    View/newmpsocdialog.cpp \
+    Core/heuristic.cpp \
+    Core/heuristiccontroller.cpp
 
 INCLUDEPATH = . \
     Core \
     View
 	
 FORMS = \
-    mainwindow.ui \
-    View/mpsocbox.ui
+    View/mpsocbox.ui \
+    mpsoc_emulator.ui \
+    View/newmpsocdialog.ui
 
 #DEFINES = 
 
@@ -68,7 +85,10 @@ DISTFILES += \
     Applications/APP_GENE/Aplicacao_7.txt \
     Applications/APP_GENE/Aplicacao_8.txt \
     Applications/APP_GENE/Aplicacao_9.txt \
-    Applications/APP_GENE.json
+    Applications/APP_GENE.json \
+    mpsoc.ico \
+    mpsoc.rc \
+    Heuristics/NearestNeighbor.js
 
 heuristics.path = $$OUT_PWD/Heuristics
 heuristics.files += $$files(Heuristics/*)

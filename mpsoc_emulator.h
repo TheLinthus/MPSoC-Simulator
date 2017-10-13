@@ -13,28 +13,33 @@
 #include <QFile>
 #include <QProgressBar>
 #include <QtScript/qscriptengine.h>
-#include "Core/mpsoc.h"
 #include "View/mpsocbox.h"
+#include "View/newmpsocdialog.h"
+#include "Core/applicationcontroller.h"
+#include "Core/mpsoccontroller.h"
+#include "Core/heuristiccontroller.h"
 
 namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
+class MPSoC_Emulator : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    explicit MPSoC_Emulator(QWidget *parent = 0);
+    ~MPSoC_Emulator();
 
 private slots:
     //void increment();
 
-    void loadApplications();
+    void parallelLoad();
 
-    void on_applicationsList_changed(const QItemSelection &selection);
-    void on_runningList_changed(const QItemSelection &selection);
+    void applicationsListModel_selectionChanged(const QItemSelection, const QItemSelection);
+    void runningListModel_selectionChanged(const QItemSelection, const QItemSelection);
+
+    void applicationButtonsCheckEnable();
 
     void closeEvent(QCloseEvent *event) override;
 
@@ -43,9 +48,7 @@ private slots:
     void on_addMPSoCButton_clicked();
     void on_applicationsPushButton_clicked();
     void on_emulationPushButton_clicked();
-
     void on_heuristicsPushButton_clicked();
-
 private:
     QTimer *thread;
 
@@ -53,6 +56,12 @@ private:
 
     QProgressBar *statusProgress;
     QLabel *statusLabel;
+
+    QStringListModel *applicationsListModel;
+    QStringListModel *runningListModel;
+
+    void loadApplications();
+    void loadHeuristics();
 };
 
 #endif // MAINWINDOW_H

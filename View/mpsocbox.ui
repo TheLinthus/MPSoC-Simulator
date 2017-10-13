@@ -52,7 +52,7 @@
      <item>
       <widget class="QLabel" name="titleLabel">
        <property name="text">
-        <string>TextLabel</string>
+        <string>%1x%2 MPSoC, %3</string>
        </property>
       </widget>
      </item>

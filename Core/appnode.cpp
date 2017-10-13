@@ -2,7 +2,7 @@
 
 namespace Core {
 
-AppNode::AppNode(qreal lifespan, QObject *parent)
+AppNode::AppNode(int lifespan, QObject *parent)
     : lifespan(lifespan)
     , cycles(0)
     , QObject(parent)
@@ -12,14 +12,6 @@ AppNode::AppNode(qreal lifespan, QObject *parent)
 
 AppNode::~AppNode() {
 
-}
-
-QColor AppNode::getColor() {
-    return color;
-}
-
-void AppNode::setColor(QColor color) {
-    this->color = color;
 }
 
 int AppNode::getThread() const {
@@ -34,12 +26,16 @@ bool AppNode::isDone() {
     return cycles >= lifespan;
 }
 
-qreal AppNode::getLifespan() const {
+int AppNode::getLifespan() const {
     return lifespan;
 }
 
-qreal AppNode::getCycles() const {
+int AppNode::getCycles() const {
     return cycles;
+}
+
+void AppNode::setLifespan(const int lifespan) {
+    this->lifespan = lifespan;
 }
 
 void AppNode::tick() {

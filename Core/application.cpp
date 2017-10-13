@@ -2,32 +2,53 @@
 
 namespace Core {
 
-Application::Application(AppNode *root, QObject *parent)
+Application::Application(QObject *parent)
     : QObject(parent)
 {
-    nodes.append(root);
 }
 
-int Application::addNode(AppNode *node)
-{
-    int size = nodes.size();
-    nodes.append(node);
-    return size;
+void Application::addNode(int index, int lifespan) {
+    // If application already exists, doesn't create new one
+    if (!exists(index)) {
+        nodes.insert(index, new AppNode(lifespan, this));
+    }
 }
 
-void Application::addNodeConnection(qreal load, int from, int to)
-{
-    if (from < 0) {
-        qCritical() << "int from(" << from << ") out of index array (<0)";
-        return;
-    }
-    if (to > nodes.size()) {
-        qCritical() << "int to(" << to << ") out of index array (>" << nodes.size() << ")";
-        return;
+void Application::addNodeConnection(int from, int to, int volume, qreal load) {
+    // Set Node's lifespan to max Load Data Volume linked or let it be if greater than
+    // Lifespan can't be lesser than data volume
+    if (volume > getNode(from)->getLifespan())
+        getNode(from)->setLifespan(volume);
+    if (volume > getNode(to)->getLifespan())
+        getNode(to)->setLifespan(volume);
+
+    // Create connection
+    if (connections.find(from) == connections.end()) {
+        connections.insert(from, new QMap<int, AppLoad *>());
     }
 
-    AppLoad *appLoad = new AppLoad();
+    Core::AppLoad * appLoad = new AppLoad(load, volume, this);
+    connections.value(from)->insert(to, appLoad);
+}
 
+AppNode *Application::getNode(int index) {
+    return nodes.value(index);
+}
+
+bool Application::exists(int index) {
+    return nodes.find(index) != nodes.end();
+}
+
+void Application::removeNode(int index) {
+    nodes.remove(index);
+}
+
+QColor Application::getColor() {
+    return color;
+}
+
+void Application::setColor(QColor color) {
+    this->color = color;
 }
 
 } // namespace Core

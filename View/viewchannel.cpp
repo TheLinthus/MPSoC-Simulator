@@ -3,10 +3,10 @@
 namespace View {
 
 Channel::Channel(int x, int y, bool v, Core::Channel *c)
-    : x((v ? 10 : 100) + (x * 200))
-    , y((v ? 100 : 10) + (y * 200))
-    , w(v ? 25 : 100)
-    , h(v ? 100 : 25)
+    : x((v ? 10 : 102) + (x * 200))
+    , y((v ? 102 : 10) + (y * 200))
+    , w(v ? 25 : 96)
+    , h(v ? 96 : 25)
     , vertical(v)
     , over(false)
     , channel(c)
@@ -14,7 +14,7 @@ Channel::Channel(int x, int y, bool v, Core::Channel *c)
     setAcceptHoverEvents(true);
     connect(channel, SIGNAL(loadChanged(int)), this, SLOT(change()));
 
-    setToolTip(QString("channel load: %1").arg(channel->val()));
+    setToolTip(QString("<p>Channel load: %1</p><p>From A to B: %2</p><p>From B to A: %3</p>").arg(channel->val()).arg(channel->valAtB()).arg(channel->valBtA()));
 }
 
 QRectF Channel::boundingRect() const {
@@ -22,18 +22,19 @@ QRectF Channel::boundingRect() const {
 }
 
 void Channel::hoverEnterEvent(QGraphicsSceneHoverEvent *) {
+    if (hoverEffect != nullptr) {
+        hoverEffect = new QGraphicsDropShadowEffect();
+        hoverEffect->setBlurRadius(25);
+        hoverEffect->setColor(QColor(Qt::white));
+        hoverEffect->setOffset(0,0);
+        setGraphicsEffect(hoverEffect);
+    }
     over = true;
-    QGraphicsDropShadowEffect * effect = new QGraphicsDropShadowEffect();
-    effect->setBlurRadius(50);
-    effect->setColor(Qt::white);
-    effect->setOffset(0,0);
-    effect->setBlurRadius(10);
-    setGraphicsEffect(effect);
 }
 
 void Channel::hoverLeaveEvent(QGraphicsSceneHoverEvent *) {
     over = false;
-    graphicsEffect()->deleteLater();
+    hoverEffect->deleteLater();
 }
 
 void Channel::mousePressEvent(QGraphicsSceneMouseEvent *) {
@@ -46,11 +47,16 @@ void Channel::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget
     QPainterPath path;
     path.addRect(rect);
 
-    if (over) {
-
-    }
-
     painter->setPen(Qt::NoPen);
+    painter->setBrush(QBrush(QColor(255,255,255,127)));
+
+    if (over) {
+        if (vertical) {
+            painter->drawRect(rect.adjusted(-2,0,2,0));
+        } else {
+            painter->drawRect(rect.adjusted(0,-2,0,2));
+        }
+    }
 
     int g, b;
 
@@ -69,7 +75,7 @@ void Channel::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget
 
 void Channel::change() {
     this->update();
-    setToolTip(QString("channel load: %1").arg(channel->val()));
+    setToolTip(QString("<p>Channel load: %1</p><p>From A to B: %2</p><p>From B to A: %3</p>").arg(channel->val()).arg(channel->valAtB()).arg(channel->valBtA()));
 }
 
 } // namespace View

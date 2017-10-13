@@ -2,8 +2,10 @@
 
 namespace Core {
 
-AppLoad::AppLoad(QObject *parent)
-    : QObject(parent)
+AppLoad::AppLoad(int volume, qreal load, QObject *parent)
+    : QObject(parent),
+      volume(volume),
+      load(load)
 {
 
 }

@@ -17,18 +17,19 @@ QRectF Processor::boundingRect() const {
 }
 
 void Processor::hoverEnterEvent(QGraphicsSceneHoverEvent *) {
+    if (hoverEffect != nullptr) {
+        hoverEffect = new QGraphicsDropShadowEffect();
+        hoverEffect->setBlurRadius(25);
+        hoverEffect->setColor(QColor(Qt::white));
+        hoverEffect->setOffset(0,0);
+        setGraphicsEffect(hoverEffect);
+    }
     over = true;
-    QGraphicsDropShadowEffect * effect = new QGraphicsDropShadowEffect();
-    effect->setBlurRadius(50);
-    effect->setColor(Qt::white);
-    effect->setOffset(0,0);
-    effect->setBlurRadius(10);
-    setGraphicsEffect(effect);
 }
 
 void Processor::hoverLeaveEvent(QGraphicsSceneHoverEvent *) {
     over = false;
-    graphicsEffect()->deleteLater();
+    hoverEffect->deleteLater();
 }
 
 void Processor::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
@@ -37,18 +38,18 @@ void Processor::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidg
     QPainterPath path;
     path.addRoundedRect(rect,10,10);
 
-    if (over) {
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(QBrush(QColor(255,255,255,127)));
 
+    if (over) {
+        painter->drawRoundedRect(rect.adjusted(-4,-4,4,4),13,13);
     }
 
-    painter->setClipPath(path);
-    painter->setPen(Qt::NoPen);
-
     painter->setBrush(QBrush(Qt::white));
-    painter->drawPath(path);
+
+    painter->setClipPath(path);
 
     painter->setPen(QPen(Qt::black, 1));
-    painter->setBrush(QBrush(Qt::red));
     int cores = processor->nOfThreads();
     if (cores > 1) {
         // multicore paint
@@ -56,7 +57,7 @@ void Processor::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidg
             if (processor->isIdle(i))
                 painter->setBrush(Qt::white);
             else
-                painter->setBrush(QBrush(processor->runningNode(i)->getColor()));
+                painter->setBrush(QBrush(((Core::Application *)processor->runningNode(i)->parent())->getColor()));
             painter->drawPie(x-25,y-25,150,150,5760/cores*i,5760/cores);
         }
     } else {
@@ -64,7 +65,7 @@ void Processor::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidg
         if (processor->isIdle())
             painter->setBrush(Qt::white);
         else
-            painter->setBrush(QBrush(processor->runningNode()->getColor()));
+            painter->setBrush(QBrush(((Core::Application *)processor->runningNode()->parent())->getColor()));
         painter->drawPath(path);
     }
 

@@ -9,15 +9,15 @@ class AppLoad : public QObject
 {
     Q_OBJECT
 public:
-    explicit AppLoad(QObject *parent = 0);
+    explicit AppLoad(int volume, qreal load, QObject *parent = 0);
 
 signals:
 
 public slots:
 
 private:
-    int income;
-    int outcome;
+    int volume;
+    qreal load;
 };
 
 } // namespace Core

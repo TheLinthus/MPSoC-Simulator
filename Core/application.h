@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QVector>
 #include <QDebug>
+#include <QColor>
 #include "appload.h"
 #include "appnode.h"
 
@@ -15,29 +16,29 @@ class Application : public QObject
 public:
     /**
      * @brief Application A graph of an application to be scheduled in future emulation
-     * @param root Root AppNode, to be the start point
      * @param parent
      */
-    explicit Application(AppNode *root, QObject *parent = 0);
+    explicit Application(QObject *parent = 0);
 
     /**
-     * @brief addNode Add a new AppNode to the Application, and add a AppLoad betwen an existing AppNode
-     * @param node The AppNode to be inserted in the Application
-     * @param load The AppLoad betwen the added AppNode and the AppNode to append at
-     * @param to Index of AppNode to append at
-     * @return integer Index of inserted AppNode in the Application
+     * @brief addNode Add a new AppNode to the Application
+     * @return
      */
-    int addNode(AppNode *node);
-    void addNodeConnection(qreal load, int from, int to);
-    int indexOf(AppNode *node);
-    QVector<AppNode *> connectedNodes();
-    AppNode *getNode(int index);
+    void addNode(int index, int lifespan);
+    void addNodeConnection(int from, int to, int volume, qreal load);
 
+    AppNode *getNode(int index);
+    bool exists(int index);
     void removeNode(int index);
 
+    QColor getColor();
+    void setColor(QColor color);
+
 private:
-    QVector<AppNode *> nodes;
-    QVector<AppLoad *> packageTransmission;
+    QColor color;
+
+    QMap<int, AppNode *> nodes;
+    QMap<int, QMap<int, AppLoad *> *> connections;
 
 signals:
 

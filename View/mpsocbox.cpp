@@ -8,6 +8,8 @@ MPSoCBox::MPSoCBox(QWidget *parent) :
     , gridWidth(1)
     , gridHeight(1)
     , mpsoc(nullptr)
+    , heuristic(nullptr)
+    , heuristicName(QString("Null"))
     , ui(new Ui::MPSoCBox)
 {
     ui->setupUi(this);
@@ -18,17 +20,17 @@ MPSoCBox::MPSoCBox(QWidget *parent) :
 
 MPSoCBox::~MPSoCBox() {
     delete ui;
-    delete mpsoc;
 }
 
 } // namespace View
 
 void View::MPSoCBox::on_closeButton_clicked() {
     QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, QWidget::window()->windowTitle(), "Are you sure you want to remove this MPSoC?",
+    reply = QMessageBox::question(this, QWidget::window()->windowTitle(), "Are you sure you want to remove this MPSoC?\nIt will resut in reseting all active simulations.",
                                 QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes) {
         this->deleteLater();
+        mpsocs->remove(mpsoc);
     }
 }
 
@@ -41,14 +43,25 @@ int View::MPSoCBox::getGridWidth() const {
 }
 
 void View::MPSoCBox::setMPSoC(Core::MPSoC *value) {
-    if (mpsoc != nullptr) {
-        mpsocScene->clear();
-        delete mpsoc;
-    }
-    gridWidth = value->getWidth();
-    gridHeight = value->getHeight();
-    mpsocScene->setSceneRect(-50,-50,gridWidth*200,gridHeight*200);
+    if (mpsoc != nullptr)
+        disconnect(mpsoc, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
     mpsoc = value;
+    connect(mpsoc, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
+
+    connect(mpsoc, SIGNAL(changed()), this, SLOT(drawnMPSoC()));
+    connect(mpsoc, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
+
+    ui->titleLabel->setText(title.arg(QString::number(gridWidth), QString::number(gridHeight), heuristicName));
+
+    drawnMPSoC();
+}
+
+void View::MPSoCBox::drawnMPSoC() {
+    mpsocScene->clear();
+
+    gridWidth = mpsoc->getWidth();
+    gridHeight = mpsoc->getHeight();
+    mpsocScene->setSceneRect(-50,-50,gridWidth*200,gridHeight*200);
 
     mpsocScene->addRect(-50,-50,gridWidth*200,gridHeight*200,QPen(QColor(32,32,32),5), QBrush(QColor(64,64,64)));
 
@@ -56,7 +69,7 @@ void View::MPSoCBox::setMPSoC(Core::MPSoC *value) {
     for (int i = 0; i < gridWidth; i++) {
         for (int j = 0; j < gridHeight; j++) {
             Core::Processor * cp = mpsoc->getCore(i,j);
-            View::Processor * vp = new Processor(i,j,cp);
+            View::Processor * vp = new View::Processor(i,j,cp);
             mpsocScene->addItem(vp);
             if (Core::Channel * cc = mpsoc->getCore(i,j)->getChannel(Core::South)) {
                 View::Channel * vc = new View::Channel(i,j,true,cc);
@@ -70,32 +83,20 @@ void View::MPSoCBox::setMPSoC(Core::MPSoC *value) {
     }
 }
 
-void View::MPSoCBox::setHeuristic(QString heuristic) {
-    QString text;
-    QFile file(QString("Heuristics\\%1.js").arg(heuristic));
-    if (!file.exists()) {
-        qWarning() << "Heuristic Files doesn't exist";
-    }
-    qInfo() << "Reading" << QString("Heuristics\\%1.js").arg(heuristic) << "...";
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
-    text = file.readAll();
-    file.close();
+void View::MPSoCBox::setHeuristic(Core::Heuristic *heuristic) {
+    this->heuristic = heuristic;
+    heuristicName = heuristic->getName();
 
-    engine.evaluate(text);
-    qInfo() << "Loaded Heuristic" << engine.evaluate("name").toString() << ". From" << engine.evaluate("author").toString();
-    qInfo() << "Test chossing a core:" << engine.evaluate("selectCore()").toString();
-
-    ui->titleLabel->setText(QString("%1x%2 MPSoC, %3").arg(gridWidth).arg(gridHeight).arg(engine.evaluate("name").toString()));
+    ui->titleLabel->setText(title.arg(QString::number(gridWidth), QString::number(gridHeight), heuristicName));
 }
 
-void View::MPSoCBox::resizeEvent(QResizeEvent *) {
+void View::MPSoCBox::fitInView() {
     ui->mpsocGV->setMaximumHeight(ui->mpsocGV->width());
     ui->mpsocGV->fitInView(mpsocScene->sceneRect(),Qt::KeepAspectRatio);
 }
 
-void View::MPSoCBox::showEvent(QShowEvent *){
-    ui->mpsocGV->setMaximumHeight(ui->mpsocGV->width());
-    ui->mpsocGV->fitInView(mpsocScene->sceneRect(),Qt::KeepAspectRatio);
+void View::MPSoCBox::paintEvent(QPaintEvent *) {
+    fitInView();
 }
 
 int View::MPSoCBox::getGridHeight() const {

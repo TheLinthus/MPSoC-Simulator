@@ -5,14 +5,11 @@
 #include <QMessageBox>
 #include <QtCore>
 #include <QtGui>
-#include <QtScript/QScriptEngine>
-#include <QtScript/QScriptValue>
-#include <QtScript/QtScriptDepends>
 #include <QDebug>
 #include <View/viewprocessor.h>
 #include <View/viewchannel.h>
-#include <Core/mpsoc.h>
-
+#include <Core/mpsoccontroller.h>
+#include <Core/heuristiccontroller.h>
 #include <QDebug>
 
 namespace View {
@@ -35,20 +32,26 @@ public:
 
 public slots:
     void setMPSoC(Core::MPSoC *value);
-    void setHeuristic(QString heuristic);
+    void setHeuristic(Core::Heuristic *heuristic);
 
 private slots:
     void on_closeButton_clicked();
 
+    void drawnMPSoC();
+
+    void fitInView();
 protected:
-    void resizeEvent(QResizeEvent *) override;
-    void showEvent(QShowEvent *) override;
+    void paintEvent(QPaintEvent *);
 
 private:
     int gridWidth;
     int gridHeight;
+    QString heuristicName;
+    const QString title = QString("%1x%2 MPSoC, %3");
+
+
     Core::MPSoC *mpsoc;
-    QScriptEngine engine;
+    Core::Heuristic *heuristic;
 
     QGraphicsScene *mpsocScene;
     Ui::MPSoCBox *ui;

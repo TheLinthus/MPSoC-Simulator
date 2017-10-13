@@ -19,6 +19,10 @@
   <property name="windowTitle">
    <string>MPSoC Emulator</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>mpsoc.ico</normaloff>mpsoc.ico</iconset>
+  </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
   </property>

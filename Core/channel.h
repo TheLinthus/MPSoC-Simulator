@@ -2,6 +2,7 @@
 #define CHANNEL_H
 
 #include <QObject>
+#include <QDebug>
 
 namespace Core {
 
@@ -16,20 +17,32 @@ public:
     /**
      * @brief add Change the payload of the channel, can have negative and positive values, to increase and decrease.
      * @param value qreal floating number to add or remove payload
+     * @param AtB boolean direction of load indicator, if from point A to B
      */
-    void add(qreal value);
+    void add(qreal value, bool AtB);
     /**
-     * @brief val Return the current payload on the channel
+     * @brief val Return the current total payload on the channel
      * @return <i>qreal</i> payload on the channel
      */
-    qreal val();
+    qreal val() const;
+    /**
+      * @brief valAtB Return the current payload from point A to B in the channel
+      * @return <i>qreal</i> payload from A to B
+      */
+    qreal valAtB() const;
+    /**
+      * @brief valAtB Return the current payload from point A to B in the channel
+      * @return <i>qreal</i> payload from A to B
+      */
+    qreal valBtA() const;
     /**
      * @brief reset Reset the payload to 0 (zero)
      */
     void reset();
 
 private:
-    qreal load; // A floating value that may go from 0 to 100
+    qreal loadAtB; // A floating value that may go from 0 to 100
+    qreal loadBtA;
 
 signals:
     void overloaded();

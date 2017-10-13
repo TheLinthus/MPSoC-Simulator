@@ -31,6 +31,8 @@ private:
 
     Core::Channel* channel;
 
+    QGraphicsDropShadowEffect *hoverEffect;
+
     void hoverEnterEvent(QGraphicsSceneHoverEvent *) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *) override;

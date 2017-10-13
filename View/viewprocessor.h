@@ -8,6 +8,7 @@
 #include <QStyle>
 #include <QGraphicsEffect>
 #include <Core/processor.h>
+#include <Core/application.h>
 
 namespace View {
 
@@ -32,6 +33,8 @@ private:
     bool over;
 
     Core::Processor *processor;
+
+    QGraphicsDropShadowEffect *hoverEffect;
 
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
