@@ -1,4 +1,4 @@
-#include "mpsoc_emulator.h"
+#include "mpsoc_se.h"
 #include <QApplication>
 
 int main(int argc, char *argv[]) {

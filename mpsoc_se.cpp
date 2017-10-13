@@ -1,5 +1,5 @@
 
-#include "mpsoc_emulator.h"
+#include "mpsoc_se.h"
 #include "ui_mpsoc_emulator.h"
 
 MPSoC_Emulator::MPSoC_Emulator(QWidget *parent) :
