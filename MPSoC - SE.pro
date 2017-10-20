@@ -7,7 +7,7 @@ QT       += script core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = MPSoC-Emulator
+TARGET = MPSoC - SE
 TEMPLATE = app
 
 RC_FILE = mpsoc.rc

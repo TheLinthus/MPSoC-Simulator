@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setApplicationName("MPSoC Emulator");
     QCoreApplication::setApplicationVersion("1.0.0");
 
-    MPSoC_Emulator w;
+    MPSoC_Simulator w;
     w.show();
 
     qInfo("Start!");

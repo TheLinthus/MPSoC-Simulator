@@ -23,13 +23,13 @@ namespace Ui {
 class MainWindow;
 }
 
-class MPSoC_Emulator : public QMainWindow
+class MPSoC_Simulator : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MPSoC_Emulator(QWidget *parent = 0);
-    ~MPSoC_Emulator();
+    explicit MPSoC_Simulator(QWidget *parent = 0);
+    ~MPSoC_Simulator();
 
 private slots:
     //void increment();

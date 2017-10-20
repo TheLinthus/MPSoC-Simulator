@@ -193,7 +193,7 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="pageEmulator">
+      <widget class="QWidget" name="pageSimulator">
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <property name="spacing">
          <number>0</number>

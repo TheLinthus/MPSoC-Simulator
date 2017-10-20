@@ -1,8 +1,8 @@
 
 #include "mpsoc_se.h"
-#include "ui_mpsoc_emulator.h"
+#include "ui_mpsoc_se.h"
 
-MPSoC_Emulator::MPSoC_Emulator(QWidget *parent) :
+MPSoC_Simulator::MPSoC_Simulator(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     thread(new QTimer(this))
@@ -43,17 +43,17 @@ MPSoC_Emulator::MPSoC_Emulator(QWidget *parent) :
     restoreState(settings.value("mainWindowState").toByteArray());
 }
 
-MPSoC_Emulator::~MPSoC_Emulator() {
+MPSoC_Simulator::~MPSoC_Simulator() {
     delete ui;
 }
 
-void MPSoC_Emulator::parallelLoad() {
+void MPSoC_Simulator::parallelLoad() {
     loadApplications();
     loadHeuristics();
     this->statusBar()->showMessage("Load done",2000);
 }
 
-void MPSoC_Emulator::loadApplications() {
+void MPSoC_Simulator::loadApplications() {
 
     this->statusBar()->showMessage("Loading applications files...");
 
@@ -104,7 +104,7 @@ void MPSoC_Emulator::loadApplications() {
     this->statusBar()->showMessage("Read applications done.");
 }
 
-void MPSoC_Emulator::loadHeuristics() {
+void MPSoC_Simulator::loadHeuristics() {
     this->statusBar()->showMessage("Reading heuristics availability...");
     statusProgress->setVisible(true);
     statusProgress->setRange(0,0);
@@ -113,14 +113,14 @@ void MPSoC_Emulator::loadHeuristics() {
     this->statusBar()->showMessage("Heuristics lookup done.");
 }
 
-void MPSoC_Emulator::applicationButtonsCheckEnable() {
+void MPSoC_Simulator::applicationButtonsCheckEnable() {
     ui->runApplicationPushButton->setEnabled(ui->applicationsList->selectionModel()->selectedIndexes().count() > 0 && mpsocs->count() > 0 /* && Can Add an Application now */);
     ui->killApplicationPushButton->setEnabled(ui->runningList->selectionModel()->selectedIndexes().count() > 0 /*&& Can Kill an Application now */);
 }
 
-void MPSoC_Emulator::closeEvent(QCloseEvent *event) {
+void MPSoC_Simulator::closeEvent(QCloseEvent *event) {
     QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, windowTitle(), "Are you sure you want to close MPSoC Emulator?",
+    reply = QMessageBox::question(this, windowTitle(), QString("Are you sure you want to close %1?").arg(windowTitle()),
                                 QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes) {
         QSettings settings;
@@ -133,7 +133,7 @@ void MPSoC_Emulator::closeEvent(QCloseEvent *event) {
     }
 }
 
-void MPSoC_Emulator::on_addMPSoCButton_clicked() {
+void MPSoC_Simulator::on_addMPSoCButton_clicked() {
     View::NewMPSoCDialog *dialog = new View::NewMPSoCDialog(this);
 
     if (dialog->exec() == QDialog::Rejected)
@@ -151,38 +151,38 @@ void MPSoC_Emulator::on_addMPSoCButton_clicked() {
     applicationButtonsCheckEnable();
 }
 
-void MPSoC_Emulator::applicationsListModel_selectionChanged(const QItemSelection, const QItemSelection) {
+void MPSoC_Simulator::applicationsListModel_selectionChanged(const QItemSelection, const QItemSelection) {
     applicationButtonsCheckEnable();
 }
 
-void MPSoC_Emulator::runningListModel_selectionChanged(const QItemSelection, const QItemSelection) {
+void MPSoC_Simulator::runningListModel_selectionChanged(const QItemSelection, const QItemSelection) {
     applicationButtonsCheckEnable();
 }
 
-void MPSoC_Emulator::on_timerSpinBox_valueChanged(int val) {
+void MPSoC_Simulator::on_timerSpinBox_valueChanged(int val) {
     thread->setInterval(val);
 }
 
-void MPSoC_Emulator::on_stepSlider_valueChanged(int val) {
+void MPSoC_Simulator::on_stepSlider_valueChanged(int val) {
     ui->stepCounter->setText(QString("%1/%2").arg(val).arg(ui->stepSlider->maximum()));
 }
 
-void MPSoC_Emulator::on_applicationsPushButton_clicked() {
-    ui->emulationPushButton->setChecked(false);
+void MPSoC_Simulator::on_applicationsPushButton_clicked() {
+    ui->simulationPushButton->setChecked(false);
     ui->applicationsPushButton->setChecked(true);
     ui->heuristicsPushButton->setChecked(false);
     ui->widgetStack->setCurrentWidget(ui->pageApplications);
 }
 
-void MPSoC_Emulator::on_emulationPushButton_clicked() {
-    ui->emulationPushButton->setChecked(true);
+void MPSoC_Simulator::on_simulationPushButton_clicked() {
+    ui->simulationPushButton->setChecked(true);
     ui->applicationsPushButton->setChecked(false);
     ui->heuristicsPushButton->setChecked(false);
-    ui->widgetStack->setCurrentWidget(ui->pageEmulator);
+    ui->widgetStack->setCurrentWidget(ui->pageSimulator);
 }
 
-void MPSoC_Emulator::on_heuristicsPushButton_clicked() {
-    ui->emulationPushButton->setChecked(false);
+void MPSoC_Simulator::on_heuristicsPushButton_clicked() {
+    ui->simulationPushButton->setChecked(false);
     ui->applicationsPushButton->setChecked(false);
     ui->heuristicsPushButton->setChecked(true);
 
