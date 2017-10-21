@@ -4,6 +4,10 @@
 #include <QObject>
 #include <QFile>
 #include <QDebug>
+#include <QDir>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include "core/application.h"
 
 #define apps Core::ApplicationController::instance()
@@ -18,27 +22,32 @@ private:
     ApplicationController(QObject* parent = 0);
     static ApplicationController* createInstance();
 
-    QList<Core::Application *> applicationsList;
+    QMap<QString, Core::Application *> applicationsList;
     QList<Core::Application *> runningList;
 
 public:
     ~ApplicationController();
     static ApplicationController* instance();
 
-    bool addFromFile(const QString &path);
-    void saveToFile(int index);
-    void add(Core::Application app);
-    void remove(int index);
-    Core::Application *getApplication(int index);
+    bool addFromFile(const QString &path, const QString name, const QString groupName = "");
+    void saveToFile(QString name);
+    void add(QString name, Application *app);
+    void remove(QString name);
+    QList<QString> getApplicationsList() const;
+    Core::Application *getApplication(QString name);
     Core::Application *getRunning(int index);
-    void run(int index);
+    void run(QString name);
     void kill(int index);
     int applicationsCount();
     int runningCount();
 
-signals:
-
 public slots:
+    void updateAvailabilityList();
+
+signals:
+    void progressUpdate(int);
+    void progressMaxUpdate(int);
+    void updateDone();
 };
 
 } // namespace Core

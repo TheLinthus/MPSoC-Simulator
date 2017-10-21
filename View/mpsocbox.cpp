@@ -8,7 +8,6 @@ MPSoCBox::MPSoCBox(QWidget *parent) :
     , gridWidth(1)
     , gridHeight(1)
     , mpsoc(nullptr)
-    , heuristic(nullptr)
     , heuristicName(QString("Null"))
     , ui(new Ui::MPSoCBox)
 {
@@ -51,6 +50,8 @@ void View::MPSoCBox::setMPSoC(Core::MPSoC *value) {
     connect(mpsoc, SIGNAL(changed()), this, SLOT(drawnMPSoC()));
     connect(mpsoc, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
 
+    heuristicName = mpsoc->getHeuristic()->getName();
+
     ui->titleLabel->setText(title.arg(QString::number(gridWidth), QString::number(gridHeight), heuristicName));
 
     drawnMPSoC();
@@ -81,13 +82,6 @@ void View::MPSoCBox::drawnMPSoC() {
             }
         }
     }
-}
-
-void View::MPSoCBox::setHeuristic(Core::Heuristic *heuristic) {
-    this->heuristic = heuristic;
-    heuristicName = heuristic->getName();
-
-    ui->titleLabel->setText(title.arg(QString::number(gridWidth), QString::number(gridHeight), heuristicName));
 }
 
 void View::MPSoCBox::fitInView() {

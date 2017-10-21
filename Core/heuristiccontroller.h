@@ -26,6 +26,11 @@ public:
 
 public slots:
     void updateAvailabilityList();
+
+signals:
+    void progressUpdate(int);
+    void progressMaxUpdate(int);
+    void updateDone();
 };
 
 } // namespace Core

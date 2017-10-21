@@ -28,7 +28,7 @@ Core::ApplicationController* ApplicationController::instance() {
     return Singleton<Core::ApplicationController>::instance(Core::ApplicationController::createInstance);
 }
 
-bool ApplicationController::addFromFile(const QString &path) {
+bool ApplicationController::addFromFile(const QString &path, const QString name, const QString groupName) {
     QFile file(path);
 
     if (file.exists() &&  file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -47,7 +47,11 @@ bool ApplicationController::addFromFile(const QString &path) {
             app->addNodeConnection(CHILD_INDEX, PARENT_INDEX, CHILD_TO_PARENT_VOLUME, CHILD_TO_PARENT_LOAD);
         }
 
-        applicationsList.append(app);
+        if (groupName.isEmpty()) {
+            add(name,app);
+        } else {
+            add("[" + groupName + "] " + name,app);
+        }
 
         return true;
     } else {
@@ -56,27 +60,39 @@ bool ApplicationController::addFromFile(const QString &path) {
     return false;
 }
 
-void ApplicationController::saveToFile(int index) {
+void ApplicationController::saveToFile(QString name) {
 
 }
 
-void ApplicationController::add(Application app) {
+void ApplicationController::add(QString name, Application *app) {
+    if (applicationsList.contains(name)) {
+        int n = 2;
+        while (applicationsList.contains(name + " " + n)) {
+            n++;
+        }
+        applicationsList.insert(name + " " + n, app);
+    } else {
+        applicationsList.insert(name, app);
+    }
+}
+
+void ApplicationController::remove(QString name) {
 
 }
 
-void ApplicationController::remove(int index) {
-
+QList<QString> ApplicationController::getApplicationsList() const {
+    return applicationsList.keys();
 }
 
-Application *ApplicationController::getApplication(int index) {
-    return applicationsList.at(index);
+Application *ApplicationController::getApplication(QString name) {
+    return applicationsList.value(name);
 }
 
 Application *ApplicationController::getRunning(int index) {
     return runningList.at(index);
 }
 
-void ApplicationController::run(int index) {
+void ApplicationController::run(QString name) {
 
 }
 
@@ -90,6 +106,49 @@ int ApplicationController::applicationsCount() {
 
 int ApplicationController::runningCount() {
     return runningList.count();
+}
+
+void ApplicationController::updateAvailabilityList() {
+    QDir applicationsDir("Applications");
+    applicationsDir.setNameFilters(QStringList()<<"*.json");
+
+    int loadMax = applicationsDir.count();
+    int loadValue = 0;
+
+    emit progressMaxUpdate(loadMax);
+
+    foreach (QString s, applicationsDir.entryList()) {
+        emit progressUpdate(loadValue);
+        QString text;
+        QFile file("Applications\\"+s);
+        file.open(QIODevice::ReadOnly | QIODevice::Text);
+        text = file.readAll();
+        file.close();
+
+        loadValue++;
+
+        QJsonDocument json = QJsonDocument::fromJson(text.toUtf8());
+        if (json.isNull()) {
+            qWarning() << "Error File";
+            continue;
+        }
+
+        QJsonObject obj = json.object();
+        QString appsName = obj.value("name").toString();
+        QJsonArray array = obj.value("applications").toArray();
+
+        loadMax += array.size();
+        emit progressMaxUpdate(loadMax);
+
+        for (int i = 0; i < array.size(); i++) {
+            emit progressUpdate(loadValue);
+            loadValue++;
+            addFromFile(array.at(i).toObject().value("file").toString(), array.at(i).toObject().value("name").toString(), appsName);
+        }
+    }
+
+    emit progressUpdate(loadMax);
+    emit updateDone();
 }
 
 } // namespace Core

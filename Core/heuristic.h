@@ -2,8 +2,10 @@
 #define CORE_HEURISTIC_H
 
 #include <QObject>
+#include <QDebug>
 #include <QtScript/QScriptEngine>
 #include <QtScript/QScriptValue>
+#include <QtScript/QScriptValueIterator>
 #include <QtScript/QtScriptDepends>
 #include <Exception/badheuristicimplementationexception.h>
 

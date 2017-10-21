@@ -4,7 +4,7 @@ namespace Core {
 
 Heuristic::Heuristic(QObject *parent) :
     QObject(parent),
-    enabled(false),
+    enabled(true),
     name("No name"),
     description(""),
     author("Unknow")
@@ -60,12 +60,13 @@ bool Heuristic::isEngineEnabled() {
 
 QPoint Heuristic::selectCore() const {
     if (enabled) {
-        QScriptValue evaluated = engine->evaluate("selectCore()");
-        if (evaluated.isObject()) {
-            QScriptValue point = evaluated.toObject();
+        QScriptValue point = engine->evaluate("selectCore()");      // Call the heuristic script function to selecting a Core
+        if (point.isObject() && !point.isError()
+                && point.property("x").isValid()
+                && point.property("y").isValid()) {                 // If no error was found and the return is an object with X and Y, nothing is wrong with the script
             QPoint p = QPoint();
-            p.setX(point.property("xp").toInteger());
-            p.setY(point.property("yp").toInteger());
+            p.setX(point.property("x").toInteger());                // Extract the points X and Y from the return
+            p.setY(point.property("y").toInteger());
             return p;
         } else {
             throw BadHeuristicImplementationException{};

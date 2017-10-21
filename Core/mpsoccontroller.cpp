@@ -26,6 +26,10 @@ Core::MPSoC *MPSoCController::add(int h, int w) {
     return mpsocList.last();
 }
 
+Core::MPSoC *MPSoCController::get(int index) {
+    return mpsocList.value(index);
+}
+
 int MPSoCController::count() const {
     return mpsocList.count();
 }

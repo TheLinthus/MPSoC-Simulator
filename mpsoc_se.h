@@ -5,14 +5,11 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QTimer>
-#include <QDesktopServices>
-#include <QVector>
 #include <QDebug>
 #include <QUrl>
 #include <QFileDialog>
 #include <QFile>
 #include <QProgressBar>
-#include <QtScript/qscriptengine.h>
 #include "View/mpsocbox.h"
 #include "View/newmpsocdialog.h"
 #include "Core/applicationcontroller.h"
@@ -23,18 +20,30 @@ namespace Ui {
 class MainWindow;
 }
 
+class ApplicationLoader : public QThread {
+    Q_OBJECT
+
+public:
+    ApplicationLoader(){}
+    virtual ~ApplicationLoader(){}
+
+public slots:
+    void run() override;
+
+signals:
+    void status(QString, int);
+};
+
 class MPSoC_Simulator : public QMainWindow
 {
     Q_OBJECT
-
 public:
     explicit MPSoC_Simulator(QWidget *parent = 0);
     ~MPSoC_Simulator();
 
 private slots:
     //void increment();
-
-    void parallelLoad();
+    void loadingDone();
 
     void applicationsListModel_selectionChanged(const QItemSelection, const QItemSelection);
     void runningListModel_selectionChanged(const QItemSelection, const QItemSelection);
@@ -47,10 +56,14 @@ private slots:
     void on_stepSlider_valueChanged(int val);
     void on_addMPSoCButton_clicked();
     void on_applicationsPushButton_clicked();
-    void on_emulationPushButton_clicked();
+    void on_simulationPushButton_clicked();
     void on_heuristicsPushButton_clicked();
+    void on_nextStepButton_clicked();
+
 private:
-    QTimer *thread;
+    QThread *thread;
+    QTimer *timer;
+    ApplicationLoader *worker;
 
     Ui::MainWindow *ui;
 
@@ -59,9 +72,6 @@ private:
 
     QStringListModel *applicationsListModel;
     QStringListModel *runningListModel;
-
-    void loadApplications();
-    void loadHeuristics();
 };
 
 #endif // MAINWINDOW_H

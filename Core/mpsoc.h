@@ -4,6 +4,7 @@
 #include <QObject>
 #include <Core/processor.h>
 #include <Core/channel.h>
+#include <Core/heuristic.h>
 
 namespace Core {
 
@@ -21,12 +22,16 @@ public:
     QVector<Channel *> getPatch(Processor a, Processor b);
     QVector<Channel *> getPatch(int x1, int y1, int x2, int y2);
 
+    Core::Heuristic *getHeuristic() const;
+    void setHeuristic(Core::Heuristic *value);
+
 protected:
     int height;
     int width;
 
 private:
-    Processor*** processors;
+    Processor ***processors;
+    Core::Heuristic *heuristic;
 
 signals:
     void changed();

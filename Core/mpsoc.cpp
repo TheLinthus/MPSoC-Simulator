@@ -82,6 +82,14 @@ QVector<Channel *> MPSoC::getPatch(int x1, int y1, int x2, int y2) {
     return patch;
 }
 
+Core::Heuristic *MPSoC::getHeuristic() const {
+    return heuristic;
+}
+
+void MPSoC::setHeuristic(Core::Heuristic *value) {
+    heuristic = value;
+}
+
 // Prototipe, dynamic modify mpsoc
 //void MPSoC::setWidth(int w) {
 //    width = w;

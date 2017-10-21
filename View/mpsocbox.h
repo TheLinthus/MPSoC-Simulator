@@ -32,7 +32,6 @@ public:
 
 public slots:
     void setMPSoC(Core::MPSoC *value);
-    void setHeuristic(Core::Heuristic *heuristic);
 
 private slots:
     void on_closeButton_clicked();
@@ -49,9 +48,7 @@ private:
     QString heuristicName;
     const QString title = QString("%1x%2 MPSoC, %3");
 
-
     Core::MPSoC *mpsoc;
-    Core::Heuristic *heuristic;
 
     QGraphicsScene *mpsocScene;
     Ui::MPSoCBox *ui;

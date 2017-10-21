@@ -4,5 +4,5 @@ var description = "selects the first free resource capable of supporting the exe
 
 function selectCore(arg) {
 
-    return new Point(0,1);
+    return {x:0,y:1};
 };

@@ -36,13 +36,21 @@ void HeuristicController::updateAvailabilityList() {
     QDir heuristicsDir("Heuristics");
     heuristicsDir.setNameFilters(QStringList()<<"*.js");    // Filter for '.js' script files
 
+    int count = heuristicsDir.count();
+    int progress = 0;
+
+    emit progressMaxUpdate(count);
+
     foreach (QString s, heuristicsDir.entryList()) {
+        emit progressUpdate(progress);
         QString text;
 
         QFile file(QString("Heuristics\\%1").arg(s));
         file.open(QIODevice::ReadOnly | QIODevice::Text);
         text = file.readAll();
         file.close();
+
+        progress++;
 
         QScriptEngine * engine = new QScriptEngine();
 
@@ -89,8 +97,12 @@ void HeuristicController::updateAvailabilityList() {
             } while (heuristicList.contains(name));
 
         }
+        heuristic->setEngine(engine);
         heuristicList.insert(name, heuristic);
     }
+
+    emit progressUpdate(count);
+    emit updateDone();
 }
 
 } // namespace Core

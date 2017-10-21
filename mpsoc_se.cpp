@@ -5,7 +5,11 @@
 MPSoC_Simulator::MPSoC_Simulator(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    thread(new QTimer(this))
+    thread(new QThread(this)),
+    timer(new QTimer(this)),
+    applicationsListModel(new QStringListModel()),
+    runningListModel(new QStringListModel()),
+    statusLabel(new QLabel(this->statusBar()))
 {
     QSettings settings;
     restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
@@ -19,8 +23,6 @@ MPSoC_Simulator::MPSoC_Simulator(QWidget *parent) :
     statusProgress = new QProgressBar(this->statusBar());
     statusProgress->setMaximumSize(242,16);
 
-    statusLabel = new QLabel(this->statusBar());
-
     statusProgress->setTextVisible(false);
     statusProgress->setValue(0);
     statusProgress->setMinimum(0);
@@ -30,15 +32,29 @@ MPSoC_Simulator::MPSoC_Simulator(QWidget *parent) :
     this->statusBar()->addPermanentWidget(statusLabel);
     this->statusBar()->addPermanentWidget(statusProgress);
 
-    applicationsListModel = new QStringListModel();
-    runningListModel = new QStringListModel();
     ui->applicationsList->setModel(applicationsListModel);
     ui->runningList->setModel(runningListModel);
 
-    connect(ui->applicationsList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(applicationsListModel_selectionChanged(QItemSelection,QItemSelection)));
-    connect(ui->runningList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(runningListModel_selectionChanged(QItemSelection,QItemSelection)));
+    connect(ui->applicationsList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+                this, SLOT(applicationsListModel_selectionChanged(QItemSelection,QItemSelection)));
+    connect(ui->runningList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+                this, SLOT(runningListModel_selectionChanged(QItemSelection,QItemSelection)));
 
-    QTimer::singleShot(0, this,  SLOT(parallelLoad()));
+    connect(apps, SIGNAL(progressUpdate(int)), statusProgress, SLOT(setValue(int)));
+    connect(apps, SIGNAL(progressMaxUpdate(int)), statusProgress, SLOT(setMaximum(int)));
+    connect(heuristics, SIGNAL(progressUpdate(int)), statusProgress, SLOT(setValue(int)));
+    connect(heuristics, SIGNAL(progressMaxUpdate(int)), statusProgress, SLOT(setMaximum(int)));
+
+    ApplicationLoader *worker = new ApplicationLoader;
+
+    apps->moveToThread(worker);
+    heuristics->moveToThread(worker);
+
+    connect(worker, SIGNAL(finished()), this, SLOT(loadingDone()));
+    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
+    connect(worker, SIGNAL(status(QString,int)), statusBar(), SLOT(showMessage(QString,int)));
+
+    worker->start();
 
     restoreState(settings.value("mainWindowState").toByteArray());
 }
@@ -47,70 +63,24 @@ MPSoC_Simulator::~MPSoC_Simulator() {
     delete ui;
 }
 
-void MPSoC_Simulator::parallelLoad() {
-    loadApplications();
-    loadHeuristics();
-    this->statusBar()->showMessage("Load done",2000);
-}
+void ApplicationLoader::run() {
+    emit status("Loading applications files...", 0);
+    apps->updateAvailabilityList();
+    emit status("Read applications done.", 2000);
 
-void MPSoC_Simulator::loadApplications() {
-
-    this->statusBar()->showMessage("Loading applications files...");
-
-    QDir applicationsDir("Applications");
-    applicationsDir.setNameFilters(QStringList()<<"*.json");
-
-    int loadMax = applicationsDir.count();
-    int loadValue = 0;
-
-    statusProgress->setMaximum(loadMax);
-    statusProgress->setValue(loadValue);
-
-    foreach (QString s, applicationsDir.entryList()) {
-        loadValue++;
-        statusProgress->setValue(loadValue);
-
-        QString text;
-        QFile file("Applications\\"+s);
-        file.open(QIODevice::ReadOnly | QIODevice::Text);
-        text = file.readAll();
-        file.close();
-
-        QJsonDocument json = QJsonDocument::fromJson(text.toUtf8());
-        if (json.isNull()) {
-            qWarning() << "Error File";
-            continue;
-        }
-
-        QJsonObject obj = json.object();
-        QString appsName = obj.value("name").toString();
-        QJsonArray array = obj.value("applications").toArray();
-
-        loadMax += array.size();
-        statusProgress->setMaximum(loadMax);
-
-        int index = applicationsListModel->rowCount();
-        applicationsListModel->insertRows(index, array.size());
-        for (int i = 0; i < array.size(); i++) {
-            loadValue++;
-            if (apps->addFromFile(array.at(i).toObject().value("file").toString())) {
-                statusProgress->setValue(loadValue);
-                applicationsListModel->setData(applicationsListModel->index(index + i), "[" + appsName + "] " + array.at(i).toObject().value("name").toString());
-            }
-        }
-    }
-
-    statusProgress->setVisible(false);
-    this->statusBar()->showMessage("Read applications done.");
-}
-
-void MPSoC_Simulator::loadHeuristics() {
-    this->statusBar()->showMessage("Reading heuristics availability...");
-    statusProgress->setVisible(true);
-    statusProgress->setRange(0,0);
+    emit status("Looking for avaliable heuristics...", 0);
     heuristics->updateAvailabilityList();
+    emit status("Heuristics lookup done.", 2000);
+
+    apps->moveToThread(QApplication::instance()->thread());
+    heuristics->moveToThread(QApplication::instance()->thread());
+
+    emit status("Load done", 2000);
+}
+
+void MPSoC_Simulator::loadingDone() {
     statusProgress->setVisible(false);
-    this->statusBar()->showMessage("Heuristics lookup done.");
+    applicationsListModel->setStringList(apps->getApplicationsList());
 }
 
 void MPSoC_Simulator::applicationButtonsCheckEnable() {
@@ -141,13 +111,16 @@ void MPSoC_Simulator::on_addMPSoCButton_clicked() {
 
     QHBoxLayout* layout =  ui->mpsocsLayout;
 
-    View::MPSoCBox* newmpsoc = new View::MPSoCBox();
-    newmpsoc->setMPSoC(mpsocs->add(dialog->getX(),dialog->getY()));
-    newmpsoc->setHeuristic(heuristics->getHeuristic(dialog->getHeuristic()));
+    View::MPSoCBox *mpsocbox = new View::MPSoCBox();
+    Core::MPSoC *mpsoc = mpsocs->add(dialog->getX(),dialog->getY());
 
-    layout->insertWidget(layout->count() - 1, newmpsoc);
+    mpsoc->setHeuristic(heuristics->getHeuristic(dialog->getHeuristic()));
 
-    connect(newmpsoc, SIGNAL(destroyed(QObject*)), this, SLOT(applicationButtonsCheckEnable()));
+    mpsocbox->setMPSoC(mpsoc);
+
+    layout->insertWidget(layout->count() - 1, mpsocbox);
+
+    connect(mpsocbox, SIGNAL(destroyed(QObject*)), this, SLOT(applicationButtonsCheckEnable()));
     applicationButtonsCheckEnable();
 }
 
@@ -160,7 +133,7 @@ void MPSoC_Simulator::runningListModel_selectionChanged(const QItemSelection, co
 }
 
 void MPSoC_Simulator::on_timerSpinBox_valueChanged(int val) {
-    thread->setInterval(val);
+    timer->setInterval(val);
 }
 
 void MPSoC_Simulator::on_stepSlider_valueChanged(int val) {
@@ -187,4 +160,13 @@ void MPSoC_Simulator::on_heuristicsPushButton_clicked() {
     ui->heuristicsPushButton->setChecked(true);
 
     //TODO
+}
+
+void MPSoC_Simulator::on_nextStepButton_clicked() {
+    try {
+        qDebug() << "First Free: " << heuristics->getHeuristic("First Free")->selectCore();
+        qDebug() << "Nearest Neighbor: " << heuristics->getHeuristic("Nearest Neighbor")->selectCore();
+    } catch (int e) {
+        qDebug() << "Exception " << e;
+    }
 }

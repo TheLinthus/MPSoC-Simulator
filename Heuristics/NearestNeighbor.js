@@ -3,5 +3,5 @@ var name = "Nearest Neighbor";
 
 function selectCore(arg) {
 
-    return new Point(1,1);
+    return {x:1,y:1};
 };
