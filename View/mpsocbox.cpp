@@ -7,7 +7,7 @@ MPSoCBox::MPSoCBox(QWidget *parent) :
     QWidget(parent)
     , gridWidth(1)
     , gridHeight(1)
-    , mpsoc(nullptr)
+    , mpsoc(0)
     , heuristicName(QString("Null"))
     , ui(new Ui::MPSoCBox)
 {
@@ -42,7 +42,7 @@ int View::MPSoCBox::getGridWidth() const {
 }
 
 void View::MPSoCBox::setMPSoC(Core::MPSoC *value) {
-    if (mpsoc != nullptr)
+    if (mpsoc != 0)
         disconnect(mpsoc, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
     mpsoc = value;
     connect(mpsoc, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));

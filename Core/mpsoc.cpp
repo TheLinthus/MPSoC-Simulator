@@ -39,7 +39,7 @@ MPSoC::~MPSoC()
 
 Processor* MPSoC::getCore(int x, int y) {
     if (x > width || y > height) {
-        return nullptr;
+        return 0;
     }
     return processors[x][y];
 }

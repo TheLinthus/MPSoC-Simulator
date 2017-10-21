@@ -8,7 +8,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include "core/application.h"
+#include <Core/application.h>
 
 #define apps Core::ApplicationController::instance()
 

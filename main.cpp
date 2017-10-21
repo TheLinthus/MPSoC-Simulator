@@ -6,12 +6,11 @@ int main(int argc, char *argv[]) {
 
     QCoreApplication::setOrganizationDomain("tecnomissoes.com.br");
     QCoreApplication::setOrganizationName("Tecno Missões");
-    QCoreApplication::setApplicationName("MPSoC Emulator");
+    QCoreApplication::setApplicationName("MPSoC Simulation Environment");
     QCoreApplication::setApplicationVersion("1.0.0");
 
     MPSoC_Simulator w;
     w.show();
 
-    qInfo("Start!");
     return a.exec();
 }

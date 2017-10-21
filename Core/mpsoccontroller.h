@@ -2,7 +2,7 @@
 #define CORE_MPSOCCONTROLLER_H
 
 #include <QObject>
-#include "core/mpsoc.h"
+#include <Core/mpsoc.h>
 #define mpsocs Core::MPSoCController::instance()
 
 namespace Core {

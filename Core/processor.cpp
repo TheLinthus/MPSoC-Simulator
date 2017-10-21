@@ -4,10 +4,10 @@ namespace Core {
 
 Processor::Processor(int x, int y, int threads, QObject *parent)
     : QObject(parent)
-    , north(nullptr)
-    , west(nullptr)
-    , south(nullptr)
-    , east(nullptr)
+    , north(0)
+    , west(0)
+    , south(0)
+    , east(0)
     , threads(threads)
     , x(x)
     , y(y)
@@ -21,13 +21,13 @@ Channel *Processor::getChannel(Direction direction) {
         case West : return west;
         case South : return south;
         case East : return east;
-        default : return nullptr;
+        default : return 0;
     }
 }
 
 int Processor::firstIdle() {
     for (int i = 0; i < threads; i++) {
-        if (cores[i] != nullptr)
+        if (cores[i] != 0)
             return i;
     }
     return -1;
@@ -35,14 +35,14 @@ int Processor::firstIdle() {
 
 int Processor::isIdle(int i)
 {
-    return cores[i] == nullptr;
+    return cores[i] == 0;
 }
 
 bool Processor::run(AppNode *node, int thread) {
     if (thread < 0 || thread >= threads) {
         return false;
     }
-    if (cores[thread] == nullptr) {
+    if (cores[thread] == 0) {
         node->setThread(thread);
         connect(node, SIGNAL(finished(int)), this, SLOT(kill(int)));
         cores[thread] = node;
@@ -71,9 +71,9 @@ void Processor::kill(int thread) {
     if (thread < 0 || thread >= threads) {
         return;
     }
-    if (cores[thread] != nullptr) {
+    if (cores[thread] != 0) {
         delete cores[thread];
-        cores[thread] = nullptr;
+        cores[thread] = 0;
         emit changed();
     }
 }

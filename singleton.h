@@ -51,15 +51,15 @@ Singleton<T>::Singleton() {
 
 template <class T>
 Singleton<T>::~Singleton() {
-  T* createdTptr = (T*)tptr.fetchAndStoreOrdered(nullptr);
+  T* createdTptr = (T*)tptr.fetchAndStoreOrdered(0);
   if (createdTptr) {
     delete createdTptr;
   }
-  create.store(nullptr);
+  create.store(0);
 }
 
-template<class T> QBasicAtomicPointer<void> Singleton<T>::create = Q_BASIC_ATOMIC_INITIALIZER(nullptr);
+template<class T> QBasicAtomicPointer<void> Singleton<T>::create = Q_BASIC_ATOMIC_INITIALIZER(0);
 template<class T> QBasicAtomicInt Singleton<T>::flag = Q_BASIC_ATOMIC_INITIALIZER(CallOnce::CO_Request);
-template<class T> QBasicAtomicPointer<void> Singleton<T>::tptr = Q_BASIC_ATOMIC_INITIALIZER(nullptr);
+template<class T> QBasicAtomicPointer<void> Singleton<T>::tptr = Q_BASIC_ATOMIC_INITIALIZER(0);
 
 #endif // SINGLETON_H

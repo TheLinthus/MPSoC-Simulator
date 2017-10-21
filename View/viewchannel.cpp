@@ -22,7 +22,7 @@ QRectF Channel::boundingRect() const {
 }
 
 void Channel::hoverEnterEvent(QGraphicsSceneHoverEvent *) {
-    if (hoverEffect != nullptr) {
+    if (hoverEffect != 0) {
         hoverEffect = new QGraphicsDropShadowEffect();
         hoverEffect->setBlurRadius(25);
         hoverEffect->setColor(QColor(Qt::white));
