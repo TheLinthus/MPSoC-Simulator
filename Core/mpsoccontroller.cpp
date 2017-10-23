@@ -21,8 +21,13 @@ Core::MPSoCController* MPSoCController::instance() {
     return Singleton<Core::MPSoCController>::instance(Core::MPSoCController::createInstance);
 }
 
-Core::MPSoC *MPSoCController::add(int h, int w) {
-    mpsocList.append(new MPSoC(h, w, this));
+Core::MPSoC *MPSoCController::add(int h, int w, const QPoint &master) {
+    mpsocList.append(new MPSoC(h, w, master, this));
+    return mpsocList.last();
+}
+
+Core::MPSoC *MPSoCController::add(int h, int w, int masterX, int masterY) {
+    mpsocList.append(new MPSoC(h, w, QPoint(masterX, masterY), this));
     return mpsocList.last();
 }
 

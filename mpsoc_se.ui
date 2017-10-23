@@ -707,7 +707,19 @@
     <addaction name="actionShow_Help"/>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuSimulation">
+    <property name="title">
+     <string>&amp;Simulation</string>
+    </property>
+    <addaction name="actionAdd_MPSoC"/>
+    <addaction name="separator"/>
+    <addaction name="action_Reset_Simulation"/>
+    <addaction name="actionStep_Back"/>
+    <addaction name="actionStep_Foward"/>
+    <addaction name="actionAuto_Step"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuSimulation"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
@@ -748,6 +760,75 @@
     <string>&amp;About...</string>
    </property>
   </action>
+  <action name="actionAdd_MPSoC">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/images/add-1.png</normaloff>:/icons/images/add-1.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Add MPSoC</string>
+   </property>
+   <property name="shortcut">
+    <string>F2</string>
+   </property>
+  </action>
+  <action name="action_Reset_Simulation">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/images/repeat-1.png</normaloff>:/icons/images/repeat-1.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Reset Simulation</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
+  <action name="actionStep_Back">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/images/previous.png</normaloff>:/icons/images/previous.png</iconset>
+   </property>
+   <property name="text">
+    <string>Step &amp;Back</string>
+   </property>
+   <property name="shortcut">
+    <string>F3</string>
+   </property>
+  </action>
+  <action name="actionStep_Foward">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/images/skip.png</normaloff>:/icons/images/skip.png</iconset>
+   </property>
+   <property name="text">
+    <string>Step &amp;Foward</string>
+   </property>
+   <property name="shortcut">
+    <string>F4</string>
+   </property>
+  </action>
+  <action name="actionAuto_Step">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/images/play-button-1.png</normaloff>:/icons/images/play-button-1.png</iconset>
+   </property>
+   <property name="text">
+    <string>Au&amp;to Step</string>
+   </property>
+   <property name="shortcut">
+    <string>F6</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
@@ -767,6 +848,70 @@
     <hint type="destinationlabel">
      <x>495</x>
      <y>311</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionAdd_MPSoC</sender>
+   <signal>triggered()</signal>
+   <receiver>addMPSoCButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>252</x>
+     <y>578</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionStep_Back</sender>
+   <signal>triggered()</signal>
+   <receiver>prevStepButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>406</x>
+     <y>578</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionStep_Foward</sender>
+   <signal>triggered()</signal>
+   <receiver>nextStepButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>578</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>action_Reset_Simulation</sender>
+   <signal>triggered()</signal>
+   <receiver>resetButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>355</x>
+     <y>578</y>
     </hint>
    </hints>
   </connection>

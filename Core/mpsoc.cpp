@@ -3,16 +3,22 @@
 
 namespace Core {
 
-MPSoC::MPSoC(int w, int h, QObject *parent)
+MPSoC::MPSoC(int h, int w, QPoint master, QObject *parent)
     : QObject(parent)
     , width(w)
-    , height(h) {
+    , height(h)
+    , master(master)
+{
     qDebug("Construindo nova MPSoC %dx%d", width, height);
     processors = new Processor**[w];
     for (int i = 0; i < w; i++) {
         processors[i] = new Processor*[h];
         for (int j = 0; j < h; j++) {
-            processors[i][j] = new Processor(i,j);
+            if (i == master.x() && j == master.y()) {
+                processors[i][j] = new Processor(i,j, Processor::Master);
+            } else {
+                processors[i][j] = new Processor(i,j);
+            }
             connect(processors[i][j], SIGNAL(changed()), this, SLOT(update()));
             if (i > 0) { // If isn't 1st col, set west channel form west core
                 processors[i][j]->setChannel(West, processors[i-1][j]->getChannel(East));
@@ -30,6 +36,12 @@ MPSoC::MPSoC(int w, int h, QObject *parent)
             }
         }
     }
+}
+
+MPSoC::MPSoC(int w, int h, int masterX, int masterY, QObject *parent)
+    : MPSoC(h,w,QPoint(masterX,masterY),parent)
+{
+
 }
 
 MPSoC::~MPSoC()

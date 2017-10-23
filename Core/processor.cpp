@@ -2,7 +2,7 @@
 
 namespace Core {
 
-Processor::Processor(int x, int y, int threads, QObject *parent)
+Processor::Processor(int x, int y, Type type, int threads, QObject *parent)
     : QObject(parent)
     , north(0)
     , west(0)
@@ -11,8 +11,14 @@ Processor::Processor(int x, int y, int threads, QObject *parent)
     , threads(threads)
     , x(x)
     , y(y)
+    , type(type)
 {
     cores = new AppNode*[threads]();
+    if (isMaster()) {
+        MasterApplication *masterApplication = new MasterApplication();
+        connect(this, SIGNAL(destroyed(QObject*)), masterApplication, SLOT(deleteLater()));
+        cores[0] = new AppNode(-1, masterApplication);
+    }
 }
 
 Channel *Processor::getChannel(Direction direction) {
@@ -43,8 +49,7 @@ bool Processor::run(AppNode *node, int thread) {
         return false;
     }
     if (cores[thread] == 0) {
-        node->setThread(thread);
-        connect(node, SIGNAL(finished(int)), this, SLOT(kill(int)));
+        connect(node, SIGNAL(finished(AppNode *)), this, SLOT(kill(AppNode *)));
         cores[thread] = node;
         emit changed();
         return true;
@@ -65,6 +70,27 @@ int Processor::getX() const {
 
 int Processor::getY() const {
     return y;
+}
+
+int Processor::getType() const {
+    return type;
+}
+
+bool Processor::isMaster() {
+    return type == Master;
+}
+
+int Processor::getThreadOf(const AppNode *appNode) {
+    for (int i = 0; i < threads; i++) {
+        if (appNode == cores[i]) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void Processor::kill(AppNode *appNode) {
+    kill(getThreadOf(appNode));
 }
 
 void Processor::kill(int thread) {

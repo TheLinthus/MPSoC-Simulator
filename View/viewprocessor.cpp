@@ -10,6 +10,8 @@ Processor::Processor(int x, int y, Core::Processor* m)
 {
     setAcceptHoverEvents(true);
     connect(processor, SIGNAL(changed()), this, SLOT(change()));
+
+    updateToolTip();
 }
 
 QRectF Processor::boundingRect() const {
@@ -32,10 +34,29 @@ void Processor::hoverLeaveEvent(QGraphicsSceneHoverEvent *) {
     hoverEffect->deleteLater();
 }
 
+void Processor::updateToolTip() {
+    QMetaEnum qenum = QMetaEnum::fromType<Core::Processor::Type>();
+    QString toolTip = QString(tr("Processor %1, %2<hr>%3<br>%4 thread(s)<hr>")).arg(
+                QString::number(processor->getX()),
+                QString::number(processor->getY()),
+                QString(qenum.valueToKey(processor->getType())),
+                QString::number(processor->nOfThreads()));
+    for (int i = 0; i < processor->nOfThreads(); i++) {
+        toolTip.append(QString("Thread %1: ").arg(i));
+        if (processor->isIdle(i)) {
+            toolTip.append(tr("Idle"));
+        } else {
+            toolTip.append(((Core::Application *) processor->runningNode(i)->parent())->getName());
+        }
+    }
+    setToolTip(toolTip);
+}
+
 void Processor::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     QRectF rect = boundingRect();
 
     QPainterPath path;
+
     path.addRoundedRect(rect,10,10);
 
     painter->setPen(Qt::NoPen);
@@ -75,10 +96,23 @@ void Processor::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidg
     painter->setPen(QPen(Qt::black,3));
     painter->setBrush(Qt::NoBrush);
     painter->drawPath(path);
+
+    // Master indicator
+    if (processor->isMaster()) {
+        painter->setPen(QPen(Qt::white,5));
+        painter->setBrush(QBrush(Qt::blue));
+        painter->drawEllipse(rect.topLeft() + QPoint(10,10), 18, 18);
+
+        painter->setFont(QFont("Trebuchet MS", 18, QFont::Bold));
+        painter->setPen(QPen(Qt::white));
+        painter->drawText(rect.topLeft() + QPointF(1,18), "M");
+    }
+
 }
 
 void Processor::change() {
     this->update();
+    updateToolTip();
 }
 
 } // namespace View

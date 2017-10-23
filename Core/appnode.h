@@ -13,9 +13,6 @@ public:
     explicit AppNode(int lifespan, QObject *parent = 0);
     ~AppNode();
 
-    int getThread() const;
-    void setThread(int value);
-
     bool isDone();
     int getLifespan() const;
     int getCycles() const;
@@ -25,10 +22,9 @@ public:
 private:
     int cycles;
     int lifespan;
-    int thread;
 
 signals:
-    void finished(int thread);
+    void finished(AppNode *);
     void changed();
 
 public slots:

@@ -42,10 +42,13 @@ int View::MPSoCBox::getGridWidth() const {
 }
 
 void View::MPSoCBox::setMPSoC(Core::MPSoC *value) {
-    if (mpsoc != 0)
+    if (mpsoc != 0) {
+        disconnect(mpsoc, SIGNAL(changed()), this, SLOT(drawnMPSoC()));
         disconnect(mpsoc, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
+    }
     mpsoc = value;
-    connect(mpsoc, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
+    gridWidth = mpsoc->getWidth();
+    gridHeight = mpsoc->getHeight();
 
     connect(mpsoc, SIGNAL(changed()), this, SLOT(drawnMPSoC()));
     connect(mpsoc, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
@@ -60,8 +63,6 @@ void View::MPSoCBox::setMPSoC(Core::MPSoC *value) {
 void View::MPSoCBox::drawnMPSoC() {
     mpsocScene->clear();
 
-    gridWidth = mpsoc->getWidth();
-    gridHeight = mpsoc->getHeight();
     mpsocScene->setSceneRect(-50,-50,gridWidth*200,gridHeight*200);
 
     mpsocScene->addRect(-50,-50,gridWidth*200,gridHeight*200,QPen(QColor(32,32,32),5), QBrush(QColor(64,64,64)));

@@ -60,6 +60,10 @@ private slots:
     void on_heuristicsPushButton_clicked();
     void on_nextStepButton_clicked();
 
+    void on_playTimerButton_clicked();
+
+    void on_pauseTimerButton_clicked();
+
 private:
     QThread *thread;
     QTimer *timer;

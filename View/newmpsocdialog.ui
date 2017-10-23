@@ -2,14 +2,6 @@
 <ui version="4.0">
  <class>View::NewMPSoCDialog</class>
  <widget class="QDialog" name="View::NewMPSoCDialog">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>370</width>
-    <height>133</height>
-   </rect>
-  </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
@@ -19,34 +11,49 @@
    </property>
    <item>
     <widget class="QGroupBox" name="groupBox">
+     <property name="minimumSize">
+      <size>
+       <width>340</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="title">
       <string>MPSoC Parameters</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <layout class="QFormLayout" name="formLayout">
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
           <property name="whatsThis">
-           <string>The number of processor rows</string>
+           <string>The number of processor columns</string>
           </property>
           <property name="text">
-           <string>Height (y)</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="whatsThis">
-           <string>The Heuristic for task allocation determination</string>
-          </property>
-          <property name="text">
-           <string>Heuristic</string>
+           <string>Width (x)</string>
           </property>
          </widget>
         </item>
         <item row="0" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QSpinBox" name="xSpinBox">
+            <property name="minimumSize">
+             <size>
+              <width>48</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="whatsThis">
+             <string>The number of processor columns</string>
+            </property>
+            <property name="minimum">
+             <number>2</number>
+            </property>
+            <property name="maximum">
+             <number>16</number>
+            </property>
+           </widget>
+          </item>
           <item>
            <widget class="QSlider" name="xHorizontalSlider">
             <property name="whatsThis">
@@ -69,8 +76,22 @@
             </property>
            </widget>
           </item>
+         </layout>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="whatsThis">
+           <string>The number of processor rows</string>
+          </property>
+          <property name="text">
+           <string>Height (y)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QSpinBox" name="xSpinBox">
+           <widget class="QSpinBox" name="ySpinBox">
             <property name="minimumSize">
              <size>
               <width>48</width>
@@ -78,7 +99,7 @@
              </size>
             </property>
             <property name="whatsThis">
-             <string>The number of processor columns</string>
+             <string>The number of processor rows</string>
             </property>
             <property name="minimum">
              <number>2</number>
@@ -88,10 +109,6 @@
             </property>
            </widget>
           </item>
-         </layout>
-        </item>
-        <item row="1" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
            <widget class="QSlider" name="yHorizontalSlider">
             <property name="whatsThis">
@@ -114,26 +131,17 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QSpinBox" name="ySpinBox">
-            <property name="minimumSize">
-             <size>
-              <width>48</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="whatsThis">
-             <string>The number of processor rows</string>
-            </property>
-            <property name="minimum">
-             <number>2</number>
-            </property>
-            <property name="maximum">
-             <number>16</number>
-            </property>
-           </widget>
-          </item>
          </layout>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="whatsThis">
+           <string>The Heuristic for task allocation determination</string>
+          </property>
+          <property name="text">
+           <string>Heuristic</string>
+          </property>
+         </widget>
         </item>
         <item row="2" column="1">
          <widget class="QComboBox" name="comboBox">
@@ -142,15 +150,22 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label">
-          <property name="whatsThis">
-           <string>The number of processor columns</string>
-          </property>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_4">
           <property name="text">
-           <string>Width (x)</string>
+           <string>Master:</string>
           </property>
          </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLabel" name="masterAddr">
+          <property name="text">
+           <string>0, 0</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="2">
+         <layout class="QGridLayout" name="gridLayout"/>
         </item>
        </layout>
       </item>

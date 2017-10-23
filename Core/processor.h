@@ -3,15 +3,19 @@
 
 #include <QObject>
 #include <Core/channel.h>
-#include <Core/appnode.h>
+#include <Core/application.h>
 
 namespace Core {
 
 class Processor : public QObject
 {
     Q_OBJECT
+
 public:
-    explicit Processor(int x, int y, int threads = 1, QObject *parent = 0);
+    enum Type {Master,Slave};
+    Q_ENUM(Type)
+
+    explicit Processor(int x, int y, Type type = Slave, int threads = 1, QObject *parent = 0);
 
     void setChannel(Direction direction, Channel *channel);
     Channel *getChannel(Direction direction);
@@ -23,6 +27,9 @@ public:
 
     int getX() const;
     int getY() const;
+    int getType() const;
+    bool isMaster();
+    int getThreadOf(const AppNode *appNode);
 
 private:
     Channel* north;
@@ -31,6 +38,7 @@ private:
     Channel* east;
     AppNode** cores;
     int threads;
+    Type type;
 
     int x;
     int y;
@@ -39,7 +47,8 @@ signals:
     void changed();
 
 public slots:
-    void kill(int thread);
+    void kill(int thread = -1);
+    void kill(AppNode * thread);
 };
 
 } // namespace Core

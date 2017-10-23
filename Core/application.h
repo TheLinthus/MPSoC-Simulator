@@ -19,30 +19,49 @@ public:
      * @param parent
      */
     explicit Application(QObject *parent = 0);
+    ~Application();
 
     /**
      * @brief addNode Add a new AppNode to the Application
      * @return
      */
     void addNode(int index, int lifespan);
-    void addNodeConnection(int from, int to, int volume, qreal load);
+    void addNodeConnection(const int from, int to, const int volume, const qreal load);
 
     AppNode *getNode(int index);
+    AppLoad *getLoad(int from, int to);
+
     bool exists(int index);
     void removeNode(int index);
 
     QColor getColor();
     void setColor(QColor color);
 
-private:
-    QColor color;
+    QString getName() const;
+    void setName(const QString &value);
 
+    Application *clone(QObject *parent);
+
+protected:
+    QColor color;
+    QString name;
+
+private:
     QMap<int, AppNode *> nodes;
     QMap<int, QMap<int, AppLoad *> *> connections;
 
 signals:
 
 public slots:
+};
+
+class MasterApplication : public Application
+{
+    Q_OBJECT
+
+public:
+    explicit MasterApplication();
+    ~MasterApplication();
 };
 
 } // namespace Core

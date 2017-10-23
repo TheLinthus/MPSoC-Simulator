@@ -49,8 +49,10 @@ bool ApplicationController::addFromFile(const QString &path, const QString name,
 
         if (groupName.isEmpty()) {
             add(name,app);
+            app->setName(name);
         } else {
             add("[" + groupName + "] " + name,app);
+            app->setName("[" + groupName + "] " + name);
         }
 
         return true;
@@ -93,11 +95,11 @@ Application *ApplicationController::getRunning(int index) {
 }
 
 void ApplicationController::run(QString name) {
-
+    runningList.append(applicationsList.value(name)->clone(this));
 }
 
 void ApplicationController::kill(int index) {
-
+    runningList.at(index)->deleteLater();
 }
 
 int ApplicationController::applicationsCount() {

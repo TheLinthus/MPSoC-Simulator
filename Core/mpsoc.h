@@ -12,7 +12,8 @@ class MPSoC : public QObject
 {
     Q_OBJECT
 public:
-    explicit MPSoC(int h, int w, QObject *parent = 0);
+    explicit MPSoC(int h, int w, QPoint master, QObject *parent = 0);
+    explicit MPSoC(int h, int w, int masterX = 0, int masterY = 0, QObject *parent = 0);
     ~MPSoC();
 
     Processor *getCore(int x, int y);
@@ -31,6 +32,7 @@ protected:
 
 private:
     Processor ***processors;
+    QPoint master;
     Core::Heuristic *heuristic;
 
 signals:

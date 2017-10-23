@@ -11,6 +11,10 @@ class AppLoad : public QObject
 public:
     explicit AppLoad(int volume, qreal load, QObject *parent = 0);
 
+    int getVolume() const;
+
+    qreal getLoad() const;
+
 signals:
 
 public slots:

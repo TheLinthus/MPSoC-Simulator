@@ -14,7 +14,7 @@ Channel::Channel(int x, int y, bool v, Core::Channel *c)
     setAcceptHoverEvents(true);
     connect(channel, SIGNAL(loadChanged(int)), this, SLOT(change()));
 
-    setToolTip(QString("<p>Channel load: %1</p><p>From A to B: %2</p><p>From B to A: %3</p>").arg(channel->val()).arg(channel->valAtB()).arg(channel->valBtA()));
+    updateToolTip();
 }
 
 QRectF Channel::boundingRect() const {
@@ -39,6 +39,10 @@ void Channel::hoverLeaveEvent(QGraphicsSceneHoverEvent *) {
 
 void Channel::mousePressEvent(QGraphicsSceneMouseEvent *) {
 
+}
+
+void Channel::updateToolTip() {
+    setToolTip(QString("Channel load: %1<hr>From A to B: %2<br>From B to A: %3").arg(channel->val()).arg(channel->valAtB()).arg(channel->valBtA()));
 }
 
 void Channel::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
@@ -69,13 +73,13 @@ void Channel::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget
         g = 255 - (channel->val() - 50) * 5.1;
         b = 0;
     }
-    painter->setBrush(QBrush(QColor(255,g,b))); // Branco ao vermelho, percentual da carga no canal
+    painter->setBrush(QBrush(QColor(255,g,b))); // Do branco ao amarelo e ao vermelho, percentual da carga no canal
     painter->drawPath(path);
 }
 
 void Channel::change() {
     this->update();
-    setToolTip(QString("<p>Channel load: %1</p><p>From A to B: %2</p><p>From B to A: %3</p>").arg(channel->val()).arg(channel->valAtB()).arg(channel->valBtA()));
+    updateToolTip();
 }
 
 } // namespace View

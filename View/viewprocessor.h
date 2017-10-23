@@ -38,6 +38,8 @@ private:
 
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+
+    void updateToolTip();
 };
 
 } // namespace View

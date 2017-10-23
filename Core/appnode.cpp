@@ -11,19 +11,11 @@ AppNode::AppNode(int lifespan, QObject *parent)
 }
 
 AppNode::~AppNode() {
-
-}
-
-int AppNode::getThread() const {
-    return thread;
-}
-
-void AppNode::setThread(int value) {
-    thread = value;
+    emit finished(this);
 }
 
 bool AppNode::isDone() {
-    return cycles >= lifespan;
+    return cycles == lifespan;
 }
 
 int AppNode::getLifespan() const {
@@ -39,10 +31,12 @@ void AppNode::setLifespan(const int lifespan) {
 }
 
 void AppNode::tick() {
-    cycles++;
-    emit changed();
-    if (isDone()) {
-        emit finished(thread);
+    if (cycles < lifespan) {
+        cycles++;
+        emit changed();
+        if (isDone()) {
+            emit finished(this);
+        }
     }
 }
 

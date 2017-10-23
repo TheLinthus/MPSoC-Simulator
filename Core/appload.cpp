@@ -10,4 +10,14 @@ AppLoad::AppLoad(int volume, qreal load, QObject *parent)
 
 }
 
+int AppLoad::getVolume() const
+{
+    return volume;
+}
+
+qreal AppLoad::getLoad() const
+{
+    return load;
+}
+
 } // namespace Core

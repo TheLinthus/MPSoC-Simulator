@@ -112,7 +112,7 @@ void MPSoC_Simulator::on_addMPSoCButton_clicked() {
     QHBoxLayout* layout =  ui->mpsocsLayout;
 
     View::MPSoCBox *mpsocbox = new View::MPSoCBox();
-    Core::MPSoC *mpsoc = mpsocs->add(dialog->getX(),dialog->getY());
+    Core::MPSoC *mpsoc = mpsocs->add(dialog->getW(),dialog->getH(),dialog->getMaster());
 
     mpsoc->setHeuristic(heuristics->getHeuristic(dialog->getHeuristic()));
 
@@ -169,4 +169,12 @@ void MPSoC_Simulator::on_nextStepButton_clicked() {
     } catch (int e) {
         qDebug() << "Exception " << e;
     }
+}
+
+void MPSoC_Simulator::on_playTimerButton_clicked() {
+    ui->actionAuto_Step->setChecked(true);
+}
+
+void MPSoC_Simulator::on_pauseTimerButton_clicked() {
+    ui->actionAuto_Step->setChecked(false);
 }

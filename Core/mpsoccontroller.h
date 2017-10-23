@@ -21,7 +21,8 @@ public:
     ~MPSoCController();
     static MPSoCController* instance();
 
-    Core::MPSoC *add(int h, int w);
+    Core::MPSoC *add(int h, int w, const QPoint &master);
+    Core::MPSoC *add(int h, int w, int masterX, int masterY);
     Core::MPSoC *get(int index);
     int count() const;
     void remove(MPSoC *mpsoc);
