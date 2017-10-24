@@ -33,7 +33,7 @@ public:
     void saveToFile(QString name);
     void add(QString name, Application *app);
     void remove(QString name);
-    QList<QString> getApplicationsList() const;
+    QStringList getApplicationsList() const;
     Core::Application *getApplication(QString name);
     Core::Application *getRunning(int index);
     void run(QString name);

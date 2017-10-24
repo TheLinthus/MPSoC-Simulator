@@ -45,8 +45,13 @@ void HeuristicController::updateAvailabilityList() {
         emit progressUpdate(progress);
         QString text;
 
-        QFile file(QString("Heuristics\\%1").arg(s));
-        file.open(QIODevice::ReadOnly | QIODevice::Text);
+        QFile file(heuristicsDir.absoluteFilePath(s));
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qWarning() << "Could not open file" << file.fileName();
+            progress++;
+            continue;
+        }
+
         text = file.readAll();
         file.close();
 

@@ -245,7 +245,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>499</width>
-                <height>502</height>
+                <height>514</height>
                </rect>
               </property>
               <layout class="QHBoxLayout" name="mpsocsLayout">
@@ -648,7 +648,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QListView" name="runningList"/>
+            <widget class="QListView" name="runningList">
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QPushButton" name="killApplicationPushButton">
@@ -691,7 +695,7 @@
      <x>0</x>
      <y>0</y>
      <width>991</width>
-     <height>21</height>
+     <height>17</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -718,8 +722,22 @@
     <addaction name="actionStep_Foward"/>
     <addaction name="actionAuto_Step"/>
    </widget>
+   <widget class="QMenu" name="menuApplications">
+    <property name="title">
+     <string>&amp;Applications</string>
+    </property>
+    <addaction name="action_Open_Applications_Directory"/>
+   </widget>
+   <widget class="QMenu" name="menuHeuristics">
+    <property name="title">
+     <string>H&amp;euristics</string>
+    </property>
+    <addaction name="action_Open_Heuristics_Directory"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSimulation"/>
+   <addaction name="menuApplications"/>
+   <addaction name="menuHeuristics"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
@@ -827,6 +845,24 @@
    </property>
    <property name="shortcut">
     <string>F6</string>
+   </property>
+  </action>
+  <action name="action_Open_Applications_Directory">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/images/folder-12.png</normaloff>:/icons/images/folder-12.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Open Directory</string>
+   </property>
+  </action>
+  <action name="action_Open_Heuristics_Directory">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/images/folder-12.png</normaloff>:/icons/images/folder-12.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Open Directory</string>
    </property>
   </action>
  </widget>

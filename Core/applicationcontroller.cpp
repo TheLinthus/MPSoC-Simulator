@@ -57,6 +57,7 @@ bool ApplicationController::addFromFile(const QString &path, const QString name,
 
         return true;
     } else {
+        qWarning() << "File " << path << " doesn't exist or can't be open";
         return false;
     }
     return false;
@@ -82,8 +83,8 @@ void ApplicationController::remove(QString name) {
 
 }
 
-QList<QString> ApplicationController::getApplicationsList() const {
-    return applicationsList.keys();
+QStringList ApplicationController::getApplicationsList() const {
+    return QStringList(applicationsList.keys());
 }
 
 Application *ApplicationController::getApplication(QString name) {
@@ -122,8 +123,12 @@ void ApplicationController::updateAvailabilityList() {
     foreach (QString s, applicationsDir.entryList()) {
         emit progressUpdate(loadValue);
         QString text;
-        QFile file("Applications\\"+s);
-        file.open(QIODevice::ReadOnly | QIODevice::Text);
+        QFile file(applicationsDir.absoluteFilePath(s));
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qWarning() << "Could not open file" << file.fileName();
+            loadValue++;
+            continue;
+        }
         text = file.readAll();
         file.close();
 
@@ -131,7 +136,7 @@ void ApplicationController::updateAvailabilityList() {
 
         QJsonDocument json = QJsonDocument::fromJson(text.toUtf8());
         if (json.isNull()) {
-            qWarning() << "Error File";
+            qWarning() << "File " << file.fileName() << " doesn't have a valid Json";
             continue;
         }
 
@@ -145,7 +150,7 @@ void ApplicationController::updateAvailabilityList() {
         for (int i = 0; i < array.size(); i++) {
             emit progressUpdate(loadValue);
             loadValue++;
-            addFromFile(array.at(i).toObject().value("file").toString(), array.at(i).toObject().value("name").toString(), appsName);
+            addFromFile(applicationsDir.absoluteFilePath(array.at(i).toObject().value("file").toString()), array.at(i).toObject().value("name").toString(), appsName);
         }
     }
 

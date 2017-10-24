@@ -103,9 +103,9 @@ void Processor::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidg
         painter->setBrush(QBrush(Qt::blue));
         painter->drawEllipse(rect.topLeft() + QPoint(10,10), 18, 18);
 
-        painter->setFont(QFont("Trebuchet MS", 18, QFont::Bold));
+        painter->setFont(QFont("Geneva", 18, QFont::Bold));
         painter->setPen(QPen(Qt::white));
-        painter->drawText(rect.topLeft() + QPointF(1,18), "M");
+        painter->drawText(rect.topLeft() + QPointF(0,18), "M");
     }
 
 }
