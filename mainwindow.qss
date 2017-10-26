@@ -1,12 +1,32 @@
 QMenuBar {
     background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgb(170, 170, 170), stop:1 rgb(191, 191, 191));
 }
-#leftPanel, #rightPanel, #centralPanel, #tools {
+#leftPanel, #pageSimulation, #pageApplications, #pageHeuristics {
     color: rgb(255, 255, 255);
     background-color: rgb(88, 88, 88);
 }
-#leftPanel QPushButton, #leftPanel QLabel, #rightPanel QPushButton, #rightPanel QLabel, #centralPanel QPushButton, #centralPanel QLabel {
+#leftPanel QPushButton, #leftPanel QLabel,
+#widgetStack QPushButton, #widgetStack QLabel, #widgetStack QGroupBox {
     color: rgb(255, 255, 255);
+}
+#widgetStack > QWidget {
+    border: 0;
+}
+#widgetStack QDateEdit, #widgetStack QLineEdit {
+    padding-left: 3px;
+}
+#widgetStack QDateEdit[readOnly="true"], #widgetStack QLineEdit:read-only {
+    border: 0;
+    background-color: #444;
+    color: #fff;
+}
+#widgetStack QDateEdit:disabled, #widgetStack QLineEdit:disabled, #widegetStack checkBox:disabled {
+    border: 1px solid #000;
+    background-color: #777;
+    color: #777;
+}
+#widgetStack QDateEdit:focus, #widgetStack QLineEdit:focus, #widegetStack checkBox:focus {
+    border: 1px solid palette(highlight);
 }
 QPushButton:flat {
     border: none;

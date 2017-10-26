@@ -45,12 +45,13 @@ private slots:
     //void increment();
     void loadingDone();
 
-    void applicationsListModel_selectionChanged(const QItemSelection, const QItemSelection);
-    void runningListModel_selectionChanged(const QItemSelection, const QItemSelection);
-
     void applicationButtonsCheckEnable();
 
     void closeEvent(QCloseEvent *event) override;
+
+    void applicationsListModel_selectionChanged(const QItemSelection, const QItemSelection);
+    void runningListModel_selectionChanged(const QItemSelection, const QItemSelection);
+    void applicationsGroupListModel_selectionChanged(const QItemSelection s, const QItemSelection);
 
     void on_timerSpinBox_valueChanged(int val);
     void on_stepSlider_valueChanged(int val);
@@ -59,10 +60,13 @@ private slots:
     void on_simulationPushButton_clicked();
     void on_heuristicsPushButton_clicked();
     void on_nextStepButton_clicked();
-
     void on_playTimerButton_clicked();
-
     void on_pauseTimerButton_clicked();
+    void on_pushButtonCreateNewApplicationGroup_clicked();
+    void on_pushButtonCreateApplicationGroupFromFile_clicked();
+    void on_pushButtonSaveApplicationGroup_clicked();
+
+    void on_pushButtonCancelApplicationGroup_clicked();
 
 private:
     QThread *thread;
@@ -75,7 +79,10 @@ private:
     QLabel *statusLabel;
 
     QStringListModel *applicationsListModel;
+    QStringListModel *applicationsGroupListModel;
     QStringListModel *runningListModel;
+    Core::ApplicationGroup *editApplicationsGroup;
+    void clearEditor();
 };
 
 #endif // MAINWINDOW_H

@@ -381,6 +381,7 @@
         <file>images/zoom-in.png</file>
         <file>images/zoom-out.png</file>
         <file>images/pause-2.png</file>
+        <file>images/edit-cancel.png</file>
     </qresource>
     <qresource prefix="/stylesheet" lang="qss">
         <file>mainwindow.qss</file>

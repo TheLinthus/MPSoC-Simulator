@@ -20,6 +20,15 @@ Core::ApplicationController *ApplicationController::createInstance() {
     return new ApplicationController();
 }
 
+QString ApplicationController::getFileVersion(int v) const {
+    switch (v) {
+        case ApplicationFileVersion::Basic:
+        default:
+            return QString("(\\d+)\\s*\\[\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\]");
+    }
+    return QString();
+}
+
 Core::ApplicationController::~ApplicationController() {
 
 }
@@ -28,16 +37,16 @@ Core::ApplicationController* ApplicationController::instance() {
     return Singleton<Core::ApplicationController>::instance(Core::ApplicationController::createInstance);
 }
 
-bool ApplicationController::addFromFile(const QString &path, const QString name, const QString groupName) {
+bool ApplicationController::addFromFile(const QString &path, const QString name, ApplicationGroup *group) {
     QFile file(path);
 
     if (file.exists() &&  file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QRegExp rx("(\\d+)\\s*\\[\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\]");
+        QRegExp rx(getFileVersion(Basic));
         rx.indexIn(file.readAll());
 
         file.close();
 
-        Core::Application *app = new Application(this);
+        Core::Application *app = new Core::Application(group);
 
         for (int i = 0; i < rx.captureCount(); i+=7) {
             app->addNode(PARENT_INDEX, 0); // Add parent Node to application
@@ -47,13 +56,8 @@ bool ApplicationController::addFromFile(const QString &path, const QString name,
             app->addNodeConnection(CHILD_INDEX, PARENT_INDEX, CHILD_TO_PARENT_VOLUME, CHILD_TO_PARENT_LOAD);
         }
 
-        if (groupName.isEmpty()) {
-            add(name,app);
-            app->setName(name);
-        } else {
-            add("[" + groupName + "] " + name,app);
-            app->setName("[" + groupName + "] " + name);
-        }
+        app->setName(name);
+        add(app->getName(),app);
 
         return true;
     } else {
@@ -87,12 +91,20 @@ QStringList ApplicationController::getApplicationsList() const {
     return QStringList(applicationsList.keys());
 }
 
+QStringList ApplicationController::getApplicationsGroupList() const {
+    return QStringList(applicationsGroupList.keys());
+}
+
 Application *ApplicationController::getApplication(QString name) {
     return applicationsList.value(name);
 }
 
 Application *ApplicationController::getRunning(int index) {
     return runningList.at(index);
+}
+
+ApplicationGroup *ApplicationController::getApplicationGroup(QString name) {
+    return applicationsGroupList.value(name);
 }
 
 void ApplicationController::run(QString name) {
@@ -135,13 +147,23 @@ void ApplicationController::updateAvailabilityList() {
         loadValue++;
 
         QJsonDocument json = QJsonDocument::fromJson(text.toUtf8());
-        if (json.isNull()) {
+        if (json.isEmpty() || json.isNull()) {
             qWarning() << "File " << file.fileName() << " doesn't have a valid Json";
             continue;
         }
 
         QJsonObject obj = json.object();
-        QString appsName = obj.value("name").toString();
+
+        ApplicationGroup *group = new ApplicationGroup(this);
+
+        group->setName(obj.value("name").toString());
+        group->setAuthor(obj.value("author").toString());
+        group->setDate(QDate::fromString(obj.value("date").toString(), Qt::ISODate));
+        group->setEnabled(obj.value("enabled").toBool());
+        group->setFile(file.fileName());
+
+        applicationsGroupList.insert(group->getName(), group);
+
         QJsonArray array = obj.value("applications").toArray();
 
         loadMax += array.size();
@@ -150,7 +172,10 @@ void ApplicationController::updateAvailabilityList() {
         for (int i = 0; i < array.size(); i++) {
             emit progressUpdate(loadValue);
             loadValue++;
-            addFromFile(applicationsDir.absoluteFilePath(array.at(i).toObject().value("file").toString()), array.at(i).toObject().value("name").toString(), appsName);
+            addFromFile(
+                        applicationsDir.absoluteFilePath(array.at(i).toObject().value("file").toString()),
+                        array.at(i).toObject().value("name").toString(),
+                        group);
         }
     }
 

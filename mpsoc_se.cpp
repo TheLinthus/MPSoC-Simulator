@@ -7,6 +7,7 @@ MPSoC_Simulator::MPSoC_Simulator(QWidget *parent) :
     ui(new Ui::MainWindow),
     thread(new QThread(this)),
     timer(new QTimer(this)),
+    applicationsGroupListModel(new QStringListModel()),
     applicationsListModel(new QStringListModel()),
     runningListModel(new QStringListModel()),
     statusLabel(new QLabel(this->statusBar()))
@@ -34,11 +35,14 @@ MPSoC_Simulator::MPSoC_Simulator(QWidget *parent) :
 
     ui->applicationsList->setModel(applicationsListModel);
     ui->runningList->setModel(runningListModel);
+    ui->applicationsGroupList->setModel(applicationsGroupListModel);
 
     connect(ui->applicationsList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
                 this, SLOT(applicationsListModel_selectionChanged(QItemSelection,QItemSelection)));
     connect(ui->runningList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
                 this, SLOT(runningListModel_selectionChanged(QItemSelection,QItemSelection)));
+    connect(ui->applicationsGroupList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+                this, SLOT(applicationsGroupListModel_selectionChanged(QItemSelection,QItemSelection)));
 
     connect(apps, SIGNAL(progressUpdate(int)), statusProgress, SLOT(setValue(int)));
     connect(apps, SIGNAL(progressMaxUpdate(int)), statusProgress, SLOT(setMaximum(int)));
@@ -81,6 +85,7 @@ void ApplicationLoader::run() {
 void MPSoC_Simulator::loadingDone() {
     statusProgress->setVisible(false);
     applicationsListModel->setStringList(apps->getApplicationsList());
+    applicationsGroupListModel->setStringList(apps->getApplicationsGroupList());
 }
 
 void MPSoC_Simulator::applicationButtonsCheckEnable() {
@@ -132,6 +137,27 @@ void MPSoC_Simulator::runningListModel_selectionChanged(const QItemSelection, co
     applicationButtonsCheckEnable();
 }
 
+void MPSoC_Simulator::applicationsGroupListModel_selectionChanged(const QItemSelection s, const QItemSelection) {
+    if (ui->applicationsGroupList->selectionModel()->selectedIndexes().count() > 0) {
+        ui->groupBoxApplicationGroup->setEnabled(true);
+        ui->groupBoxApplicationGroup->setTitle(tr("Edit Application Group"));
+        ui->pushButtonSaveApplicationGroup->setEnabled(true);
+        ui->pushButtonCancelApplicationGroup->setEnabled(true);
+
+        Core::ApplicationGroup *group = apps->getApplicationGroup(ui->applicationsGroupList->selectionModel()->selectedIndexes().first().data().toString());
+
+        ui->lineEditApplicationGroupName->setReadOnly(true);
+        ui->lineEditApplicationGroupName->setText(group->getName());
+        ui->lineEditApplicationGroupAuthor->setReadOnly(true);
+        ui->lineEditApplicationGroupAuthor->setText(group->getAuthor());
+        ui->lineEditApplicationGroupApplicationsCount->setText("0"); // TODO
+        ui->dateEditApplicationGroupDate->setDate(group->getDate());
+        ui->checkBoxApplicationGroupEnabled->setChecked(group->isEnabled());
+    } else {
+        clearEditor();
+    }
+}
+
 void MPSoC_Simulator::on_timerSpinBox_valueChanged(int val) {
     timer->setInterval(val);
 }
@@ -151,15 +177,14 @@ void MPSoC_Simulator::on_simulationPushButton_clicked() {
     ui->simulationPushButton->setChecked(true);
     ui->applicationsPushButton->setChecked(false);
     ui->heuristicsPushButton->setChecked(false);
-    ui->widgetStack->setCurrentWidget(ui->pageSimulator);
+    ui->widgetStack->setCurrentWidget(ui->pageSimulation);
 }
 
 void MPSoC_Simulator::on_heuristicsPushButton_clicked() {
     ui->simulationPushButton->setChecked(false);
     ui->applicationsPushButton->setChecked(false);
     ui->heuristicsPushButton->setChecked(true);
-
-    //TODO
+    ui->widgetStack->setCurrentWidget(ui->pageHeuristics);
 }
 
 void MPSoC_Simulator::on_nextStepButton_clicked() {
@@ -177,4 +202,53 @@ void MPSoC_Simulator::on_playTimerButton_clicked() {
 
 void MPSoC_Simulator::on_pauseTimerButton_clicked() {
     ui->actionAuto_Step->setChecked(false);
+}
+
+void MPSoC_Simulator::on_pushButtonCreateNewApplicationGroup_clicked() {
+    ui->applicationsGroupList->selectionModel()->clearSelection();
+    ui->groupBoxApplicationGroup->setEnabled(true);
+    ui->groupBoxApplicationGroup->setTitle(tr("New Application Group"));
+    ui->pushButtonSaveApplicationGroup->setEnabled(true);
+    ui->pushButtonCancelApplicationGroup->setEnabled(true);
+    ui->lineEditApplicationGroupName->setFocus();
+    ui->lineEditApplicationGroupName->setReadOnly(false);
+    QString name = qgetenv("USER");
+    if (name.isEmpty())
+        name = qgetenv("USERNAME");
+    ui->lineEditApplicationGroupAuthor->setText(name);
+    ui->lineEditApplicationGroupAuthor->setReadOnly(false);
+    ui->lineEditApplicationGroupApplicationsCount->setText(0);
+    ui->dateEditApplicationGroupDate->setDate(QDate::currentDate());
+    ui->checkBoxApplicationGroupEnabled->setChecked(true);
+}
+
+void MPSoC_Simulator::on_pushButtonCreateApplicationGroupFromFile_clicked() {
+
+}
+
+void MPSoC_Simulator::on_pushButtonSaveApplicationGroup_clicked() {
+    if (ui->applicationsGroupList->selectionModel()->selectedIndexes().count() > 0) { // Edit
+        editApplicationsGroup = apps->getApplicationGroup(ui->applicationsGroupList->selectionModel()->selectedIndexes().first().data().toString());
+        editApplicationsGroup->setEnabled(ui->checkBoxApplicationGroupEnabled->isChecked());
+        apps->saveToFile(editApplicationsGroup->getName());
+    } else {    // New
+
+    }
+}
+
+void MPSoC_Simulator::on_pushButtonCancelApplicationGroup_clicked() {
+    clearEditor();
+}
+
+void MPSoC_Simulator::clearEditor() {
+    ui->applicationsGroupList->selectionModel()->clearSelection();
+
+    ui->groupBoxApplicationGroup->setEnabled(false);
+    ui->groupBoxApplicationGroup->setTitle(tr("Select an Application Group"));
+    ui->pushButtonSaveApplicationGroup->setEnabled(false);
+    ui->pushButtonCancelApplicationGroup->setEnabled(false);
+    ui->lineEditApplicationGroupName->clear();
+    ui->lineEditApplicationGroupAuthor->clear();
+    ui->lineEditApplicationGroupApplicationsCount->clear();
+    ui->checkBoxApplicationGroupEnabled->setChecked(false);
 }

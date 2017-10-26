@@ -16,12 +16,15 @@ public:
     explicit MPSoC(int h, int w, int masterX = 0, int masterY = 0, QObject *parent = 0);
     ~MPSoC();
 
-    Processor *getCore(int x, int y);
+    Processor *getCore(const QPoint &p) const;
+    Processor *getCore(int x, int y) const;
 
     int getHeight() const;
     int getWidth() const;
-    QVector<Channel *> getPatch(Processor a, Processor b);
-    QVector<Channel *> getPatch(int x1, int y1, int x2, int y2);
+    QVector<Channel *> getPatch(const QPoint &a, const QPoint &b) const;
+    QVector<Channel *> getPatch(int x1, int y1, int x2, int y2) const;
+    QVector<Processor *> getFree() const;
+    QVector<Processor *> getBusy() const;
 
     Core::Heuristic *getHeuristic() const;
     void setHeuristic(Core::Heuristic *value);
@@ -31,7 +34,7 @@ protected:
     int width;
 
 private:
-    Processor ***processors;
+    QVector<QVector <Processor *>> processors;
     QPoint master;
     Core::Heuristic *heuristic;
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>991</width>
-    <height>623</height>
+    <width>990</width>
+    <height>609</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -191,9 +191,9 @@
     <item>
      <widget class="QStackedWidget" name="widgetStack">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
-      <widget class="QWidget" name="pageSimulator">
+      <widget class="QWidget" name="pageSimulation">
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <property name="spacing">
          <number>0</number>
@@ -211,7 +211,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QFrame" name="centralPanel">
+         <widget class="QFrame" name="simulatorCentralPanel">
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
@@ -244,8 +244,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>499</width>
-                <height>514</height>
+                <width>498</width>
+                <height>488</height>
                </rect>
               </property>
               <layout class="QHBoxLayout" name="mpsocsLayout">
@@ -555,7 +555,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QFrame" name="rightPanel">
+         <widget class="QFrame" name="simulatorRightPanel">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -564,7 +564,7 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>260</width>
+            <width>240</width>
             <height>0</height>
            </size>
           </property>
@@ -681,10 +681,298 @@
          </widget>
         </item>
        </layout>
-       <zorder>rightPanel</zorder>
-       <zorder>centralPanel</zorder>
+       <zorder>simulatorRightPanel</zorder>
+       <zorder>simulatorCentralPanel</zorder>
       </widget>
-      <widget class="QWidget" name="pageApplications"/>
+      <widget class="QWidget" name="pageApplications">
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QFrame" name="applicationsCentralPanel">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <property name="spacing">
+            <number>3</number>
+           </property>
+           <property name="leftMargin">
+            <number>4</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>4</number>
+           </property>
+           <property name="bottomMargin">
+            <number>4</number>
+           </property>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="simulatorRightPanel_3">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>240</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>260</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_9">
+           <property name="spacing">
+            <number>4</number>
+           </property>
+           <property name="leftMargin">
+            <number>8</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>8</number>
+           </property>
+           <property name="bottomMargin">
+            <number>4</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>Applications</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_11">
+             <property name="text">
+              <string>Application Groups</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QListView" name="applicationsGroupList">
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonCreateNewApplicationGroup">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>36</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Create New</string>
+             </property>
+             <property name="icon">
+              <iconset resource="resources.qrc">
+               <normaloff>:/icons/images/file.png</normaloff>:/icons/images/file.png</iconset>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonCreateApplicationGroupFromFile">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>36</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Create From File</string>
+             </property>
+             <property name="icon">
+              <iconset resource="resources.qrc">
+               <normaloff>:/icons/images/folder-13.png</normaloff>:/icons/images/folder-13.png</iconset>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBoxApplicationGroup">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="title">
+              <string>Select an Application Group</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_2">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>Name:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="lineEditApplicationGroupName"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string>Author:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="lineEditApplicationGroupAuthor"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>Date:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>Applications</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="lineEditApplicationGroupApplicationsCount">
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_8">
+                <property name="text">
+                 <string>Enabled:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QCheckBox" name="checkBoxApplicationGroupEnabled">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QDateEdit" name="dateEditApplicationGroupDate">
+                <property name="frame">
+                 <bool>true</bool>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+                <property name="buttonSymbols">
+                 <enum>QAbstractSpinBox::NoButtons</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <property name="spacing">
+              <number>6</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QPushButton" name="pushButtonSaveApplicationGroup">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>36</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Save</string>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/icons/images/save.png</normaloff>:/icons/images/save.png</iconset>
+               </property>
+               <property name="flat">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButtonCancelApplicationGroup">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>36</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Cancel</string>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/icons/images/multiply.png</normaloff>:/icons/images/multiply.png</iconset>
+               </property>
+               <property name="flat">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="pageHeuristics"/>
      </widget>
     </item>
    </layout>
@@ -694,8 +982,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>991</width>
-     <height>17</height>
+     <width>990</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -867,6 +1155,32 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>simulationPushButton</tabstop>
+  <tabstop>applicationsPushButton</tabstop>
+  <tabstop>heuristicsPushButton</tabstop>
+  <tabstop>mpsocsPanel</tabstop>
+  <tabstop>stepSlider</tabstop>
+  <tabstop>addMPSoCButton</tabstop>
+  <tabstop>resetButton</tabstop>
+  <tabstop>prevStepButton</tabstop>
+  <tabstop>nextStepButton</tabstop>
+  <tabstop>pauseTimerButton</tabstop>
+  <tabstop>playTimerButton</tabstop>
+  <tabstop>timerSpinBox</tabstop>
+  <tabstop>applicationsList</tabstop>
+  <tabstop>runApplicationPushButton</tabstop>
+  <tabstop>runningList</tabstop>
+  <tabstop>killApplicationPushButton</tabstop>
+  <tabstop>applicationsGroupList</tabstop>
+  <tabstop>pushButtonCreateNewApplicationGroup</tabstop>
+  <tabstop>pushButtonCreateApplicationGroupFromFile</tabstop>
+  <tabstop>lineEditApplicationGroupName</tabstop>
+  <tabstop>lineEditApplicationGroupAuthor</tabstop>
+  <tabstop>dateEditApplicationGroupDate</tabstop>
+  <tabstop>checkBoxApplicationGroupEnabled</tabstop>
+  <tabstop>lineEditApplicationGroupApplicationsCount</tabstop>
+ </tabstops>
  <resources>
   <include location="resources.qrc"/>
  </resources>

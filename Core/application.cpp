@@ -64,9 +64,11 @@ void Application::setColor(QColor color) {
     this->color = color;
 }
 
-QString Application::getName() const
-{
-    return name;
+QString Application::getName() const {
+    if (parent() == 0) {
+        return name;
+    }
+    return QString("[%1] %2").arg(((ApplicationGroup *) parent())->getName(), name);
 }
 
 void Application::setName(const QString &value)
@@ -92,11 +94,63 @@ Application *Application::clone(QObject *parent) {
     return clone;
 }
 
+QString Application::getFile() const {
+    return file;
+}
+
+void Application::setFile(const QString &value) {
+    file = value;
+}
+
 MasterApplication::MasterApplication() {
     setColor(Qt::blue);
     setName(tr("Master"));
 }
 
 MasterApplication::~MasterApplication() {}
+
+ApplicationGroup::ApplicationGroup(QObject *parent) : QObject(parent) {}
+
+ApplicationGroup::~ApplicationGroup() { }
+
+QString ApplicationGroup::getFile() const {
+    return file;
+}
+
+void ApplicationGroup::setFile(const QString &value) {
+    file = value;
+}
+
+QString ApplicationGroup::getName() const {
+    return name;
+}
+
+void ApplicationGroup::setName(const QString &value) {
+    name = value;
+}
+
+QString ApplicationGroup::getAuthor() const {
+    return author;
+}
+
+void ApplicationGroup::setAuthor(const QString &value) {
+    author = value;
+}
+
+QDate ApplicationGroup::getDate() const {
+    return date;
+}
+
+void ApplicationGroup::setDate(const QDate &value) {
+    date = value;
+}
+
+bool ApplicationGroup::isEnabled() const {
+    return enabled;
+}
+
+void ApplicationGroup::setEnabled(bool value) {
+    enabled = value;
+}
 
 } // namespace Core

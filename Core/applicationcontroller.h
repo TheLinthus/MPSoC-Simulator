@@ -23,19 +23,28 @@ private:
     static ApplicationController* createInstance();
 
     QMap<QString, Core::Application *> applicationsList;
+    QMap<QString, Core::ApplicationGroup *> applicationsGroupList;
     QList<Core::Application *> runningList;
+
+    QString getFileVersion(int v) const;
+
+    enum ApplicationFileVersion {
+        Basic
+    };
 
 public:
     ~ApplicationController();
     static ApplicationController* instance();
 
-    bool addFromFile(const QString &path, const QString name, const QString groupName = "");
+    bool addFromFile(const QString &path, const QString name, ApplicationGroup *group);
     void saveToFile(QString name);
     void add(QString name, Application *app);
     void remove(QString name);
     QStringList getApplicationsList() const;
+    QStringList getApplicationsGroupList() const;
     Core::Application *getApplication(QString name);
     Core::Application *getRunning(int index);
+    ApplicationGroup *getApplicationGroup(QString name);
     void run(QString name);
     void kill(int index);
     int applicationsCount();

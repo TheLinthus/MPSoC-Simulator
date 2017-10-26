@@ -3,12 +3,43 @@
 
 #include <QObject>
 #include <QVector>
-#include <QDebug>
+#include <QDate>
+#include <QMap>
 #include <QColor>
 #include "appload.h"
 #include "appnode.h"
 
 namespace Core {
+
+class ApplicationGroup : public QObject
+{
+    Q_OBJECT
+public:
+    explicit ApplicationGroup(QObject *parent = 0);
+    ~ApplicationGroup();
+
+    QString getFile() const;
+    void setFile(const QString &value);
+
+    QString getName() const;
+    void setName(const QString &value);
+
+    QString getAuthor() const;
+    void setAuthor(const QString &value);
+
+    QDate getDate() const;
+    void setDate(const QDate &value);
+
+    bool isEnabled() const;
+    void setEnabled(bool value);
+
+private:
+    QString file;
+    QString name;
+    QString author;
+    QDate date;
+    bool enabled;
+};
 
 class Application : public QObject
 {
@@ -42,9 +73,13 @@ public:
 
     Application *clone(QObject *parent);
 
+    QString getFile() const;
+    void setFile(const QString &value);
+
 protected:
     QColor color;
     QString name;
+    QString file;
 
 private:
     QMap<int, AppNode *> nodes;

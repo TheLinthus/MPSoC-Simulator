@@ -8,11 +8,10 @@ MPSoC::MPSoC(int h, int w, QPoint master, QObject *parent)
     , width(w)
     , height(h)
     , master(master)
+    , processors(w, QVector<Processor *>(h))
 {
     qDebug("Construindo nova MPSoC %dx%d", width, height);
-    processors = new Processor**[w];
     for (int i = 0; i < w; i++) {
-        processors[i] = new Processor*[h];
         for (int j = 0; j < h; j++) {
             if (i == master.x() && j == master.y()) {
                 processors[i][j] = new Processor(i,j, Processor::Master);
@@ -49,7 +48,11 @@ MPSoC::~MPSoC()
     qDebug("MPSoC %dx%d sendo destruida", width, height);
 }
 
-Processor* MPSoC::getCore(int x, int y) {
+Processor *MPSoC::getCore(const QPoint &p) const {
+    return getCore(p.x(), p.y());
+}
+
+Processor* MPSoC::getCore(int x, int y) const {
     if (x > width || y > height) {
         return 0;
     }
@@ -64,34 +67,68 @@ int MPSoC::getWidth() const {
     return width;
 }
 
-QVector<Channel *> MPSoC::getPatch(Processor a, Processor b) {
-    return getPatch(a.getX(), a.getY(), b.getX(), b.getY());
+QVector<Channel *> MPSoC::getPatch(const QPoint &a, const QPoint &b) const {
+    return getPatch(a.x(), a.y(), b.x(), b.y());
 }
 
-QVector<Channel *> MPSoC::getPatch(int x1, int y1, int x2, int y2) {
+QVector<Channel *> MPSoC::getPatch(int x1, int y1, int x2, int y2) const {
     if (x1 > width || y1 > height || x2 > width || y2 > height) {
-        return QVector<Channel *>();
+        return QVector<Channel *>();    // If out of bound return empety list
     }
     int lenght = abs(x1 - x2) + abs(y1 - y2);
     QVector<Channel *> patch(lenght);
 
-    int count = 0;
     int math = x1 < x2 ? +1 : -1;
     Direction dir = x1 < x2 ? East : West ;
     while (x1 != x2) {
-        patch[count] = processors[x1][y1]->getChannel(dir);
+        patch.append(processors[x1][y1]->getChannel(dir));
         x1 += math;
-        count++;
     }
     math = y1 < y2 ? +1 : -1;
     dir = y1 < y2 ? South : North;
     while (y1 != y2) {
-        patch[count] = processors[x1][y1]->getChannel(dir);
+        patch.append(processors[x1][y1]->getChannel(dir));
         y1 += math;
-        count++;
     }
 
     return patch;
+}
+
+QVector<Processor *> MPSoC::getFree() const {
+    QVector<Processor *> list = QVector<Processor *>();
+
+    for (int i = 0; i < width; i ++) {
+        for (int j = 0; j < height; j++) {
+            Processor * p = processors[i][j];
+            for (int k = 0; k < p->nOfThreads(); k++) {
+                if (p->isIdle(k)) {
+                    list.append(p); // If at least one thread is free add it into return list
+                    continue;
+                }
+            }
+        }
+    }
+
+    return list;
+}
+
+QVector<Processor *> MPSoC::getBusy() const {
+    QVector<Processor *> list = QVector<Processor *>();
+
+    for (int i = 0; i < width; i ++) {
+        for (int j = 0; j < height; j++) {
+            Processor * p = processors[i][j];
+            list.append(p);
+            for (int k = 0; k < p->nOfThreads(); k++) {
+                if (p->isIdle(k)) {
+                    list.removeLast(); // If at least one thread is free doesn't put it into return list
+                    continue;
+                }
+            }
+        }
+    }
+
+    return list;
 }
 
 Core::Heuristic *MPSoC::getHeuristic() const {
@@ -102,7 +139,7 @@ void MPSoC::setHeuristic(Core::Heuristic *value) {
     heuristic = value;
 }
 
-// Prototipe, dynamic modify mpsoc
+// Prototype, dynamic modify mpsoc
 //void MPSoC::setWidth(int w) {
 //    width = w;
 //    // destroy or create new processors

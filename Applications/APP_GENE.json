@@ -1,7 +1,8 @@
 {
     "author": "Ewerson Carvalho",
     "name": "GENE",
-    "date": "Oct 2017",
+    "date": "2017-10-02",
+    "enabled": true,
     "applications": [
         {
             "name": "Aplicação 00",
