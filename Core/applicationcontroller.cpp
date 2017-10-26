@@ -57,7 +57,7 @@ bool ApplicationController::addFromFile(const QString &path, const QString name,
         }
 
         app->setName(name);
-        add(app->getName(),app);
+        add(app, group);
 
         return true;
     } else {
@@ -71,23 +71,18 @@ void ApplicationController::saveToFile(QString name) {
 
 }
 
-void ApplicationController::add(QString name, Application *app) {
-    if (applicationsList.contains(name)) {
-        int n = 2;
-        while (applicationsList.contains(name + " " + n)) {
-            n++;
+void ApplicationController::add(Application *app, ApplicationGroup *group) {
+    group->add(app);
+    applicationsList.insert(app->getName(), app);
+}
+
+QStringList ApplicationController::getApplicationsList(const QString &group) const {
+    if (group != 0) {
+        if (applicationsGroupList.contains(group)) {
+            return applicationsGroupList.value(group)->getApplicationsList();
         }
-        applicationsList.insert(name + " " + n, app);
-    } else {
-        applicationsList.insert(name, app);
+        return QStringList();
     }
-}
-
-void ApplicationController::remove(QString name) {
-
-}
-
-QStringList ApplicationController::getApplicationsList() const {
     return QStringList(applicationsList.keys());
 }
 

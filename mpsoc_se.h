@@ -10,11 +10,14 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QProgressBar>
-#include "View/mpsocbox.h"
-#include "View/newmpsocdialog.h"
-#include "Core/applicationcontroller.h"
-#include "Core/mpsoccontroller.h"
-#include "Core/heuristiccontroller.h"
+#include <View/mpsocbox.h>
+#include <View/newmpsocdialog.h>
+#include <View/simulationtab.h>
+#include <View/applicationstab.h>
+#include <View/heuristicstab.h>
+#include <Core/applicationcontroller.h>
+#include <Core/mpsoccontroller.h>
+#include <Core/heuristiccontroller.h>
 
 namespace Ui {
 class MainWindow;
@@ -77,6 +80,10 @@ private:
 
     QProgressBar *statusProgress;
     QLabel *statusLabel;
+
+    View::SimulationTab *simulationTab;
+    View::ApplicationsTab *applicationsTab;
+    View::HeuristicsTab *heuristicsTab;
 
     QStringListModel *applicationsListModel;
     QStringListModel *applicationsGroupListModel;

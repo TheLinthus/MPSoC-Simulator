@@ -9,9 +9,7 @@ namespace Ui {
 class SimulationTab;
 }
 
-class SimulationTab : public QWidget
-{
-    Q_OBJECT
+class SimulationTab : public QWidget {
 
 public:
     explicit SimulationTab(QWidget *parent = 0);

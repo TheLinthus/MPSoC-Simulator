@@ -1,21 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <author/>
- <comment/>
- <exportmacro/>
  <class>View::SimulationTab</class>
  <widget class="QWidget" name="View::SimulationTab">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>563</width>
+    <height>386</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Simulatio Tab</string>
   </property>
  </widget>
- <pixmapfunction/>
+ <resources/>
  <connections/>
 </ui>

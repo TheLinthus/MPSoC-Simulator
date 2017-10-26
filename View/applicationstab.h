@@ -3,13 +3,13 @@
 
 #include <QWidget>
 
+namespace View {
+
 namespace Ui {
 class ApplicationsTab;
 }
 
-class ApplicationsTab : public QWidget
-{
-    Q_OBJECT
+class ApplicationsTab : public QWidget {
 
 public:
     explicit ApplicationsTab(QWidget *parent = 0);
@@ -19,4 +19,6 @@ private:
     Ui::ApplicationsTab *ui;
 };
 
+
+} // namespace View
 #endif // APPLICATIONSTAB_H

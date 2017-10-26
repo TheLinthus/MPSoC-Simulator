@@ -3,13 +3,13 @@
 
 #include <QWidget>
 
+namespace View {
+
 namespace Ui {
 class HeuristicsTab;
 }
 
-class HeuristicsTab : public QWidget
-{
-    Q_OBJECT
+class HeuristicsTab : public QWidget {
 
 public:
     explicit HeuristicsTab(QWidget *parent = 0);
@@ -19,4 +19,6 @@ private:
     Ui::HeuristicsTab *ui;
 };
 
+
+} // namespace View
 #endif // HEURISTICSTAB_H

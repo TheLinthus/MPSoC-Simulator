@@ -15,10 +15,6 @@ MPSoC_Simulator::MPSoC_Simulator(QWidget *parent) :
     QSettings settings;
     restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
 
-    QFile qss(":/stylesheet/mainwindow.qss");
-    qss.open(QFile::ReadOnly);
-    setStyleSheet(QLatin1String(qss.readAll()));
-
     ui->setupUi(this);
 
     statusProgress = new QProgressBar(this->statusBar());
@@ -32,6 +28,21 @@ MPSoC_Simulator::MPSoC_Simulator(QWidget *parent) :
     this->statusBar()->setContentsMargins(8,0,0,0);
     this->statusBar()->addPermanentWidget(statusLabel);
     this->statusBar()->addPermanentWidget(statusProgress);
+
+    simulationTab = new View::SimulationTab(ui->widgetStack);
+    applicationsTab = new View::ApplicationsTab(ui->widgetStack);
+    heuristicsTab = new View::HeuristicsTab(ui->widgetStack);
+
+    ui->widgetStack->addWidget(simulationTab);
+    ui->widgetStack->addWidget(applicationsTab);
+    ui->widgetStack->addWidget(heuristicsTab);
+
+    ui->widgetStack->setCurrentWidget(simulationTab);
+
+    QFile qss(":/stylesheet/mainwindow.qss");
+    qss.open(QFile::ReadOnly);
+    setStyleSheet(QLatin1String(qss.readAll()));
+    qss.close();
 
     ui->applicationsList->setModel(applicationsListModel);
     ui->runningList->setModel(runningListModel);

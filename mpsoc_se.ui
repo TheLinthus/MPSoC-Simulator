@@ -191,7 +191,7 @@
     <item>
      <widget class="QStackedWidget" name="widgetStack">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="pageSimulation">
        <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -245,7 +245,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>498</width>
-                <height>488</height>
+                <height>494</height>
                </rect>
               </property>
               <layout class="QHBoxLayout" name="mpsocsLayout">
@@ -983,7 +983,7 @@
      <x>0</x>
      <y>0</y>
      <width>990</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

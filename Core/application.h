@@ -11,36 +11,6 @@
 
 namespace Core {
 
-class ApplicationGroup : public QObject
-{
-    Q_OBJECT
-public:
-    explicit ApplicationGroup(QObject *parent = 0);
-    ~ApplicationGroup();
-
-    QString getFile() const;
-    void setFile(const QString &value);
-
-    QString getName() const;
-    void setName(const QString &value);
-
-    QString getAuthor() const;
-    void setAuthor(const QString &value);
-
-    QDate getDate() const;
-    void setDate(const QDate &value);
-
-    bool isEnabled() const;
-    void setEnabled(bool value);
-
-private:
-    QString file;
-    QString name;
-    QString author;
-    QDate date;
-    bool enabled;
-};
-
 class Application : public QObject
 {
     Q_OBJECT
@@ -97,6 +67,45 @@ class MasterApplication : public Application
 public:
     explicit MasterApplication();
     ~MasterApplication();
+};
+
+class ApplicationGroup : public QObject
+{
+    Q_OBJECT
+public:
+    explicit ApplicationGroup(QObject *parent = 0);
+    ~ApplicationGroup();
+
+    QString getFile() const;
+    void setFile(const QString &value);
+
+    QString getName() const;
+    void setName(const QString &value);
+
+    QString getAuthor() const;
+    void setAuthor(const QString &value);
+
+    QDate getDate() const;
+    void setDate(const QDate &value);
+
+    bool isEnabled() const;
+    void setEnabled(bool value);
+
+    QStringList getApplicationsList() const;
+
+    void add(Application *app);
+    void remove(const QString &app);
+    Application *get(const QString &app);
+    bool contains(const QString &app);
+
+private:
+    QString file;
+    QString name;
+    QString author;
+    QDate date;
+    bool enabled;
+
+    QMap<QString, Application *> applicationsList;
 };
 
 } // namespace Core

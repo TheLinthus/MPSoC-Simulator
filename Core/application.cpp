@@ -153,4 +153,34 @@ void ApplicationGroup::setEnabled(bool value) {
     enabled = value;
 }
 
+QStringList ApplicationGroup::getApplicationsList() const {
+    return applicationsList.keys();
+}
+
+void ApplicationGroup::add(Application *app) {
+    if (contains(app->getName())) {
+        int n = 2;
+        while (contains(app->getName() + " " + n)) {
+            n++;
+        }
+        QString newName = app->getName() + " " + n;
+        app->setName(newName);
+        applicationsList.insert(newName, app);
+    } else {
+        applicationsList.insert(app->getName(), app);
+    }
+}
+
+void ApplicationGroup::remove(const QString &app) {
+    applicationsList.remove(app);
+}
+
+Application *ApplicationGroup::get(const QString &app) {
+    applicationsList.value(app);
+}
+
+bool ApplicationGroup::contains(const QString &app) {
+    applicationsList.contains(app);
+}
+
 } // namespace Core

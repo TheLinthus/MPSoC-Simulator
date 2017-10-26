@@ -38,9 +38,9 @@ public:
 
     bool addFromFile(const QString &path, const QString name, ApplicationGroup *group);
     void saveToFile(QString name);
-    void add(QString name, Application *app);
+    void add(Application *app, ApplicationGroup *group);
     void remove(QString name);
-    QStringList getApplicationsList() const;
+    QStringList getApplicationsList(const QString &group = "") const;
     QStringList getApplicationsGroupList() const;
     Core::Application *getApplication(QString name);
     Core::Application *getRunning(int index);

@@ -1,7 +1,7 @@
 QMenuBar {
     background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgb(170, 170, 170), stop:1 rgb(191, 191, 191));
 }
-#leftPanel, #pageSimulation, #pageApplications, #pageHeuristics {
+#leftPanel, #widgetStack > QWidget {
     color: rgb(255, 255, 255);
     background-color: rgb(88, 88, 88);
 }
@@ -9,8 +9,8 @@ QMenuBar {
 #widgetStack QPushButton, #widgetStack QLabel, #widgetStack QGroupBox {
     color: rgb(255, 255, 255);
 }
-#widgetStack > QWidget {
-    border: 0;
+#widgetStack QFrame {
+    border: none;
 }
 #widgetStack QDateEdit, #widgetStack QLineEdit {
     padding-left: 3px;

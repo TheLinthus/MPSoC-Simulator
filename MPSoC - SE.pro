@@ -29,7 +29,10 @@ HEADERS = Core/appnode.h \
     Core/heuristic.h \
     Core/heuristiccontroller.h \
     Exception/badheuristicimplementationexception.h \
-    mpsoc_se.h
+    mpsoc_se.h \
+    View/simulationtab.h \
+    View/applicationstab.h \
+    View/heuristicstab.h
 
 SOURCES = Core/appnode.cpp \
     Core/channel.cpp \
@@ -46,7 +49,10 @@ SOURCES = Core/appnode.cpp \
     View/newmpsocdialog.cpp \
     Core/heuristic.cpp \
     Core/heuristiccontroller.cpp \
-    mpsoc_se.cpp
+    mpsoc_se.cpp \
+    View/simulationtab.cpp \
+    View/applicationstab.cpp \
+    View/heuristicstab.cpp
 
 INCLUDEPATH = . \
     Core \
@@ -55,7 +61,10 @@ INCLUDEPATH = . \
 FORMS = \
     View/mpsocbox.ui \
     View/newmpsocdialog.ui \
-    mpsoc_se.ui
+    mpsoc_se.ui \
+    View/simulationtab.ui \
+    View/applicationstab.ui \
+    View/heuristicstab.ui
 
 #DEFINES = 
 
