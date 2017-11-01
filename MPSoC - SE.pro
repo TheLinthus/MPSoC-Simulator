@@ -10,8 +10,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = MPSoC-SE
 TEMPLATE = app
 
-RC_FILE = mpsoc.rc
-
 HEADERS = Core/appnode.h \
     Core/channel.h \
     Core/mpsoc.h \
@@ -97,20 +95,32 @@ DISTFILES += \
     Applications/APP_GENE.json \
     mpsoc.ico \
     mpsoc.rc \
-    Heuristics/NearestNeighbor.js
+    Heuristics/NearestNeighbor.js \
+    mpsoc.icns
 
-heuristics.path = $$OUT_PWD/Heuristics
-heuristics.files += $$files(Heuristics/*)
+macx {
+    ICON = mpsoc.icns
 
-#message("Found heuristics for installation: "$$heuristics.files)
-#message("Will install those heuristics in: "$$heuristics.path)
+    heuristics.path = Contents/MacOS/Heuristics
+    heuristics.files += $$files(Heuristics/*)
 
-applications.path = $$OUT_PWD/Applications
-applications.files += $$files(Applications/*)
+    applications.path = Contents/MacOS/Applications
+    applications.files += $$files(Applications/*)
 
-#message("Found applications for installation: "$$applications.files)
-#message("Will install those applications in: "$$applications.path)
+    QMAKE_BUNDLE_DATA += \
+        heuristics \
+        applications
+}
+!macx {
+    RC_FILE = mpsoc.rc
 
-INSTALLS += \
-    heuristics \
-    applications
+    heuristics.path = $$OUT_PWD/Heuristics
+    heuristics.files += $$files(Heuristics/*)
+
+    applications.path = $$OUT_PWD/Applications
+    applications.files += $$files(Applications/*)
+
+    INSTALLS += \
+        heuristics \
+        applications
+}
