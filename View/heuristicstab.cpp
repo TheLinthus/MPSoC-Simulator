@@ -4,7 +4,7 @@
 namespace View {
 
 HeuristicsTab::HeuristicsTab(QWidget *parent) :
-    QWidget(parent),
+    QFrame(parent),
     ui(new Ui::HeuristicsTab)
 {
     ui->setupUi(this);

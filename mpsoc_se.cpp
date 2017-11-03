@@ -7,16 +7,22 @@ MPSoC_Simulator::MPSoC_Simulator(QWidget *parent) :
     ui(new Ui::MainWindow),
     thread(new QThread(this)),
     timer(new QTimer(this)),
-    applicationsGroupListModel(new QStringListModel()),
-    applicationsListModel(new QStringListModel()),
-    runningListModel(new QStringListModel()),
     statusLabel(new QLabel(this->statusBar()))
 {
     QSettings settings;
-    restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
 
+    // SetUp GUI
     ui->setupUi(this);
 
+    restoreGeometry(settings.value("mainWindowGeometry").toByteArray());    // Restore window size/position from last size/position
+    restoreState(settings.value("mainWindowState").toByteArray());          // Restore window state from last window state
+
+    QFile qss(":/stylesheet/mainwindow.qss");
+    qss.open(QFile::ReadOnly);
+    setStyleSheet(QLatin1String(qss.readAll()));
+    qss.close();
+
+    // SetUp progress bar from main window's Status Bar
     statusProgress = new QProgressBar(this->statusBar());
     statusProgress->setMaximumSize(242,16);
 
@@ -29,55 +35,55 @@ MPSoC_Simulator::MPSoC_Simulator(QWidget *parent) :
     this->statusBar()->addPermanentWidget(statusLabel);
     this->statusBar()->addPermanentWidget(statusProgress);
 
+    connect(apps, SIGNAL(progressUpdate(int)), statusProgress, SLOT(setValue(int)));
+    connect(apps, SIGNAL(progressMaxUpdate(int)), statusProgress, SLOT(setMaximum(int)));
+    connect(heuristics, SIGNAL(progressUpdate(int)), statusProgress, SLOT(setValue(int)));
+    connect(heuristics, SIGNAL(progressMaxUpdate(int)), statusProgress, SLOT(setMaximum(int)));
+
+    // SetUp widgets view for the main WidgetStack
     simulationTab = new View::SimulationTab(ui->widgetStack);
     applicationsTab = new View::ApplicationsTab(ui->widgetStack);
     heuristicsTab = new View::HeuristicsTab(ui->widgetStack);
 
+    connect(apps, SIGNAL(updateDone(QStringList,QStringList)), simulationTab, SLOT(updateListViewModel(QStringList)));
+    connect(apps, SIGNAL(updateDone(QStringList,QStringList)), applicationsTab, SLOT(updateListViewModel(QStringList,QStringList)));
+
+    // Connect action menus with shortcuts to right buttons
+    connect(ui->actionAdd_MPSoC, SIGNAL(triggered(bool)), simulationTab, SLOT(on_buttonAddMPSoC_clicked()));
+    connect(ui->actionStep_Back, SIGNAL(triggered(bool)), simulationTab, SLOT(on_buttonPrevStep_clicked()));
+    connect(ui->actionStep_Foward, SIGNAL(triggered(bool)), simulationTab, SLOT(on_buttonNextStep_clicked()));
+    connect(ui->action_Reset_Simulation, SIGNAL(triggered(bool)), simulationTab, SLOT(on_ButtonReset_clicked()));
+    connect(ui->actionAuto_Step, SIGNAL(toggled(bool)), simulationTab, SLOT(on_autoStepToggle(bool)));
+    connect(ui->action_Open_Applications_Directory, SIGNAL(triggered(bool)), applicationsTab, SLOT(on_pushButtonOpenDirectory_clicked()));
+
+    // SetUp widgetStack's tabs of left panel buttons
     ui->widgetStack->addWidget(simulationTab);
     ui->widgetStack->addWidget(applicationsTab);
     ui->widgetStack->addWidget(heuristicsTab);
 
     ui->widgetStack->setCurrentWidget(simulationTab);
 
-    QFile qss(":/stylesheet/mainwindow.qss");
-    qss.open(QFile::ReadOnly);
-    setStyleSheet(QLatin1String(qss.readAll()));
-    qss.close();
-
-    ui->applicationsList->setModel(applicationsListModel);
-    ui->runningList->setModel(runningListModel);
-    ui->applicationsGroupList->setModel(applicationsGroupListModel);
-
-    connect(ui->applicationsList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-                this, SLOT(applicationsListModel_selectionChanged(QItemSelection,QItemSelection)));
-    connect(ui->runningList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-                this, SLOT(runningListModel_selectionChanged(QItemSelection,QItemSelection)));
-    connect(ui->applicationsGroupList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-                this, SLOT(applicationsGroupListModel_selectionChanged(QItemSelection,QItemSelection)));
-
-    connect(apps, SIGNAL(progressUpdate(int)), statusProgress, SLOT(setValue(int)));
-    connect(apps, SIGNAL(progressMaxUpdate(int)), statusProgress, SLOT(setMaximum(int)));
-    connect(heuristics, SIGNAL(progressUpdate(int)), statusProgress, SLOT(setValue(int)));
-    connect(heuristics, SIGNAL(progressMaxUpdate(int)), statusProgress, SLOT(setMaximum(int)));
-
+    // SetUp Thread Worker, for sideloading
     ApplicationLoader *worker = new ApplicationLoader;
 
-    apps->moveToThread(worker);
+    apps->moveToThread(worker);         // Controllers must go to auxiliary thread to right set children relationship
     heuristics->moveToThread(worker);
 
-    connect(worker, SIGNAL(finished()), this, SLOT(loadingDone()));
-    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
-    connect(worker, SIGNAL(status(QString,int)), statusBar(), SLOT(showMessage(QString,int)));
+    connect(worker, SIGNAL(finished()), this, SLOT(loadingDone()));                             // Notify main window
+    connect(worker, SIGNAL(finished()), simulationTab, SLOT(updateView()));                     // Notify widget to enable buttons
+    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));                           // Auto delete worker after job done
+    connect(worker, SIGNAL(status(QString,int)), statusBar(), SLOT(showMessage(QString,int)));  // Show messages from worker to Status Bar
 
     worker->start();
-
-    restoreState(settings.value("mainWindowState").toByteArray());
 }
 
 MPSoC_Simulator::~MPSoC_Simulator() {
     delete ui;
 }
 
+/**
+ * @brief ApplicationLoader::run worker job, load applications and heuristics files in an auxiliary thread
+ */
 void ApplicationLoader::run() {
     emit status("Loading applications files...", 0);
     apps->updateAvailabilityList();
@@ -95,171 +101,64 @@ void ApplicationLoader::run() {
 
 void MPSoC_Simulator::loadingDone() {
     statusProgress->setVisible(false);
-    applicationsListModel->setStringList(apps->getApplicationsList());
-    applicationsGroupListModel->setStringList(apps->getApplicationsGroupList());
+    if (heuristics->count() == 0) {
+        QMessageBox alert;
+        alert.setText(QString(tr("The application could not find any heuristic, you should add at least one in matter to proceed with simulations.")));
+        alert.setStandardButtons(QMessageBox::Ok | QMessageBox::Help);
+        alert.setDefaultButton(QMessageBox::Ok);
+        alert.setWindowTitle(windowTitle());
+        alert.setIcon(QMessageBox::Warning);
+
+        int res = alert.exec();
+        switch (res) {
+        case QMessageBox::Help:
+            // TODO
+            break;
+        case QMessageBox::Ok:
+            ui->heuristicsPushButton->animateClick();
+            break;
+        default:
+            break;
+        }
+    }
 }
 
-void MPSoC_Simulator::applicationButtonsCheckEnable() {
-    ui->runApplicationPushButton->setEnabled(ui->applicationsList->selectionModel()->selectedIndexes().count() > 0 && mpsocs->count() > 0 /* && Can Add an Application now */);
-    ui->killApplicationPushButton->setEnabled(ui->runningList->selectionModel()->selectedIndexes().count() > 0 /*&& Can Kill an Application now */);
-}
-
+/**
+ * @brief MPSoC_Simulator::closeEvent actions before exit
+ * @param event
+ */
 void MPSoC_Simulator::closeEvent(QCloseEvent *event) {
     QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, windowTitle(), QString("Are you sure you want to close %1?").arg(windowTitle()),
+    reply = QMessageBox::question(this, windowTitle(), QString(tr("Are you sure you want to close %1?")).arg(windowTitle()),
                                 QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes) {
         QSettings settings;
-        settings.setValue("mainWindowGeometry", saveGeometry());
-        settings.setValue("mainWindowState", saveState());
+        settings.setValue("mainWindowGeometry", saveGeometry());    // Save window size/position
+        settings.setValue("mainWindowState", saveState());          // Save window state
 
         event->accept();
     } else {
-        event->ignore();
+        event->ignore(); // Deny exit
     }
-}
-
-void MPSoC_Simulator::on_addMPSoCButton_clicked() {
-    View::NewMPSoCDialog *dialog = new View::NewMPSoCDialog(this);
-
-    if (dialog->exec() == QDialog::Rejected)
-        return;
-
-    QHBoxLayout* layout =  ui->mpsocsLayout;
-
-    View::MPSoCBox *mpsocbox = new View::MPSoCBox();
-    Core::MPSoC *mpsoc = mpsocs->add(dialog->getW(),dialog->getH(),dialog->getMaster());
-
-    mpsoc->setHeuristic(heuristics->getHeuristic(dialog->getHeuristic()));
-
-    mpsocbox->setMPSoC(mpsoc);
-
-    layout->insertWidget(layout->count() - 1, mpsocbox);
-
-    connect(mpsocbox, SIGNAL(destroyed(QObject*)), this, SLOT(applicationButtonsCheckEnable()));
-    applicationButtonsCheckEnable();
-}
-
-void MPSoC_Simulator::applicationsListModel_selectionChanged(const QItemSelection, const QItemSelection) {
-    applicationButtonsCheckEnable();
-}
-
-void MPSoC_Simulator::runningListModel_selectionChanged(const QItemSelection, const QItemSelection) {
-    applicationButtonsCheckEnable();
-}
-
-void MPSoC_Simulator::applicationsGroupListModel_selectionChanged(const QItemSelection s, const QItemSelection) {
-    if (ui->applicationsGroupList->selectionModel()->selectedIndexes().count() > 0) {
-        ui->groupBoxApplicationGroup->setEnabled(true);
-        ui->groupBoxApplicationGroup->setTitle(tr("Edit Application Group"));
-        ui->pushButtonSaveApplicationGroup->setEnabled(true);
-        ui->pushButtonCancelApplicationGroup->setEnabled(true);
-
-        Core::ApplicationGroup *group = apps->getApplicationGroup(ui->applicationsGroupList->selectionModel()->selectedIndexes().first().data().toString());
-
-        ui->lineEditApplicationGroupName->setReadOnly(true);
-        ui->lineEditApplicationGroupName->setText(group->getName());
-        ui->lineEditApplicationGroupAuthor->setReadOnly(true);
-        ui->lineEditApplicationGroupAuthor->setText(group->getAuthor());
-        ui->lineEditApplicationGroupApplicationsCount->setText("0"); // TODO
-        ui->dateEditApplicationGroupDate->setDate(group->getDate());
-        ui->checkBoxApplicationGroupEnabled->setChecked(group->isEnabled());
-    } else {
-        clearEditor();
-    }
-}
-
-void MPSoC_Simulator::on_timerSpinBox_valueChanged(int val) {
-    timer->setInterval(val);
-}
-
-void MPSoC_Simulator::on_stepSlider_valueChanged(int val) {
-    ui->stepCounter->setText(QString("%1/%2").arg(val).arg(ui->stepSlider->maximum()));
 }
 
 void MPSoC_Simulator::on_applicationsPushButton_clicked() {
     ui->simulationPushButton->setChecked(false);
     ui->applicationsPushButton->setChecked(true);
     ui->heuristicsPushButton->setChecked(false);
-    ui->widgetStack->setCurrentWidget(ui->pageApplications);
+    ui->widgetStack->setCurrentWidget(applicationsTab);
 }
 
 void MPSoC_Simulator::on_simulationPushButton_clicked() {
     ui->simulationPushButton->setChecked(true);
     ui->applicationsPushButton->setChecked(false);
     ui->heuristicsPushButton->setChecked(false);
-    ui->widgetStack->setCurrentWidget(ui->pageSimulation);
+    ui->widgetStack->setCurrentWidget(simulationTab);
 }
 
 void MPSoC_Simulator::on_heuristicsPushButton_clicked() {
     ui->simulationPushButton->setChecked(false);
     ui->applicationsPushButton->setChecked(false);
     ui->heuristicsPushButton->setChecked(true);
-    ui->widgetStack->setCurrentWidget(ui->pageHeuristics);
-}
-
-void MPSoC_Simulator::on_nextStepButton_clicked() {
-    try {
-        qDebug() << "First Free: " << heuristics->getHeuristic("First Free")->selectCore();
-        qDebug() << "Nearest Neighbor: " << heuristics->getHeuristic("Nearest Neighbor")->selectCore();
-    } catch (int e) {
-        qDebug() << "Exception " << e;
-    }
-}
-
-void MPSoC_Simulator::on_playTimerButton_clicked() {
-    ui->actionAuto_Step->setChecked(true);
-}
-
-void MPSoC_Simulator::on_pauseTimerButton_clicked() {
-    ui->actionAuto_Step->setChecked(false);
-}
-
-void MPSoC_Simulator::on_pushButtonCreateNewApplicationGroup_clicked() {
-    ui->applicationsGroupList->selectionModel()->clearSelection();
-    ui->groupBoxApplicationGroup->setEnabled(true);
-    ui->groupBoxApplicationGroup->setTitle(tr("New Application Group"));
-    ui->pushButtonSaveApplicationGroup->setEnabled(true);
-    ui->pushButtonCancelApplicationGroup->setEnabled(true);
-    ui->lineEditApplicationGroupName->setFocus();
-    ui->lineEditApplicationGroupName->setReadOnly(false);
-    QString name = qgetenv("USER");
-    if (name.isEmpty())
-        name = qgetenv("USERNAME");
-    ui->lineEditApplicationGroupAuthor->setText(name);
-    ui->lineEditApplicationGroupAuthor->setReadOnly(false);
-    ui->lineEditApplicationGroupApplicationsCount->setText(0);
-    ui->dateEditApplicationGroupDate->setDate(QDate::currentDate());
-    ui->checkBoxApplicationGroupEnabled->setChecked(true);
-}
-
-void MPSoC_Simulator::on_pushButtonCreateApplicationGroupFromFile_clicked() {
-
-}
-
-void MPSoC_Simulator::on_pushButtonSaveApplicationGroup_clicked() {
-    if (ui->applicationsGroupList->selectionModel()->selectedIndexes().count() > 0) { // Edit
-        editApplicationsGroup = apps->getApplicationGroup(ui->applicationsGroupList->selectionModel()->selectedIndexes().first().data().toString());
-        editApplicationsGroup->setEnabled(ui->checkBoxApplicationGroupEnabled->isChecked());
-        apps->saveToFile(editApplicationsGroup->getName());
-    } else {    // New
-
-    }
-}
-
-void MPSoC_Simulator::on_pushButtonCancelApplicationGroup_clicked() {
-    clearEditor();
-}
-
-void MPSoC_Simulator::clearEditor() {
-    ui->applicationsGroupList->selectionModel()->clearSelection();
-
-    ui->groupBoxApplicationGroup->setEnabled(false);
-    ui->groupBoxApplicationGroup->setTitle(tr("Select an Application Group"));
-    ui->pushButtonSaveApplicationGroup->setEnabled(false);
-    ui->pushButtonCancelApplicationGroup->setEnabled(false);
-    ui->lineEditApplicationGroupName->clear();
-    ui->lineEditApplicationGroupAuthor->clear();
-    ui->lineEditApplicationGroupApplicationsCount->clear();
-    ui->checkBoxApplicationGroupEnabled->setChecked(false);
+    ui->widgetStack->setCurrentWidget(heuristicsTab);
 }

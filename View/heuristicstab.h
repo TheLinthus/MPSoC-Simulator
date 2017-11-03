@@ -1,7 +1,7 @@
 #ifndef HEURISTICSTAB_H
 #define HEURISTICSTAB_H
 
-#include <QWidget>
+#include <QFrame>
 
 namespace View {
 
@@ -9,7 +9,9 @@ namespace Ui {
 class HeuristicsTab;
 }
 
-class HeuristicsTab : public QWidget {
+class HeuristicsTab : public QFrame
+{
+    Q_OBJECT
 
 public:
     explicit HeuristicsTab(QWidget *parent = 0);

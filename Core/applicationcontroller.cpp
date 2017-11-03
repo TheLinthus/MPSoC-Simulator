@@ -37,7 +37,7 @@ Core::ApplicationController* ApplicationController::instance() {
     return Singleton<Core::ApplicationController>::instance(Core::ApplicationController::createInstance);
 }
 
-bool ApplicationController::addFromFile(const QString &path, const QString name, ApplicationGroup *group) {
+bool ApplicationController::addAppFromFile(const QString &path, const QString name, ApplicationGroup *group) {
     QFile file(path);
 
     if (file.exists() &&  file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -67,13 +67,76 @@ bool ApplicationController::addFromFile(const QString &path, const QString name,
     return false;
 }
 
-void ApplicationController::saveToFile(QString name) {
+bool ApplicationController::saveToFile(ApplicationGroup *group) {
+    QDir applicationsDir("Applications");
+    QString fileName;
+    if (group->getFile().isEmpty()) {               // Check for existing files to create a new file name
+        QString appendix = "";
+        fileName = group->getName() + appendix + ".json";
+        int i = 1;
+        applicationsDir.setNameFilters(QStringList(fileName));
+        while (applicationsDir.count() != 0) {
+            i++;
+            appendix = " " + QString::number(i);
+            fileName = group->getName() + appendix + ".json";
+            applicationsDir.setNameFilters(QStringList(fileName));
+        }
+        group->setFile(applicationsDir.relativeFilePath(fileName));
+    }
 
+    QFile file(applicationsDir.absolutePath() + "/" + group->getFile());
+    // Qt auto create files if doesn't exist on open write
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning() << "Error saving file" << file.fileName() << ", could not open:" << file.errorString();
+        return false;
+    }
+
+    QJsonObject groupObj;
+
+    groupObj["name"] = group->getName();
+    groupObj["author"] = group->getAuthor();
+    groupObj["date"] = group->getDate().toString(Qt::ISODate);
+    groupObj["enabled"] = group->isEnabled();
+
+    QJsonArray array;
+    foreach (QString item, group->getApplicationsList()) {
+        Application *app = getApplication(item);
+        QJsonObject appObj;
+
+        appObj["name"] = app->getName(false);   // Get app name without parent's name
+        appObj["file"] = app->getFile();        // Get stored file path
+
+        array.append(appObj);
+    }
+    groupObj["applications"] = array;
+
+    QJsonDocument save(groupObj);
+
+    if (!file.write(save.toJson())) {
+        qWarning() << "Error saving file" << file.fileName() << ", could not be writen:" << file.errorString();
+        return false;
+    }
+    file.close();
+
+    emit updateDone(getApplicationsList(),getApplicationsGroupList());
+    return true;
 }
 
 void ApplicationController::add(Application *app, ApplicationGroup *group) {
     group->add(app);
     applicationsList.insert(app->getName(), app);
+}
+
+void ApplicationController::add(ApplicationGroup *group) {
+    QString appendix = "", name = group->getName() + appendix;
+    int i = 1;
+    while (applicationsGroupList.contains(name)) {
+        i++;
+        appendix = " " + QString::number(i);
+        name = group->getName() + appendix;
+    }
+    group->setName(name);
+    applicationsGroupList.insert(name, group);
 }
 
 QStringList ApplicationController::getApplicationsList(const QString &group) const {
@@ -83,7 +146,13 @@ QStringList ApplicationController::getApplicationsList(const QString &group) con
         }
         return QStringList();
     }
-    return QStringList(applicationsList.keys());
+    QStringList list;
+    foreach (ApplicationGroup *group, applicationsGroupList) {
+        if (group->isEnabled()) {
+            list << group->getApplicationsList();
+        }
+    }
+    return list;
 }
 
 QStringList ApplicationController::getApplicationsGroupList() const {
@@ -155,9 +224,9 @@ void ApplicationController::updateAvailabilityList() {
         group->setAuthor(obj.value("author").toString());
         group->setDate(QDate::fromString(obj.value("date").toString(), Qt::ISODate));
         group->setEnabled(obj.value("enabled").toBool());
-        group->setFile(file.fileName());
+        group->setFile(applicationsDir.relativeFilePath(file.fileName()));
 
-        applicationsGroupList.insert(group->getName(), group);
+        add(group);
 
         QJsonArray array = obj.value("applications").toArray();
 
@@ -167,7 +236,7 @@ void ApplicationController::updateAvailabilityList() {
         for (int i = 0; i < array.size(); i++) {
             emit progressUpdate(loadValue);
             loadValue++;
-            addFromFile(
+            addAppFromFile(
                         applicationsDir.absoluteFilePath(array.at(i).toObject().value("file").toString()),
                         array.at(i).toObject().value("name").toString(),
                         group);
@@ -175,7 +244,7 @@ void ApplicationController::updateAvailabilityList() {
     }
 
     emit progressUpdate(loadMax);
-    emit updateDone();
+    emit updateDone(getApplicationsList(),getApplicationsGroupList());
 }
 
 } // namespace Core

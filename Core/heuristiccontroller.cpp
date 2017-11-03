@@ -29,6 +29,10 @@ Heuristic *HeuristicController::getHeuristic(const QString &name) {
     return heuristicList.value(name);
 }
 
+int HeuristicController::count() const{
+    return heuristicList.count();
+}
+
 void HeuristicController::updateAvailabilityList() {
     qDeleteAll(heuristicList);
     heuristicList.clear();

@@ -34,17 +34,14 @@ public:
 
     bool exists(int index);
     void removeNode(int index);
-
     QColor getColor();
     void setColor(QColor color);
-
-    QString getName() const;
+    QString getName(bool withParent = true) const;
     void setName(const QString &value);
-
-    Application *clone(QObject *parent);
-
     QString getFile() const;
     void setFile(const QString &value);
+
+    Application *clone(QObject *parent);
 
 protected:
     QColor color;
@@ -78,21 +75,16 @@ public:
 
     QString getFile() const;
     void setFile(const QString &value);
-
     QString getName() const;
     void setName(const QString &value);
-
     QString getAuthor() const;
     void setAuthor(const QString &value);
-
     QDate getDate() const;
     void setDate(const QDate &value);
-
     bool isEnabled() const;
     void setEnabled(bool value);
-
     QStringList getApplicationsList() const;
-
+    int getApplicationsCount() const;
     void add(Application *app);
     void remove(const QString &app);
     Application *get(const QString &app);

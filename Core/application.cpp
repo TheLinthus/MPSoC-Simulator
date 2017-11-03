@@ -3,7 +3,8 @@
 namespace Core {
 
 Application::Application(QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      file("")
 {
 }
 
@@ -64,11 +65,11 @@ void Application::setColor(QColor color) {
     this->color = color;
 }
 
-QString Application::getName() const {
-    if (parent() == 0) {
-        return name;
+QString Application::getName(bool withParent) const {
+    if (withParent && this->parent() != 0) {
+        return QString("[%1] %2").arg(((ApplicationGroup *) parent())->getName(), name);
     }
-    return QString("[%1] %2").arg(((ApplicationGroup *) parent())->getName(), name);
+    return name;
 }
 
 void Application::setName(const QString &value)
@@ -102,14 +103,18 @@ void Application::setFile(const QString &value) {
     file = value;
 }
 
-MasterApplication::MasterApplication() {
-    setColor(Qt::blue);
-    setName(tr("Master"));
+MasterApplication::MasterApplication()
+    : Application() {
+    color = QColor(Qt::blue);
+    name = (tr("Master"));
 }
 
 MasterApplication::~MasterApplication() {}
 
-ApplicationGroup::ApplicationGroup(QObject *parent) : QObject(parent) {}
+ApplicationGroup::ApplicationGroup(QObject *parent)
+    : QObject(parent),
+      file("")
+{}
 
 ApplicationGroup::~ApplicationGroup() { }
 
@@ -157,6 +162,10 @@ QStringList ApplicationGroup::getApplicationsList() const {
     return applicationsList.keys();
 }
 
+int ApplicationGroup::getApplicationsCount() const {
+    return applicationsList.count();
+}
+
 void ApplicationGroup::add(Application *app) {
     if (contains(app->getName())) {
         int n = 2;
@@ -176,11 +185,11 @@ void ApplicationGroup::remove(const QString &app) {
 }
 
 Application *ApplicationGroup::get(const QString &app) {
-    applicationsList.value(app);
+    return applicationsList.value(app);
 }
 
 bool ApplicationGroup::contains(const QString &app) {
-    applicationsList.contains(app);
+    return applicationsList.contains(app);
 }
 
 } // namespace Core

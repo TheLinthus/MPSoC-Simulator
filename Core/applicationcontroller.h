@@ -36,9 +36,10 @@ public:
     ~ApplicationController();
     static ApplicationController* instance();
 
-    bool addFromFile(const QString &path, const QString name, ApplicationGroup *group);
-    void saveToFile(QString name);
+    bool addAppFromFile(const QString &path, const QString name, ApplicationGroup *group);
+    bool saveToFile(ApplicationGroup *group);
     void add(Application *app, ApplicationGroup *group);
+    void add(ApplicationGroup *group);
     void remove(QString name);
     QStringList getApplicationsList(const QString &group = "") const;
     QStringList getApplicationsGroupList() const;
@@ -56,7 +57,7 @@ public slots:
 signals:
     void progressUpdate(int);
     void progressMaxUpdate(int);
-    void updateDone();
+    void updateDone(QStringList,QStringList);
 };
 
 } // namespace Core

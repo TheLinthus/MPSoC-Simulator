@@ -2,8 +2,16 @@
 <ui version="4.0">
  <class>View::NewMPSoCDialog</class>
  <widget class="QDialog" name="View::NewMPSoCDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>439</width>
+    <height>160</height>
+   </rect>
+  </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Add New MPSoC</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="sizeConstraint">

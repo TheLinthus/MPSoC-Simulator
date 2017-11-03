@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QUrl>
+#include <QLabel>
 #include <QFileDialog>
 #include <QFile>
 #include <QProgressBar>
@@ -45,31 +46,13 @@ public:
     ~MPSoC_Simulator();
 
 private slots:
-    //void increment();
     void loadingDone();
-
-    void applicationButtonsCheckEnable();
 
     void closeEvent(QCloseEvent *event) override;
 
-    void applicationsListModel_selectionChanged(const QItemSelection, const QItemSelection);
-    void runningListModel_selectionChanged(const QItemSelection, const QItemSelection);
-    void applicationsGroupListModel_selectionChanged(const QItemSelection s, const QItemSelection);
-
-    void on_timerSpinBox_valueChanged(int val);
-    void on_stepSlider_valueChanged(int val);
-    void on_addMPSoCButton_clicked();
     void on_applicationsPushButton_clicked();
     void on_simulationPushButton_clicked();
     void on_heuristicsPushButton_clicked();
-    void on_nextStepButton_clicked();
-    void on_playTimerButton_clicked();
-    void on_pauseTimerButton_clicked();
-    void on_pushButtonCreateNewApplicationGroup_clicked();
-    void on_pushButtonCreateApplicationGroupFromFile_clicked();
-    void on_pushButtonSaveApplicationGroup_clicked();
-
-    void on_pushButtonCancelApplicationGroup_clicked();
 
 private:
     QThread *thread;
@@ -84,12 +67,6 @@ private:
     View::SimulationTab *simulationTab;
     View::ApplicationsTab *applicationsTab;
     View::HeuristicsTab *heuristicsTab;
-
-    QStringListModel *applicationsListModel;
-    QStringListModel *applicationsGroupListModel;
-    QStringListModel *runningListModel;
-    Core::ApplicationGroup *editApplicationsGroup;
-    void clearEditor();
 };
 
 #endif // MAINWINDOW_H

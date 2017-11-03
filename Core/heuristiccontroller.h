@@ -23,6 +23,7 @@ public:
 
     QList<QString> getHeuristicsList() const;
     Core::Heuristic *getHeuristic(const QString &name);
+    int count() const;
 
 public slots:
     void updateAvailabilityList();
