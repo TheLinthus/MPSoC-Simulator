@@ -64,6 +64,12 @@
           </item>
           <item>
            <widget class="QSlider" name="xHorizontalSlider">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="whatsThis">
              <string>The number of processor columns</string>
             </property>
@@ -119,6 +125,12 @@
           </item>
           <item>
            <widget class="QSlider" name="yHorizontalSlider">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="whatsThis">
              <string>The number of processor rows</string>
             </property>
