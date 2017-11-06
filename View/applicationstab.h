@@ -34,7 +34,7 @@ public slots:
     void on_pushButtonCreateApplicationGroupFromFile_clicked();
     void on_pushButtonSaveApplicationGroup_clicked();
     void on_pushButtonCancelApplicationGroup_clicked();
-    void on_listViewApplicationsGroup_selectionModel_selectionChanged(const QItemSelection &, const QItemSelection &);
+    void on_listViewApplicationsGroup_selectionModel_selectionChanged(const QItemSelection &, const QItemSelection &unselected);
     void on_pushButtonOpenDirectory_clicked();
     void on_comboBoxApplications_currentIndexChanged(const QString &value);
     void on_pushButtonAddApplication_clicked();
