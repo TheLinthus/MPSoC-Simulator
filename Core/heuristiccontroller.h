@@ -2,6 +2,7 @@
 #define CORE_HEURISTICCONTROLLER_H
 
 #include <QObject>
+#include <QApplication>
 #include <QFile>
 #include "Core/heuristic.h"
 #define heuristics Core::HeuristicController::instance()

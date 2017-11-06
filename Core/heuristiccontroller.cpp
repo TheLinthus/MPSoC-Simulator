@@ -1,6 +1,12 @@
 #include "heuristiccontroller.h"
 #include "singleton.h"
 
+#ifdef Q_OS_MAC
+#define HEURISTICSPATH "../Resources/Heuristics"
+#else
+#define HEURISTICSPATH "Resources/Heuristics"
+#endif
+
 namespace Core {
 
 Core::HeuristicController::HeuristicController(QObject *parent) :
@@ -37,7 +43,8 @@ void HeuristicController::updateAvailabilityList() {
     qDeleteAll(heuristicList);
     heuristicList.clear();
 
-    QDir heuristicsDir("Heuristics");
+    QDir heuristicsDir(QDir::toNativeSeparators(QApplication::applicationDirPath()));
+    heuristicsDir.cd(HEURISTICSPATH);
     heuristicsDir.setNameFilters(QStringList()<<"*.js");    // Filter for '.js' script files
 
     int count = heuristicsDir.count();

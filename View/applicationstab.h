@@ -6,6 +6,7 @@
 #include <QStringListModel>
 #include <QStandardItemModel>
 #include <QFileDialog>
+#include <QStandardPaths>
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QDesktopServices>

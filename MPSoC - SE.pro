@@ -103,10 +103,10 @@ DISTFILES += \
 macx {
     ICON = mpsoc.icns
 
-    heuristics.path = Contents/MacOS/Heuristics
+    heuristics.path = Contents/Resources/Heuristics
     heuristics.files += $$files(Heuristics/*)
 
-    applications.path = Contents/MacOS/Applications
+    applications.path = Contents/Resources/Applications
     applications.files += $$files(Applications/*)
 
     QMAKE_BUNDLE_DATA += \

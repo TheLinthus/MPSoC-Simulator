@@ -1,6 +1,12 @@
 #include "applicationstab.h"
 #include "ui_applicationstab.h"
 
+#ifdef Q_OS_MAC
+#define APPLICATIONSPATH "../Resources/Applications"
+#else
+#define APPLICATIONSPATH "Resources/Applications"
+#endif
+
 namespace View {
 
 ApplicationsTab::ApplicationsTab(QWidget *parent) :
@@ -164,7 +170,9 @@ void ApplicationsTab::clearEditor() {
 }
 
 void ApplicationsTab::on_pushButtonOpenDirectory_clicked() {
-    QDesktopServices::openUrl(QUrl("Applications"));
+    QDir dir(QApplication::applicationDirPath());
+    dir.cd(APPLICATIONSPATH);
+    QDesktopServices::openUrl(QUrl::fromLocalFile(dir.path()));
 }
 
 void ApplicationsTab::on_comboBoxApplications_currentIndexChanged(const QString &value) {

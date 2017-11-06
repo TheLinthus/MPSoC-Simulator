@@ -2,6 +2,7 @@
 #define APPLICATIONCONTROLLER_H
 
 #include <QObject>
+#include <QApplication>
 #include <QFile>
 #include <QDebug>
 #include <QDir>
@@ -24,6 +25,8 @@ private:
 
     QMap<QString, Core::ApplicationGroup *> applicationsGroupList;
     QList<Core::Application *> runningList;
+
+    QDir applicationsDir;
 
     QString getFileVersion(int v) const;
 

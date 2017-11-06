@@ -8,12 +8,18 @@
 #define CHILD_TO_PARENT_VOLUME rx.cap(i + 5).toInt()
 #define CHILD_TO_PARENT_LOAD rx.cap(i + 6).toDouble()
 
+#ifdef Q_OS_MAC
+#define APPLICATIONSPATH "../Resources/Applications"
+#else
+#define APPLICATIONSPATH "Resources/Applications"
+#endif
+
 namespace Core {
 
 Core::ApplicationController::ApplicationController(QObject *parent) :
-    QObject(parent)
-{
-
+    QObject(parent),
+    applicationsDir(QApplication::applicationDirPath()) {
+    applicationsDir.cd(APPLICATIONSPATH);
 }
 
 Core::ApplicationController *ApplicationController::createInstance() {
@@ -38,7 +44,7 @@ Core::ApplicationController* ApplicationController::instance() {
 }
 
 Core::Application* ApplicationController::readAppFromFile(const QString &path, const QString name) {
-    QFile file(QDir("Applications").absoluteFilePath(path));
+    QFile file(applicationsDir.absoluteFilePath(path));
 
     if (file.exists() &&  file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QRegExp rx(getFileVersion(Basic));
@@ -73,26 +79,28 @@ Core::Application* ApplicationController::readAppFromFile(const QString &path, c
 }
 
 bool ApplicationController::saveToFile(ApplicationGroup *group) {
-    QDir applicationsDir("Applications");
     QString fileName;
+    QFile *file;
     if (group->getFile().isEmpty()) {               // Check for existing files to create a new file name
         QString appendix = "";
         fileName = group->getName() + appendix + ".json";
         int i = 1;
-        applicationsDir.setNameFilters(QStringList(fileName));
-        while (applicationsDir.count() != 0) {
+        file = new QFile(applicationsDir.absoluteFilePath(fileName));
+        while (file->exists()) {
             i++;
             appendix = " " + QString::number(i);
             fileName = group->getName() + appendix + ".json";
-            applicationsDir.setNameFilters(QStringList(fileName));
+            file->deleteLater();
+            file = new QFile(applicationsDir.absoluteFilePath(fileName));
         }
         group->setFile(applicationsDir.relativeFilePath(fileName));
+    } else {
+        file = new QFile(applicationsDir.absoluteFilePath(group->getFile()));
     }
 
-    QFile file(applicationsDir.absolutePath() + "/" + group->getFile());
     // Qt auto create files if doesn't exist on open write
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qWarning() << "Error saving file" << file.fileName() << ", could not open:" << file.errorString();
+    if (!file->open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning() << "Error saving file" << file->fileName() << ", could not open:" << file->errorString();
         return false;
     }
 
@@ -117,11 +125,11 @@ bool ApplicationController::saveToFile(ApplicationGroup *group) {
 
     QJsonDocument save(groupObj);
 
-    if (!file.write(save.toJson())) {
-        qWarning() << "Error saving file" << file.fileName() << ", could not be writen:" << file.errorString();
+    if (!file->write(save.toJson())) {
+        qWarning() << "Error saving file" << file->fileName() << ", could not be writen:" << file->errorString();
         return false;
     }
-    file.close();
+    file->close();
 
     emit updateDone(getApplicationsList(),getApplicationsGroupList());
     return true;
@@ -137,6 +145,8 @@ void ApplicationController::add(ApplicationGroup *group) {
     }
     group->setName(name);
     applicationsGroupList.insert(name, group);
+
+    emit updateDone(getApplicationsList(),getApplicationsGroupList());
 }
 
 QStringList ApplicationController::getApplicationsList(const QString &group) const {
@@ -211,7 +221,6 @@ int ApplicationController::runningCount() {
 }
 
 void ApplicationController::updateAvailabilityList() {
-    QDir applicationsDir("Applications");
     applicationsDir.setNameFilters(QStringList()<<"*.json");
 
     int loadMax = applicationsDir.count();
