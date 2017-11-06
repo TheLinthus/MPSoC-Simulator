@@ -44,6 +44,12 @@ private slots:
 
     void clearEditor();
 
+    void on_lineEditApplicationGroupName_textEdited(const QString &arg1);
+
+    void on_checkBoxApplicationGroupEnabled_toggled(bool checked);
+
+    void on_lineEditApplicationGroupAuthor_textEdited(const QString &arg1);
+
 private:
     Ui::ApplicationsTab *ui;
 

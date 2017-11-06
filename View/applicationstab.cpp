@@ -69,7 +69,9 @@ void ApplicationsTab::on_pushButtonSaveApplicationGroup_clicked() {
         ui->lineEditApplicationGroupName->setFocus();
         return;
     }
+    QModelIndex index;
     if (ui->listViewApplicationsGroup->selectionModel()->selectedIndexes().count() > 0) { // Edit
+        index = ui->listViewApplicationsGroup->selectionModel()->selectedIndexes().first();
         QString applicationsGroupName = ui->listViewApplicationsGroup->selectionModel()->selectedIndexes().first().data().toString();
         editApplicationsGroup = apps->getApplicationGroup(applicationsGroupName);
         editApplicationsGroup->setEnabled(ui->checkBoxApplicationGroupEnabled->isChecked());
@@ -85,6 +87,8 @@ void ApplicationsTab::on_pushButtonSaveApplicationGroup_clicked() {
         if (apps->saveToFile(editApplicationsGroup)) {
             QMessageBox::information(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
                                      tr("Application Group Saved"), QMessageBox::Ok);
+            ui->listViewApplicationsGroup->selectionModel()->select(index, QItemSelectionModel::Select);
+            ui->pushButtonSaveApplicationGroup->setEnabled(false);
         } else {
             QMessageBox::critical(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
                                   tr("Error saving Application Group File, please review System permitions"), QMessageBox::Ok);
@@ -104,6 +108,9 @@ void ApplicationsTab::on_pushButtonSaveApplicationGroup_clicked() {
             apps->add(editApplicationsGroup);
             QMessageBox::information(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
                                      tr("New Application Group Saved"), QMessageBox::Ok);
+            index = listModelApplicationsGroup->index(listModelApplicationsGroup->rowCount() - 1);
+            ui->listViewApplicationsGroup->selectionModel()->select(index, QItemSelectionModel::Select);
+            ui->pushButtonSaveApplicationGroup->setEnabled(false);
         } else {
             QMessageBox::critical(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
                                   tr("Error creating new Application Group File, please review Application Group informations and System permitions"), QMessageBox::Ok);
@@ -116,11 +123,18 @@ void ApplicationsTab::on_pushButtonCancelApplicationGroup_clicked() {
     clearEditor();
 }
 
-void ApplicationsTab::on_listViewApplicationsGroup_selectionModel_selectionChanged(const QItemSelection &, const QItemSelection &) {
+void ApplicationsTab::on_listViewApplicationsGroup_selectionModel_selectionChanged(const QItemSelection &, const QItemSelection &unselected) {
+    if (ui->pushButtonSaveApplicationGroup->isEnabled() && QMessageBox::question(parentWidget()->parentWidget(),
+                              parentWidget()->windowTitle(),
+                              tr("Are you sure you want to change selection? You gonna lose all unsaved changes."),
+                              QMessageBox::Yes, QMessageBox::No) == QMessageBox::No) {
+        ui->listViewApplicationsGroup->selectionModel()->select(unselected, QItemSelectionModel::Select);
+        return;
+    }
+    clearEditor();
     if (ui->listViewApplicationsGroup->selectionModel()->selectedIndexes().count() > 0) {
         ui->groupBoxApplicationGroup->setEnabled(true);
         ui->groupBoxApplicationGroup->setTitle(tr("Edit Application Group"));
-        ui->pushButtonSaveApplicationGroup->setEnabled(true);
         ui->pushButtonCancelApplicationGroup->setEnabled(true);
 
         editApplicationsGroup = apps->getApplicationGroup(ui->listViewApplicationsGroup->selectionModel()->selectedIndexes().first().data().toString());
@@ -140,8 +154,6 @@ void ApplicationsTab::on_listViewApplicationsGroup_selectionModel_selectionChang
         ui->comboBoxApplications->setEnabled(true);
         ui->pushButtonAddApplication->setEnabled(true);
         ui->pushButtonRemoveApplication->setEnabled(false);
-    } else {
-        clearEditor();
     }
 }
 
@@ -209,20 +221,45 @@ void ApplicationsTab::on_comboBoxApplications_currentIndexChanged(const QString 
 }
 
 void ApplicationsTab::on_pushButtonAddApplication_clicked() {
-    bool confirm;
-    QString name = QInputDialog::getText(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
-                          tr("New Applications name:"), QLineEdit::Normal,
-                          tr("Application"), &confirm);
-    if (confirm) {
-        QFileDialog dialog(parentWidget()->parentWidget());
-        dialog.setFileMode(QFileDialog::ExistingFiles);
-        dialog.setNameFilter(tr("Applications (*.txt *.xml)"));
-        if (dialog.exec()) {
-            Core::Application *app = apps->readAppFromFile(dialog.selectedFiles().first(), name);
-            if (app) {
-                addList.append(app);
+    QFileDialog dialog(parentWidget()->parentWidget());
+    dialog.setFileMode(QFileDialog::ExistingFiles);
+    dialog.setNameFilter(tr("Applications (*.txt *.xml)"));
+    if (dialog.exec()) {
+        QStringList selectedFiles = dialog.selectedFiles();
+        for (int i = 0; i < selectedFiles.count(); i++ ) {
+            QString filename(selectedFiles[i]);
+            filename = filename.split(QRegExp("(\/|\\)")).last();
+            bool confirm;
+            QString tipname(filename);
+            tipname.chop(4);
+            QString name = QInputDialog::getText(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
+                                                 QString(tr("Application name for %1:")).arg(filename),
+                                                 QLineEdit::Normal,
+                                                 tipname, &confirm);
+            if (confirm) {
+                Core::Application *app = apps->readAppFromFile(selectedFiles[i], name);
+                if (app) {
+                    if (addList.isEmpty()) {
+                        QMessageBox::information(
+                                    parentWidget()->parentWidget(),
+                                    parentWidget()->windowTitle(),
+                                    QString(tr("You need to \"Save\" to apply changes")),
+                                    QMessageBox::Ok);
+                    }
+                    addList.append(app);
+                    ui->pushButtonSaveApplicationGroup->setEnabled(true);
+                } else {
+                    QMessageBox::critical(parentWidget()->parentWidget(), parentWidget()->windowTitle(), QString(tr("Error loading Application file!")));
+                }
             } else {
-                QMessageBox::critical(parentWidget()->parentWidget(), parentWidget()->windowTitle(), QString(tr("Error loading Application file!")));
+                if (i + 1 < selectedFiles.count() &&
+                        QMessageBox::question(parentWidget()->parentWidget(),
+                                          parentWidget()->windowTitle(),
+                                          QString(tr("Do you want do cancel all remaining files?")),
+                                          QMessageBox::YesToAll,QMessageBox::No)
+                        == QMessageBox::YesToAll) {
+                    return;
+                }
             }
         }
     }
@@ -241,6 +278,7 @@ void ApplicationsTab::on_pushButtonRemoveApplication_clicked() {
                         QString(tr("You need to \"Save\" to apply changes")),
                         QMessageBox::Ok);
         }
+        ui->pushButtonSaveApplicationGroup->setEnabled(true);
         removeList << apps->getApplication(ui->comboBoxApplications->currentText());
         ui->comboBoxApplications->removeItem(ui->comboBoxApplications->currentIndex());
         ui->lineEditApplicationGroupApplicationsCount->setText(QString::number(editApplicationsGroup->getApplicationsCount() - removeList.count() + addList.count()));
@@ -249,3 +287,16 @@ void ApplicationsTab::on_pushButtonRemoveApplication_clicked() {
 }
 
 } // namespace View
+
+void View::ApplicationsTab::on_lineEditApplicationGroupName_textEdited(const QString &arg1) {
+    ui->pushButtonSaveApplicationGroup->setEnabled(true);
+}
+
+void View::ApplicationsTab::on_checkBoxApplicationGroupEnabled_toggled(bool checked) {
+    ui->pushButtonSaveApplicationGroup->setEnabled(true);
+}
+
+void View::ApplicationsTab::on_lineEditApplicationGroupAuthor_textEdited(const QString &arg1)
+{
+    ui->pushButtonSaveApplicationGroup->setEnabled(true);
+}
