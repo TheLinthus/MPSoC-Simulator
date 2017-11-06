@@ -6,9 +6,13 @@ namespace View {
 ApplicationsTab::ApplicationsTab(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::ApplicationsTab),
+    scene(new QGraphicsScene),
     listModelApplicationsGroup(new QStringListModel())
 {
     ui->setupUi(this);
+
+    ui->graphicsViewApplication->setScene(scene);
+    ui->graphicsViewApplication->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
 
     ui->listViewApplicationsGroup->setModel(listModelApplicationsGroup);
 
@@ -21,7 +25,7 @@ ApplicationsTab::~ApplicationsTab() {
     delete ui;
 }
 
-void ApplicationsTab::updateListViewModel(const QStringList &applications, const QStringList &groups) {
+void ApplicationsTab::updateListViewModel(const QStringList &, const QStringList &groups) {
     listModelApplicationsGroup->setStringList(groups);
 }
 
@@ -45,16 +49,11 @@ void ApplicationsTab::on_pushButtonCreateNewApplicationGroup_clicked() {
 
 void ApplicationsTab::on_pushButtonCreateApplicationGroupFromFile_clicked() {
     QFileDialog dialog(parentWidget()->parentWidget());
-
-    QMessageBox::information(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
-                         tr("Select between a group of Applications (*.txt) or an Application Group (*.json)"), QMessageBox::Ok);
-    dialog.setFileMode(QFileDialog::ExistingFiles);
-    QStringList filters;
-    filters << tr("Applications (*.txt)")
-            << tr("Applications Group (*.json)");
-    dialog.setNameFilters(filters);
-
-    dialog.exec();
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setNameFilter(tr("Applications Group (*.json)"));
+    if (dialog.exec()) {
+        // TODO
+    }
 }
 
 void ApplicationsTab::on_pushButtonSaveApplicationGroup_clicked() {
@@ -69,6 +68,14 @@ void ApplicationsTab::on_pushButtonSaveApplicationGroup_clicked() {
         editApplicationsGroup = apps->getApplicationGroup(applicationsGroupName);
         editApplicationsGroup->setEnabled(ui->checkBoxApplicationGroupEnabled->isChecked());
 
+        foreach (Core::Application *app, removeList) {
+            editApplicationsGroup->remove(app->getName());
+            app->deleteLater();
+        }
+        foreach (Core::Application *app, addList) {
+            editApplicationsGroup->add(app);
+        }
+
         if (apps->saveToFile(editApplicationsGroup)) {
             QMessageBox::information(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
                                      tr("Application Group Saved"), QMessageBox::Ok);
@@ -82,6 +89,10 @@ void ApplicationsTab::on_pushButtonSaveApplicationGroup_clicked() {
         editApplicationsGroup->setDate(ui->dateEditApplicationGroupDate->date());
         editApplicationsGroup->setEnabled(ui->checkBoxApplicationGroupEnabled->isChecked());
         editApplicationsGroup->setName(ui->lineEditApplicationGroupName->text());
+
+        foreach (Core::Application *app, addList) {
+            editApplicationsGroup->add(app);
+        }
 
         if (apps->saveToFile(editApplicationsGroup)) {
             apps->add(editApplicationsGroup);
@@ -99,7 +110,7 @@ void ApplicationsTab::on_pushButtonCancelApplicationGroup_clicked() {
     clearEditor();
 }
 
-void ApplicationsTab::on_listViewApplicationsGroup_selectionModel_selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
+void ApplicationsTab::on_listViewApplicationsGroup_selectionModel_selectionChanged(const QItemSelection &, const QItemSelection &) {
     if (ui->listViewApplicationsGroup->selectionModel()->selectedIndexes().count() > 0) {
         ui->groupBoxApplicationGroup->setEnabled(true);
         ui->groupBoxApplicationGroup->setTitle(tr("Edit Application Group"));
@@ -115,6 +126,14 @@ void ApplicationsTab::on_listViewApplicationsGroup_selectionModel_selectionChang
         ui->lineEditApplicationGroupApplicationsCount->setText(QString::number(editApplicationsGroup->getApplicationsCount()));
         ui->dateEditApplicationGroupDate->setDate(editApplicationsGroup->getDate());
         ui->checkBoxApplicationGroupEnabled->setChecked(editApplicationsGroup->isEnabled());
+
+        ui->comboBoxApplications->clear();
+        ui->comboBoxApplications->addItem(QString(tr("(Select an Application here)")));
+        qobject_cast<QStandardItemModel *>(ui->comboBoxApplications->model())->item(0)->setEnabled(false);
+        ui->comboBoxApplications->addItems(editApplicationsGroup->getApplicationsList());
+        ui->comboBoxApplications->setEnabled(true);
+        ui->pushButtonAddApplication->setEnabled(true);
+        ui->pushButtonRemoveApplication->setEnabled(false);
     } else {
         clearEditor();
     }
@@ -131,10 +150,94 @@ void ApplicationsTab::clearEditor() {
     ui->lineEditApplicationGroupAuthor->clear();
     ui->lineEditApplicationGroupApplicationsCount->clear();
     ui->checkBoxApplicationGroupEnabled->setChecked(false);
+
+    ui->comboBoxApplications->clear();
+    ui->comboBoxApplications->addItem(QString(tr("(Select an Application Grup first)")));
+    qobject_cast<QStandardItemModel *>(ui->comboBoxApplications->model())->item(0)->setEnabled(false);
+
+    ui->comboBoxApplications->setEnabled(false);
+    ui->pushButtonAddApplication->setEnabled(false);
+    ui->pushButtonRemoveApplication->setEnabled(false);
+
+    removeList.clear();
+    addList.clear();
 }
 
 void ApplicationsTab::on_pushButtonOpenDirectory_clicked() {
     QDesktopServices::openUrl(QUrl("Applications"));
+}
+
+void ApplicationsTab::on_comboBoxApplications_currentIndexChanged(const QString &value) {
+    scene->clear();
+    if (!value.isEmpty() && ui->comboBoxApplications->currentIndex() != 0) {
+        Core::Application *app = apps->getApplication(value);
+        if (app != 0) {
+            ui->pushButtonRemoveApplication->setEnabled(true);
+
+            View::AppNode *appnode = new View::AppNode(0,0,0,0);
+            scene->addItem(appnode);
+            appnode = new View::AppNode(0,1,2,1);
+            scene->addItem(appnode);
+            appnode = new View::AppNode(1,1,2,2);
+            scene->addItem(appnode);
+            appnode = new View::AppNode(0,2,5,3);
+            scene->addItem(appnode);
+            appnode = new View::AppNode(1,2,5,4);
+            scene->addItem(appnode);
+            appnode = new View::AppNode(2,2,5,5);
+            scene->addItem(appnode);
+            appnode = new View::AppNode(3,2,5,6);
+            scene->addItem(appnode);
+            appnode = new View::AppNode(4,2,5,7);
+            scene->addItem(appnode);
+
+            ui->graphicsViewApplication->fitInView(scene->sceneRect(),Qt::KeepAspectRatio);
+        } else {
+            QMessageBox::critical(parentWidget()->parentWidget(), parentWidget()->windowTitle(), QString(tr("Error getting application, selected Index not found")));
+        }
+    } else {
+        ui->pushButtonRemoveApplication->setEnabled(false);
+    }
+}
+
+void ApplicationsTab::on_pushButtonAddApplication_clicked() {
+    bool confirm;
+    QString name = QInputDialog::getText(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
+                          tr("New Applications name:"), QLineEdit::Normal,
+                          tr("Application"), &confirm);
+    if (confirm) {
+        QFileDialog dialog(parentWidget()->parentWidget());
+        dialog.setFileMode(QFileDialog::ExistingFiles);
+        dialog.setNameFilter(tr("Applications (*.txt *.xml)"));
+        if (dialog.exec()) {
+            Core::Application *app = apps->readAppFromFile(dialog.selectedFiles().first(), name);
+            if (app) {
+                addList.append(app);
+            } else {
+                QMessageBox::critical(parentWidget()->parentWidget(), parentWidget()->windowTitle(), QString(tr("Error loading Application file!")));
+            }
+        }
+    }
+}
+
+void ApplicationsTab::on_pushButtonRemoveApplication_clicked() {
+    if (QMessageBox::question(
+                parentWidget()->parentWidget(),
+                parentWidget()->windowTitle(),
+                QString(tr("Are you sure you want to remove %1").arg(ui->comboBoxApplications->currentText())),
+                QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes) {
+        if (removeList.isEmpty()) {
+            QMessageBox::information(
+                        parentWidget()->parentWidget(),
+                        parentWidget()->windowTitle(),
+                        QString(tr("You need to \"Save\" to apply changes")),
+                        QMessageBox::Ok);
+        }
+        removeList << apps->getApplication(ui->comboBoxApplications->currentText());
+        ui->comboBoxApplications->removeItem(ui->comboBoxApplications->currentIndex());
+        ui->lineEditApplicationGroupApplicationsCount->setText(QString::number(editApplicationsGroup->getApplicationsCount() - removeList.count() + addList.count()));
+        ui->comboBoxApplications->setCurrentIndex(0);
+    }
 }
 
 } // namespace View

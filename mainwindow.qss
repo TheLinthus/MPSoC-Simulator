@@ -9,6 +9,9 @@ QMenuBar {
 #widgetStack QPushButton, #widgetStack QLabel, #widgetStack QGroupBox {
     color: rgb(255, 255, 255);
 }
+#leftPanel QPushButton:disabled, #widgetStack QPushButton:disabled {
+    color: palette(Mid);
+}
 #widgetStack QFrame {
     border: none;
 }
@@ -43,7 +46,7 @@ QPushButton:flat:checked:hover {
 QPushButton:flat:pressed {
     background-color: rgb(55, 55, 55);
 }
-#mpsocsArea {
+#mpsocsArea, #graphicsViewApplication {
     background-color: rgb(127, 127, 127);
 }
 #mpsocsArea QLabel, #mpsocsArea QPushButton {

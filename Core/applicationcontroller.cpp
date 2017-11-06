@@ -37,8 +37,8 @@ Core::ApplicationController* ApplicationController::instance() {
     return Singleton<Core::ApplicationController>::instance(Core::ApplicationController::createInstance);
 }
 
-bool ApplicationController::addAppFromFile(const QString &path, const QString name, ApplicationGroup *group) {
-    QFile file(path);
+Core::Application* ApplicationController::readAppFromFile(const QString &path, const QString name) {
+    QFile file(QDir("Applications").absoluteFilePath(path));
 
     if (file.exists() &&  file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QRegExp rx(getFileVersion(Basic));
@@ -46,7 +46,12 @@ bool ApplicationController::addAppFromFile(const QString &path, const QString na
 
         file.close();
 
-        Core::Application *app = new Core::Application(group);
+        Core::Application *app = new Core::Application();
+
+        if (rx.captureCount() == 0) {
+            qWarning() << "File " << path << " doesn't have valid Application data";
+            return 0;
+        }
 
         for (int i = 0; i < rx.captureCount(); i+=7) {
             app->addNode(PARENT_INDEX, 0); // Add parent Node to application
@@ -57,14 +62,14 @@ bool ApplicationController::addAppFromFile(const QString &path, const QString na
         }
 
         app->setName(name);
-        add(app, group);
+        app->setFile(path);
 
-        return true;
+        return app;
     } else {
         qWarning() << "File " << path << " doesn't exist or can't be open";
-        return false;
+        return 0;
     }
-    return false;
+    return 0;
 }
 
 bool ApplicationController::saveToFile(ApplicationGroup *group) {
@@ -122,11 +127,6 @@ bool ApplicationController::saveToFile(ApplicationGroup *group) {
     return true;
 }
 
-void ApplicationController::add(Application *app, ApplicationGroup *group) {
-    group->add(app);
-    applicationsList.insert(app->getName(), app);
-}
-
 void ApplicationController::add(ApplicationGroup *group) {
     QString appendix = "", name = group->getName() + appendix;
     int i = 1;
@@ -160,7 +160,15 @@ QStringList ApplicationController::getApplicationsGroupList() const {
 }
 
 Application *ApplicationController::getApplication(QString name) {
-    return applicationsList.value(name);
+    foreach (ApplicationGroup *group, applicationsGroupList) {
+        if (group->isEnabled()) {
+            Application *app = group->get(name);
+            if (app != 0) {
+                return app;
+            }
+        }
+    }
+    return 0;
 }
 
 Application *ApplicationController::getRunning(int index) {
@@ -171,8 +179,17 @@ ApplicationGroup *ApplicationController::getApplicationGroup(QString name) {
     return applicationsGroupList.value(name);
 }
 
-void ApplicationController::run(QString name) {
-    runningList.append(applicationsList.value(name)->clone(this));
+bool ApplicationController::run(QString name) {
+    foreach (ApplicationGroup *group, applicationsGroupList) {
+        if (group->isEnabled()) {
+            Application *app = group->get(name);
+            if (app != 0) {
+                runningList.append(app->clone(this));
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void ApplicationController::kill(int index) {
@@ -180,7 +197,13 @@ void ApplicationController::kill(int index) {
 }
 
 int ApplicationController::applicationsCount() {
-    return applicationsList.count();
+    int count = 0;
+    foreach (ApplicationGroup *group, applicationsGroupList) {
+        if (group->isEnabled()) {
+            count += group->getApplicationsCount();
+        }
+    }
+    return count;
 }
 
 int ApplicationController::runningCount() {
@@ -236,10 +259,11 @@ void ApplicationController::updateAvailabilityList() {
         for (int i = 0; i < array.size(); i++) {
             emit progressUpdate(loadValue);
             loadValue++;
-            addAppFromFile(
-                        applicationsDir.absoluteFilePath(array.at(i).toObject().value("file").toString()),
-                        array.at(i).toObject().value("name").toString(),
-                        group);
+            Core::Application *app = readAppFromFile(
+                        applicationsDir.relativeFilePath(array.at(i).toObject().value("file").toString()),
+                        array.at(i).toObject().value("name").toString());
+            if (app)
+                group->add(app);
         }
     }
 

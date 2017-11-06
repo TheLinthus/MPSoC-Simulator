@@ -167,6 +167,7 @@ int ApplicationGroup::getApplicationsCount() const {
 }
 
 void ApplicationGroup::add(Application *app) {
+    app->setParent(this);
     if (contains(app->getName())) {
         int n = 2;
         while (contains(app->getName() + " " + n)) {
