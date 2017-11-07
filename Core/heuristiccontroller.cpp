@@ -4,7 +4,7 @@
 #ifdef Q_OS_MAC
 #define HEURISTICSPATH "../Resources/Heuristics"
 #else
-#define HEURISTICSPATH "Resources/Heuristics"
+#define HEURISTICSPATH "../Heuristics"
 #endif
 
 namespace Core {

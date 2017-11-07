@@ -11,7 +11,7 @@
 #ifdef Q_OS_MAC
 #define APPLICATIONSPATH "../Resources/Applications"
 #else
-#define APPLICATIONSPATH "Resources/Applications"
+#define APPLICATIONSPATH "../Applications"
 #endif
 
 namespace Core {
