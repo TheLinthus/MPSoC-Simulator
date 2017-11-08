@@ -4,20 +4,47 @@ namespace Core {
 
 Application::Application(QObject *parent)
     : QObject(parent),
-      file("")
+      file(""),
+      rootNode(0)
 {
 }
 
 Application::~Application() {
-    qDeleteAll(nodes);
+    rootNode->deleteLater();
     qDeleteAll(connections);
 }
 
-void Application::addNode(int index, int lifespan) {
-    // If node already exists, doesn't create new one
-    if (!exists(index)) {
-        nodes.insert(index, new AppNode(lifespan, this));
+void Application::setRootNode(AppNode *node) {
+    if (rootNode != 0)
+        rootNode->deleteLater();
+    node->setParent(this);
+    rootNode = node;
+}
+
+void Application::setRootNode(const int index, const int lifespan) {
+    if (rootNode != 0) {
+        rootNode->deleteLater();
     }
+    rootNode = new AppNode(index, lifespan, this);
+}
+
+bool Application::addNode(const int index, const int lifespan, const int to) {
+    if (to == -1) {
+        setRootNode(index, lifespan);
+        return true;
+    }
+    if (rootNode == 0)
+        return false;         // Can't add to without initilized root
+    if (rootNode->find(index)) {   // It is already added
+        return true;
+    } else {
+        AppNode *parentNode = rootNode->find(to);
+        if (parentNode) { // Can't add if parent node not found in
+            parentNode->addChildNode(new AppNode(index, lifespan, this));
+            return true;
+        }
+    }
+    return false;
 }
 
 void Application::addNodeConnection(const int from, int to, const int volume, const qreal load) {
@@ -29,7 +56,7 @@ void Application::addNodeConnection(const int from, int to, const int volume, co
         getNode(to)->setLifespan(volume);
 
     // Create connection
-    if (connections.find(from) == connections.end()) {
+    if (connections.value(from) == 0) {
         connections.insert(from, new QMap<int, AppLoad *>());
     }
 
@@ -37,11 +64,15 @@ void Application::addNodeConnection(const int from, int to, const int volume, co
     connections.value(from)->insert(to, appLoad);
 }
 
-AppNode *Application::getNode(int index) {
-    return nodes.value(index);
+AppNode *Application::getNode(const int index) {
+    return rootNode->find(index);
 }
 
-AppLoad *Application::getLoad(int from, int to) {
+AppNode *Application::getRootNode() {
+    return rootNode;
+}
+
+AppLoad *Application::getLoad(const int from, const int to) {
     if (connections.contains(from) && connections.value(from)->contains(to)) {
         return connections.value(from)->value(to);
     } else {
@@ -49,23 +80,47 @@ AppLoad *Application::getLoad(int from, int to) {
     }
 }
 
-bool Application::exists(int index) {
-    return nodes.find(index) != nodes.end();
+int Application::graphWidth() const {
+    return rootNode->getWidth();
 }
 
-void Application::removeNode(int index) {
-    nodes.remove(index);
+int Application::graphHeigh() const {
+    return rootNode->getHeight();
+}
+
+int Application::childCount(const int index) const {
+    return rootNode->find(index)->count() - 1;
+}
+
+int Application::connectionCount(int index) const {
+    return connections.values(index).count();
+}
+
+QMap<int, AppLoad *> *Application::getConnectionsFrom(const int from) const {
+    return connections.value(from);
+}
+
+bool Application::exists(const int index) {
+    return rootNode->find(index) != 0;
+}
+
+int Application::nodeCount() const {
+    return rootNode->count();
+}
+
+void Application::removeNode(const int index) {
+    rootNode->find(index)->deleteLater();
 }
 
 QColor Application::getColor() {
     return color;
 }
 
-void Application::setColor(QColor color) {
+void Application::setColor(const QColor color) {
     this->color = color;
 }
 
-QString Application::getName(bool withParent) const {
+QString Application::getName(const bool withParent) const {
     if (withParent && this->parent() != 0) {
         return QString("[%1] %2").arg(((ApplicationGroup *) parent())->getName(), name);
     }
@@ -82,9 +137,7 @@ Application *Application::clone(QObject *parent) {
 
     clone->setColor(QColor(color));
     clone->setName(QString(name));
-    for (int i = 0; i < nodes.size(); i++) {
-        clone->addNode(i, nodes.value(i)->getLifespan());
-    }
+    clone->setRootNode(rootNode->clone(clone));
     for (int i = 0; i < connections.size(); i++) {
         for (int j = 0; j < connections.value(i)->size(); j++) {
             AppLoad *appload = connections.value(i)->value(j);
@@ -93,6 +146,10 @@ Application *Application::clone(QObject *parent) {
     }
 
     return clone;
+}
+
+QMap<int, QMap<int, AppLoad *> *> Application::getConnections() const {
+    return connections;
 }
 
 QString Application::getFile() const {

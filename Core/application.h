@@ -22,26 +22,32 @@ public:
     explicit Application(QObject *parent = 0);
     ~Application();
 
-    /**
-     * @brief addNode Add a new AppNode to the Application
-     * @return
-     */
-    void addNode(int index, int lifespan);
+    void setRootNode(AppNode *node);
+    void setRootNode(const int index, const int lifespan);
+    bool addNode(const int index, const int lifespan, const int to = -1);
     void addNodeConnection(const int from, int to, const int volume, const qreal load);
 
-    AppNode *getNode(int index);
-    AppLoad *getLoad(int from, int to);
-
-    bool exists(int index);
-    void removeNode(int index);
+    AppNode *getNode(const int index);
+    AppNode *getRootNode();
+    AppLoad *getLoad(const int from, const int to);
+    int childCount(const int index) const;
+    int connectionCount(int index) const;
+    int graphWidth() const;
+    int graphHeigh() const;
+    QMap<int, AppLoad *> *getConnectionsFrom(const int from) const;
+    QMap<int, QMap<int, AppLoad *> *> getConnections() const;
+    bool exists(const int index);
+    int nodeCount() const;
+    void removeNode(const int index);
     QColor getColor();
-    void setColor(QColor color);
-    QString getName(bool withParent = true) const;
+    void setColor(const QColor color);
+    QString getName(const bool withParent = true) const;
     void setName(const QString &value);
     QString getFile() const;
     void setFile(const QString &value);
 
     Application *clone(QObject *parent);
+
 
 protected:
     QColor color;
@@ -49,7 +55,7 @@ protected:
     QString file;
 
 private:
-    QMap<int, AppNode *> nodes;
+    AppNode *rootNode;
     QMap<int, QMap<int, AppLoad *> *> connections;
 
 signals:

@@ -1,12 +1,12 @@
 #include "applicationcontroller.h"
 #include "singleton.h"
 
-#define PARENT_INDEX rx.cap(i + 1).toInt()
-#define CHILD_INDEX rx.cap(i + 2).toInt()
-#define PARENT_TO_CHILD_VOLUME rx.cap(i + 3).toInt()
-#define PARENT_TO_CHILD_LOAD rx.cap(i + 4).toDouble()
-#define CHILD_TO_PARENT_VOLUME rx.cap(i + 5).toInt()
-#define CHILD_TO_PARENT_LOAD rx.cap(i + 6).toDouble()
+#define PARENT_INDEX match.captured(1).toInt()
+#define CHILD_INDEX match.captured(2).toInt()
+#define PARENT_TO_CHILD_VOLUME match.captured(3).toInt()
+#define PARENT_TO_CHILD_LOAD match.captured(4).toDouble()
+#define CHILD_TO_PARENT_VOLUME match.captured(5).toInt()
+#define CHILD_TO_PARENT_LOAD match.captured(6).toDouble()
 
 #ifdef Q_OS_MAC
 #define APPLICATIONSPATH "../Resources/Applications"
@@ -47,21 +47,28 @@ Core::Application* ApplicationController::readAppFromFile(const QString &path, c
     QFile file(applicationsDir.absoluteFilePath(path));
 
     if (file.exists() &&  file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QRegExp rx(getFileVersion(Basic));
-        rx.indexIn(file.readAll());
+        QRegularExpression rx(getFileVersion(Basic));
+        QRegularExpressionMatchIterator it = rx.globalMatch(file.readAll());
 
         file.close();
 
         Core::Application *app = new Core::Application();
 
-        if (rx.captureCount() == 0) {
+        if (!it.hasNext()) {
             qWarning() << "File " << path << " doesn't have valid Application data";
             return 0;
         }
 
-        for (int i = 0; i < rx.captureCount(); i+=7) {
-            app->addNode(PARENT_INDEX, 0); // Add parent Node to application
-            app->addNode(CHILD_INDEX, 0); // Add child Node to application
+        bool root = false;
+        while (it.hasNext()) {
+            QRegularExpressionMatch match = it.next();
+            if (!root) {
+                app->addNode(PARENT_INDEX, 0); // Add parent as Root
+                root = true;
+            }
+            if (!app->addNode(CHILD_INDEX, 0, PARENT_INDEX)) {
+                qWarning() << "Application " << name << " have inconsistent Application data (assignment to undefined node)";
+            }
 
             app->addNodeConnection(PARENT_INDEX, CHILD_INDEX, PARENT_TO_CHILD_VOLUME, PARENT_TO_CHILD_LOAD);
             app->addNodeConnection(CHILD_INDEX, PARENT_INDEX, CHILD_TO_PARENT_VOLUME, CHILD_TO_PARENT_LOAD);

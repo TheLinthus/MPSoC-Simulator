@@ -43,22 +43,22 @@ public slots:
 private slots:
 
     void clearEditor();
-
     void on_lineEditApplicationGroupName_textEdited(const QString &arg1);
-
     void on_checkBoxApplicationGroupEnabled_toggled(bool checked);
-
     void on_lineEditApplicationGroupAuthor_textEdited(const QString &arg1);
 
 private:
     Ui::ApplicationsTab *ui;
 
     QGraphicsScene *scene;
+    QMap<int, View::AppNode *> graphicalNodes;
 
     QStringListModel *listModelApplicationsGroup;
     Core::ApplicationGroup *editApplicationsGroup;
+    Core::Application *editApplication;
     QVector<Core::Application*> removeList;
     QVector<Core::Application*> addList;
+    void addNodeToList(AppNode *node, const qreal width);
 };
 
 

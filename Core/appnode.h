@@ -10,18 +10,37 @@ class AppNode : public QObject
 {
     Q_OBJECT
 public:
-    explicit AppNode(int lifespan, QObject *parent = 0);
+    explicit AppNode(int n,int lifespan, QObject *parent = 0);
     ~AppNode();
 
     bool isDone();
     int getLifespan() const;
     int getCycles() const;
-
     void setLifespan(const int lifespan);
+    int getN() const;
+
+    void setParentNode(AppNode *node);
+    void addSiblingNode(AppNode *node);
+    void addChildNode(AppNode *node);
+    AppNode *getParentNode() const;
+    AppNode *find(const int n);
+    QList<AppNode *> getSiblingNodes() const;
+    QList<AppNode *> getChildNodes() const;
+
+    int getWidth() const;
+    int getHeight() const;
+    int count() const;
+
+    AppNode *clone(QObject *parent);
 
 private:
     int cycles;
+    int n;
     int lifespan;
+
+    AppNode *parentNode;
+    QList<AppNode *> siblingNodes;
+    QList<AppNode *> childNodes;
 
 signals:
     void finished(AppNode *);

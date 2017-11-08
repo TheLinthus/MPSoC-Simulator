@@ -69,6 +69,7 @@ void ApplicationsTab::on_pushButtonSaveApplicationGroup_clicked() {
         ui->lineEditApplicationGroupName->setFocus();
         return;
     }
+    ui->pushButtonSaveApplicationGroup->setEnabled(false);
     QModelIndex index;
     if (ui->listViewApplicationsGroup->selectionModel()->selectedIndexes().count() > 0) { // Edit
         index = ui->listViewApplicationsGroup->selectionModel()->selectedIndexes().first();
@@ -88,10 +89,10 @@ void ApplicationsTab::on_pushButtonSaveApplicationGroup_clicked() {
             QMessageBox::information(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
                                      tr("Application Group Saved"), QMessageBox::Ok);
             ui->listViewApplicationsGroup->selectionModel()->select(index, QItemSelectionModel::Select);
-            ui->pushButtonSaveApplicationGroup->setEnabled(false);
         } else {
             QMessageBox::critical(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
                                   tr("Error saving Application Group File, please review System permitions"), QMessageBox::Ok);
+            ui->pushButtonSaveApplicationGroup->setEnabled(true);
         }
     } else {    // New
         editApplicationsGroup = new Core::ApplicationGroup(apps);
@@ -110,10 +111,10 @@ void ApplicationsTab::on_pushButtonSaveApplicationGroup_clicked() {
                                      tr("New Application Group Saved"), QMessageBox::Ok);
             index = listModelApplicationsGroup->index(listModelApplicationsGroup->rowCount() - 1);
             ui->listViewApplicationsGroup->selectionModel()->select(index, QItemSelectionModel::Select);
-            ui->pushButtonSaveApplicationGroup->setEnabled(false);
         } else {
             QMessageBox::critical(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
                                   tr("Error creating new Application Group File, please review Application Group informations and System permitions"), QMessageBox::Ok);
+            ui->pushButtonSaveApplicationGroup->setEnabled(true);
         }
     }
 }
@@ -154,6 +155,7 @@ void ApplicationsTab::on_listViewApplicationsGroup_selectionModel_selectionChang
         ui->comboBoxApplications->setEnabled(true);
         ui->pushButtonAddApplication->setEnabled(true);
         ui->pushButtonRemoveApplication->setEnabled(false);
+        ui->pushButtonSaveApplicationGroup->setEnabled(false);
     }
 }
 
@@ -187,30 +189,45 @@ void ApplicationsTab::on_pushButtonOpenDirectory_clicked() {
     QDesktopServices::openUrl(QUrl::fromLocalFile(dir.path()));
 }
 
+void ApplicationsTab::addNodeToList(View::AppNode *node, const qreal width) {
+    qreal aux = node->pos().x();
+    node->setPos(QPointF((aux + (width / 2)) * 120, node->pos().y()));
+    graphicalNodes.insert(node->getN(), node);
+    for (Core::AppNode *child : node->getAppNode()->getChildNodes()) {
+        View::AppNode *newNode = new View::AppNode(child->getN(), child);
+        newNode->setPos(QPointF(aux, node->pos().y() + 120));
+        qreal newWidth = child->getWidth();
+        aux += newWidth;
+        addNodeToList(newNode, newWidth);
+    }
+}
+
 void ApplicationsTab::on_comboBoxApplications_currentIndexChanged(const QString &value) {
     scene->clear();
+    graphicalNodes.clear();
     if (!value.isEmpty() && ui->comboBoxApplications->currentIndex() != 0) {
-        Core::Application *app = apps->getApplication(value);
-        if (app != 0) {
+        editApplication = apps->getApplication(value);
+        if (editApplication != 0) {
             ui->pushButtonRemoveApplication->setEnabled(true);
 
-            View::AppNode *appnode = new View::AppNode(0,0,0,0);
-            scene->addItem(appnode);
-            appnode = new View::AppNode(0,1,2,1);
-            scene->addItem(appnode);
-            appnode = new View::AppNode(1,1,2,2);
-            scene->addItem(appnode);
-            appnode = new View::AppNode(0,2,5,3);
-            scene->addItem(appnode);
-            appnode = new View::AppNode(1,2,5,4);
-            scene->addItem(appnode);
-            appnode = new View::AppNode(2,2,5,5);
-            scene->addItem(appnode);
-            appnode = new View::AppNode(3,2,5,6);
-            scene->addItem(appnode);
-            appnode = new View::AppNode(4,2,5,7);
-            scene->addItem(appnode);
+            Core::AppNode *root = editApplication->getRootNode();
 
+            addNodeToList(new View::AppNode(root->getN(), root), root->getWidth());
+
+            auto mapA = editApplication->getConnections();
+            for (int keyA : mapA.keys()) {
+                auto mapB = mapA.value(keyA);
+                for (int keyB : mapB->keys()) {
+                    scene->addLine(QLineF(graphicalNodes[keyA]->pos(), graphicalNodes[keyB]->pos()), QPen(QBrush(QColor(Qt::black)), 10));
+                }
+            }
+            scene->createItemGroup(scene->items())->setScale(2);
+
+            for (View::AppNode *appNode : graphicalNodes) {
+                scene->addItem(appNode);
+            }
+
+            scene->setSceneRect(scene->itemsBoundingRect());
             ui->graphicsViewApplication->fitInView(scene->sceneRect(),Qt::KeepAspectRatio);
         } else {
             QMessageBox::critical(parentWidget()->parentWidget(), parentWidget()->windowTitle(), QString(tr("Error getting application, selected Index not found")));
@@ -286,17 +303,17 @@ void ApplicationsTab::on_pushButtonRemoveApplication_clicked() {
     }
 }
 
+void ApplicationsTab::on_lineEditApplicationGroupName_textEdited(const QString &arg1) {
+    ui->pushButtonSaveApplicationGroup->setEnabled(true);
+}
+
+void ApplicationsTab::on_checkBoxApplicationGroupEnabled_toggled(bool checked) {
+    ui->pushButtonSaveApplicationGroup->setEnabled(true);
+}
+
+void ApplicationsTab::on_lineEditApplicationGroupAuthor_textEdited(const QString &arg1) {
+    ui->pushButtonSaveApplicationGroup->setEnabled(true);
+}
+
 } // namespace View
 
-void View::ApplicationsTab::on_lineEditApplicationGroupName_textEdited(const QString &arg1) {
-    ui->pushButtonSaveApplicationGroup->setEnabled(true);
-}
-
-void View::ApplicationsTab::on_checkBoxApplicationGroupEnabled_toggled(bool checked) {
-    ui->pushButtonSaveApplicationGroup->setEnabled(true);
-}
-
-void View::ApplicationsTab::on_lineEditApplicationGroupAuthor_textEdited(const QString &arg1)
-{
-    ui->pushButtonSaveApplicationGroup->setEnabled(true);
-}

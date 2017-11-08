@@ -6,23 +6,27 @@
 #include <QPainter>
 #include <QGraphicsEffect>
 #include <QDebug>
+#include <Core/appnode.h>
+
 namespace View {
 
 class AppNode : public QGraphicsObject {
     Q_OBJECT
 public:
-    AppNode(const qreal x, const int y, const int s, const int n);
+    AppNode(int n, Core::AppNode *appNode);
+
+    int getN() const;
+    Core::AppNode *getAppNode();
 
     QRectF boundingRect() const override;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
-    qreal x;
-    int y;
-    int s;
     int n;
     bool over;
+
+    Core::AppNode *appNode;
 
     QGraphicsDropShadowEffect *hoverEffect;
 

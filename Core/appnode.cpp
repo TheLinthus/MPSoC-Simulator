@@ -2,16 +2,22 @@
 
 namespace Core {
 
-AppNode::AppNode(int lifespan, QObject *parent)
+AppNode::AppNode(int n, int lifespan, QObject *parent)
     : lifespan(lifespan)
     , cycles(0)
+    , n(n)
+    , childNodes()
+    , siblingNodes()
+    , parentNode(0)
     , QObject(parent)
 {
-
 }
 
 AppNode::~AppNode() {
     emit finished(this);
+    for (AppNode *child : childNodes) {
+        child->deleteLater();
+    }
 }
 
 bool AppNode::isDone() {
@@ -24,6 +30,95 @@ int AppNode::getLifespan() const {
 
 int AppNode::getCycles() const {
     return cycles;
+}
+
+int AppNode::getN() const {
+    return n;
+}
+
+void AppNode::setParentNode(AppNode *node) {
+    parentNode = node;
+}
+
+void AppNode::addSiblingNode(AppNode *node) {
+    if (!siblingNodes.contains(node))
+        siblingNodes << node;
+}
+
+void AppNode::addChildNode(AppNode *node) {
+    if (!childNodes.contains(node)) {
+        for (AppNode *child : childNodes) {
+            child->addSiblingNode(node);    // Register the node to his siblings
+            node->addSiblingNode(child);    // Register the siblings to the node
+        }
+        childNodes << node;
+    }
+}
+
+AppNode *AppNode::getParentNode() const{
+    return parentNode;
+}
+
+AppNode *AppNode::find(const int n) {
+    if (n == this->n) {
+        return this;
+    }
+    if (childNodes.isEmpty())
+        return 0;
+    for (AppNode *child : childNodes) {
+        AppNode *returnNode = child->find(n);
+        if (returnNode != 0)
+            return returnNode;
+    }
+    return 0;
+}
+
+QList<AppNode *> AppNode::getSiblingNodes() const {
+    return siblingNodes;
+}
+
+QList<AppNode *> AppNode::getChildNodes() const {
+    return childNodes;
+}
+
+int AppNode::getWidth() const {
+    if (childNodes.isEmpty())
+        return 1;
+    int width = 0;
+    for (AppNode *child : childNodes) {
+        width += child->getWidth();
+    }
+    return width;
+}
+
+int AppNode::getHeight() const {
+    if (childNodes.isEmpty())
+        return 1;
+    int height = 1;
+    for (AppNode *child : childNodes) {
+        height = qMax(child->getHeight(), height);
+    }
+    return height + 1;
+}
+
+int AppNode::count() const {
+    if (childNodes.isEmpty())
+        return 1;
+    int count = 1;
+    for (AppNode *child : childNodes) {
+        count += child->count();
+    }
+    return count;
+}
+
+AppNode *AppNode::clone(QObject *parent) {
+    AppNode *clone = new AppNode(n, lifespan, parent);
+
+    for (AppNode *child : childNodes) {
+        clone->addChildNode(child->clone(parent));
+    }
+
+    return clone;
 }
 
 void AppNode::setLifespan(const int lifespan) {

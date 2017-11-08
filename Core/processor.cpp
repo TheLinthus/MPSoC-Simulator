@@ -17,7 +17,8 @@ Processor::Processor(int x, int y, Type type, int threads, QObject *parent)
     if (isMaster()) {
         MasterApplication *masterApplication = new MasterApplication();
         connect(this, SIGNAL(destroyed(QObject*)), masterApplication, SLOT(deleteLater()));
-        cores[0] = new AppNode(-1, masterApplication);
+        masterApplication->setRootNode(0,-1);
+        cores[0] = masterApplication->getNode(0);
     }
 }
 

@@ -2,17 +2,23 @@
 
 namespace View {
 
-AppNode::AppNode(const qreal x, const int y, const int s, const int n) :
-    x(x),
-    y(y),
-    s(s),
-    n(n)
+AppNode::AppNode(int n, Core::AppNode *appNode) :
+    n(n),
+    appNode(appNode)
 {
     setAcceptHoverEvents(true);
 }
 
+int AppNode::getN() const {
+    return n;
+}
+
+Core::AppNode *AppNode::getAppNode() {
+    return appNode;
+}
+
 QRectF AppNode::boundingRect() const {
-    return QRectF((x * 150) - ((s * 150) / 2), 150 * y, 100, 100);
+    return QRectF(pos().x()-50, pos().y()-50, 100, 100);
 }
 
 void AppNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
@@ -23,17 +29,19 @@ void AppNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 
     painter->drawEllipse(rect);
 
-    painter->setFont(QFont("Geneva", 36, QFont::Bold));
-    painter->setPen(QPen(Qt::black));
-
     QTextOption options;
     options.setAlignment(Qt::AlignCenter);
 
-    painter->drawText(rect, QString::number(n), options);
+    painter->setFont(QFont("Geneva", 36, QFont::Bold));
+    painter->setPen(QPen(Qt::black));
+
+    painter->drawText(rect.adjusted(0,0,0,-50), QString::number(n), options);
+
+    painter->setFont(QFont("Geneva", 18, QFont::Normal));
+    painter->drawText(rect.adjusted(0,50,0,0), QString::number(appNode->getLifespan()), options);
 }
 
 void AppNode::hoverEnterEvent(QGraphicsSceneHoverEvent *) {
-    qDebug() << boundingRect();
     if (hoverEffect != 0) {
         hoverEffect = new QGraphicsDropShadowEffect();
         hoverEffect->setBlurRadius(25);
