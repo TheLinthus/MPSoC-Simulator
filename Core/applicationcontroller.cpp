@@ -120,7 +120,11 @@ bool ApplicationController::saveToFile(ApplicationGroup *group) {
 
     QJsonArray array;
     foreach (QString item, group->getApplicationsList()) {
-        Application *app = getApplication(item);
+        Application *app = group->get(item);
+        if (app == 0) {
+            qWarning() << "Error finding application" << item;
+            continue;
+        }
         QJsonObject appObj;
 
         appObj["name"] = app->getName(false);   // Get app name without parent's name
@@ -178,11 +182,9 @@ QStringList ApplicationController::getApplicationsGroupList() const {
 
 Application *ApplicationController::getApplication(QString name) {
     foreach (ApplicationGroup *group, applicationsGroupList) {
-        if (group->isEnabled()) {
-            Application *app = group->get(name);
-            if (app != 0) {
-                return app;
-            }
+        Application *app = group->get(name);
+        if (app != 0) {
+            return app;
         }
     }
     return 0;
