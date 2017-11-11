@@ -9,6 +9,17 @@ QMenuBar {
 #widgetStack QPushButton, #widgetStack QLabel, #widgetStack QGroupBox {
     color: rgb(255, 255, 255);
 }
+#widgetStack QGroupBox {
+    border: 1px solid #777;
+    margin-top: 1.5ex;
+}
+#widgetStack QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 5px;
+    top: -0.5ex;
+    padding: 0 3px;
+}
 #leftPanel QPushButton:disabled, #widgetStack QPushButton:disabled {
     color: palette(Mid);
 }

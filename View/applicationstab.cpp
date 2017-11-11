@@ -172,7 +172,7 @@ void ApplicationsTab::clearEditor() {
     ui->checkBoxApplicationGroupEnabled->setChecked(false);
 
     ui->comboBoxApplications->clear();
-    ui->comboBoxApplications->addItem(QString(tr("(Select an Application Grup first)")));
+    ui->comboBoxApplications->addItem(QString(tr("(Select an Application Group first)")));
     qobject_cast<QStandardItemModel *>(ui->comboBoxApplications->model())->item(0)->setEnabled(false);
 
     ui->comboBoxApplications->setEnabled(false);

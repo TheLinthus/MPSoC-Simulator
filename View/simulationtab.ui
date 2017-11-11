@@ -177,10 +177,20 @@
          <item>
           <widget class="Line" name="line">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>2</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">border-left: 1px solid #444;
+border-right: 1px solid #777;</string>
            </property>
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -320,10 +330,20 @@
          <item>
           <widget class="Line" name="line_2">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>2</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">border-left: 1px solid #444;
+border-right: 1px solid #777;</string>
            </property>
            <property name="orientation">
             <enum>Qt::Vertical</enum>
