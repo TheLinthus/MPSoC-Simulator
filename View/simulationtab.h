@@ -11,6 +11,7 @@
 #include <Core/mpsoc.h>
 #include <heuristiccontroller.h>
 #include <mpsoccontroller.h>
+#include <simulationcontroller.h>
 
 namespace View {
 
@@ -30,7 +31,6 @@ public slots:
     void updateListViewModel(const QStringList &list);
     void updateView();
     void on_autoStepToggle(bool);
-
     void on_pushButtonRunApplication_clicked();
     void on_pushButtonKillApplication_clicked();
     void on_buttonAddMPSoC_clicked();
@@ -40,10 +40,11 @@ public slots:
     void on_buttonPauseTimer_clicked();
     void on_buttonPlayTimer_clicked();
     void on_spinBoxTimer_valueChanged(int value);
-    void on_listViewApplications_selectionModel_selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
-    void on_listViewRunning_selectionModel_selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    void on_listViewApplications_selectionModel_selectionChanged(const QItemSelection &, const QItemSelection &);
+    void on_listViewRunning_selectionModel_selectionChanged(const QItemSelection &, const QItemSelection &);
 
 private slots:
+    void fail(int e);
     void on_sliderStep_valueChanged(int value);
 
 private:

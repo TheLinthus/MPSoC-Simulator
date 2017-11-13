@@ -7,7 +7,6 @@
 #include <QtScript/QScriptValue>
 #include <QtScript/QScriptValueIterator>
 #include <QtScript/QtScriptDepends>
-#include <Exception/badheuristicimplementationexception.h>
 
 namespace Core {
 
@@ -27,10 +26,11 @@ public:
     void setAuthor(const QString &value);
 
     void setEngine(QScriptEngine *value);
+    QScriptEngine* getEngine() const;
     void disableEngine();
     bool isEngineEnabled();
 
-    QPoint selectCore() const;
+    int selectCore(QPoint &p, QScriptValueList& args) const;
 
 private:
     QScriptEngine *engine;

@@ -67,6 +67,10 @@ int MPSoC::getWidth() const {
     return width;
 }
 
+QSize MPSoC::getSize() const {
+    return QSize(width, height);
+}
+
 QVector<Channel *> MPSoC::getPatch(const QPoint &a, const QPoint &b) const {
     return getPatch(a.x(), a.y(), b.x(), b.y());
 }
@@ -137,6 +141,15 @@ Core::Heuristic *MPSoC::getHeuristic() const {
 
 void MPSoC::setHeuristic(Core::Heuristic *value) {
     heuristic = value;
+}
+
+QScriptValue MPSoC::toScriptObject() {
+    QScriptValue obj = heuristic->getEngine()->newObject();
+    QScriptValue sizeObj = heuristic->getEngine()->newObject();
+    sizeObj.setProperty("w", width);
+    sizeObj.setProperty("h", height);
+    obj.setProperty("size", sizeObj);
+    return obj;
 }
 
 // Prototype, dynamic modify mpsoc

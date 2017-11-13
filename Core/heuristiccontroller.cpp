@@ -87,22 +87,25 @@ void HeuristicController::updateAvailabilityList() {
         Core::Heuristic *heuristic = new Core::Heuristic(this);
 
         heuristic->setFileName(file.fileName());
-        if (engine->evaluate("name == undefined").toBool()) {
+        if (engine->evaluate("(!name || name.lenght == 0)").toBool()) {
             qWarning() << s << " doesn't have defined name";
             heuristic->setName(s.left(s.size() - 3));    // If it doesn't have a name, cut down '.js' form file name to use as name
         } else {
             heuristic->setName(engine->evaluate("name").toString());        // Read the stored heuristic name to save
         }
-        if (engine->evaluate("description == undefined").toBool()) {
+        if (engine->evaluate("(!description || description.lenght == 0)").toBool()) {
             qWarning() << s << " doesn't have defined description";
         } else {
             heuristic->setDescription(engine->evaluate("description").toString());
         }
-        if (engine->evaluate("author == undefined").toBool()) {
+        if (engine->evaluate("(!author || author.lenght == 0)").toBool()) {
             qWarning() << s << " doesn't have defined author";
         } else {
             heuristic->setAuthor(engine->evaluate("author").toString());
         }
+
+        QScriptValue scriptConsole = engine->newQObject(new Debug::Logger());
+        engine->globalObject().setProperty("console", scriptConsole); // Register console object for heuristic debug with 'console.log(msg)'
 
         QString name = heuristic->getName();
         if (heuristicList.contains(heuristic->getName())) {

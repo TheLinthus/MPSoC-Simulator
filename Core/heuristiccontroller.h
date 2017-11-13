@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QFile>
 #include "Core/heuristic.h"
+#include <Debug/logger.h>
 #define heuristics Core::HeuristicController::instance()
 
 namespace Core {

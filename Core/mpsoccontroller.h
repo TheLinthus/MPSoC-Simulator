@@ -15,7 +15,7 @@ private:
     MPSoCController(QObject* parent = 0);
     static MPSoCController* createInstance();
 
-    QList<Core::MPSoC *> mpsocList;
+    QVector<Core::MPSoC *> mpsocList;
 
 public:
     ~MPSoCController();

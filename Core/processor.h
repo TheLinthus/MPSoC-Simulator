@@ -2,6 +2,7 @@
 #define CORE_CORE_H
 
 #include <QObject>
+#include <QDebug>
 #include <Core/channel.h>
 #include <Core/application.h>
 
@@ -36,7 +37,7 @@ private:
     Channel* west;
     Channel* south;
     Channel* east;
-    AppNode** cores;
+    QVector<AppNode*> cores;
     int threads;
     Type type;
 
@@ -48,7 +49,8 @@ signals:
 
 public slots:
     void kill(int thread = -1);
-    void kill(AppNode * thread);
+    void kill(AppNode * appNode);
+    void kill(QObject * appNode);
 };
 
 } // namespace Core

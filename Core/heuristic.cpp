@@ -49,6 +49,10 @@ void Heuristic::setEngine(QScriptEngine *value) {
     enabled = true;
 }
 
+QScriptEngine *Heuristic::getEngine() const {
+    return engine;
+}
+
 void Heuristic::disableEngine() {
     delete engine;
     enabled = false;
@@ -58,21 +62,28 @@ bool Heuristic::isEngineEnabled() {
     return enabled;
 }
 
-QPoint Heuristic::selectCore() const {
+int Heuristic::selectCore(QPoint &p, QScriptValueList &args) const {
     if (enabled) {
-        QScriptValue point = engine->evaluate("selectCore()");      // Call the heuristic script function to selecting a Core
-        if (point.isObject() && !point.isError()
-                && point.property("x").isValid()
-                && point.property("y").isValid()) {                 // If no error was found and the return is an object with X and Y, nothing is wrong with the script
-            QPoint p = QPoint();
-            p.setX(point.property("x").toInteger());                // Extract the points X and Y from the return
-            p.setY(point.property("y").toInteger());
-            return p;
+        QScriptValue fun = engine->globalObject().property("selectCore");   // Select Core Function on Heuristic Script
+        QScriptValue result = fun.call(QScriptValue(), args);               // Call the heuristic script function to selecting a Core
+        if (engine->hasUncaughtException()) {
+            int line = engine->uncaughtExceptionLineNumber();
+            qDebug() << "uncaught exception at line" << line << ":" << result.toString();
+            engine->clearExceptions();
+            return 4; // Script error
+        }
+        if (result.isObject() && !result.isError()
+                && result.property("x").isValid()
+                && result.property("y").isValid()) {                        // If no error was found and the return is an object with X and Y, nothing is wrong with the script
+            p.setX(result.property("x").toInteger());                       // Extract the points X and Y from the return
+            p.setY(result.property("y").toInteger());
+            return 1; // Ok
         } else {
-            throw BadHeuristicImplementationException{};
+            qDebug() << result.toString();
+            return 3; // Bad Heuristic Implementation
         }
     } else {
-        return QPoint(0, 0);
+        return 2; // Script not enabled
     }
 }
 

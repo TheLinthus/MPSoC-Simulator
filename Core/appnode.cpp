@@ -16,7 +16,7 @@ AppNode::AppNode(int n, int lifespan, QObject *parent)
 AppNode::~AppNode() {
     emit finished(this);
     for (AppNode *child : childNodes) {
-        child->deleteLater();
+        delete child;
     }
 }
 

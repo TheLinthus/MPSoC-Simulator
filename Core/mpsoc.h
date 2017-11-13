@@ -2,6 +2,7 @@
 #define CORE_MPSOC_H
 
 #include <QObject>
+#include <QScriptEngine>
 #include <Core/processor.h>
 #include <Core/channel.h>
 #include <Core/heuristic.h>
@@ -21,6 +22,7 @@ public:
 
     int getHeight() const;
     int getWidth() const;
+    QSize getSize() const;
     QVector<Channel *> getPatch(const QPoint &a, const QPoint &b) const;
     QVector<Channel *> getPatch(int x1, int y1, int x2, int y2) const;
     QVector<Processor *> getFree() const;
@@ -28,6 +30,8 @@ public:
 
     Core::Heuristic *getHeuristic() const;
     void setHeuristic(Core::Heuristic *value);
+
+    QScriptValue toScriptObject();
 
 protected:
     int height;

@@ -9,11 +9,11 @@ Processor::Processor(int x, int y, Type type, int threads, QObject *parent)
     , south(0)
     , east(0)
     , threads(threads)
+    , cores(threads)
     , x(x)
     , y(y)
     , type(type)
 {
-    cores = new AppNode*[threads]();
     if (isMaster()) {
         MasterApplication *masterApplication = new MasterApplication();
         connect(this, SIGNAL(destroyed(QObject*)), masterApplication, SLOT(deleteLater()));
@@ -50,7 +50,7 @@ bool Processor::run(AppNode *node, int thread) {
         return false;
     }
     if (cores[thread] == 0) {
-        connect(node, SIGNAL(finished(AppNode *)), this, SLOT(kill(AppNode *)));
+        connect(node, SIGNAL(destroyed(QObject*)), this, SLOT(kill(QObject*)));
         cores[thread] = node;
         emit changed();
         return true;
@@ -90,6 +90,10 @@ int Processor::getThreadOf(const AppNode *appNode) {
     return -1;
 }
 
+void Processor::kill(QObject *appNode) {
+    kill((AppNode *) appNode);
+}
+
 void Processor::kill(AppNode *appNode) {
     kill(getThreadOf(appNode));
 }
@@ -99,7 +103,6 @@ void Processor::kill(int thread) {
         return;
     }
     if (cores[thread] != 0) {
-        delete cores[thread];
         cores[thread] = 0;
         emit changed();
     }

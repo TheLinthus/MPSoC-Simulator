@@ -1,11 +1,13 @@
 #ifndef CORE_APPLICATION_H
 #define CORE_APPLICATION_H
 
+#include <functional>
 #include <QObject>
 #include <QVector>
 #include <QDate>
 #include <QMap>
 #include <QColor>
+#include <QScriptEngine>
 #include "appload.h"
 #include "appnode.h"
 
@@ -36,6 +38,7 @@ public:
     int graphHeigh() const;
     QMap<int, AppLoad *> *getConnectionsFrom(const int from) const;
     QMap<int, QMap<int, AppLoad *> *> getConnections() const;
+    QVector<AppNode *> getAllNodes(AppNode *from = 0) const;
     bool exists(const int index);
     int nodeCount() const;
     void removeNode(const int index);
@@ -46,8 +49,12 @@ public:
     QString getFile() const;
     void setFile(const QString &value);
 
-    Application *clone(QObject *parent);
+    Application *clone();
 
+    QScriptValue toScriptObject(QScriptEngine *engine);
+
+    int getUid() const;
+    void setUid(int value);
 
 protected:
     QColor color;
@@ -57,6 +64,7 @@ protected:
 private:
     AppNode *rootNode;
     QMap<int, QMap<int, AppLoad *> *> connections;
+    int uid;
 
 signals:
 

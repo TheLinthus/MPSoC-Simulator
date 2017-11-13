@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QColor>
 
+#include <QDebug>
+
 namespace Core {
 
 class AppNode : public QObject

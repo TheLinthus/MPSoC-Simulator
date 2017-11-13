@@ -20,9 +20,12 @@ SimulationTab::SimulationTab(QWidget *parent) :
     connect(
                 ui->listViewRunning->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
                 this, SLOT(on_listViewRunning_selectionModel_selectionChanged(QItemSelection,QItemSelection)));
-    //connect(
-    //            simulator, SIGNAL(notify()),
-    //            this, SLOT(updateView()));
+    connect(
+                simulator, SIGNAL(notify()),
+                this, SLOT(updateView()));
+    connect(
+                simulator, SIGNAL(failed(int)),
+                this, SLOT(fail(int)));
 }
 
 SimulationTab::~SimulationTab() {
@@ -34,17 +37,27 @@ void SimulationTab::updateListViewModel(const QStringList &list) {
 }
 
 void SimulationTab::updateView() {
-    ui->pushButtonRunApplication->setEnabled(ui->listViewApplications->selectionModel()->selectedIndexes().count() > 0 && mpsocs->count() > 0 /* && Can Add an Application now */);
-    ui->pushButtonKillApplication->setEnabled(ui->listViewRunning->selectionModel()->selectedIndexes().count() > 0 /*&& Can Kill an Application now */);
-    ui->buttonAddMPSoC->setEnabled(heuristics->count() > 0);                        // Must have at least 1 heuristic
-    ui->buttonNextStep->setEnabled(mpsocs->count() > 0);                            // Must have mpsocs to start simulation
-    //ui->buttonPlayTimer->setEnabled(mpsocs->count() > 0 && !simulator->isRunning());// ^^ and isn't running
-    //ui->buttonPauseTimer->setEnabled(simulator->isRunning());                       //If running
-    //ui->buttonPrevStep->setEnabled(simulator->currentStep() > 0);
-    //ui->buttonNextStep->setEnabled(simulator->currentStep() < simulator->stepsCount() - 1);
-    //ui->ButtonReset->setEnabled(simulator->stepsCount() > 0);
-    //ui->sliderStep->setEnabled(simulator->stepsCount() > 0);
-    //ui->labelStepCounter->setText(QString("%1/%2").arg(simulator->currentStep() + 1, simulator->stepCount()));
+    ui->pushButtonRunApplication->setEnabled(ui->listViewApplications->selectionModel()->selectedIndexes().count() > 0 && mpsocs->count() > 0 && simulator->isRunEnabled());
+    ui->pushButtonKillApplication->setEnabled(ui->listViewRunning->selectionModel()->selectedIndexes().count() > 0  && simulator->isKillEnabled());
+    ui->buttonAddMPSoC->setEnabled(heuristics->count() > 0 && !simulator->isStarted()); // Must have at least 1 heuristic and can't do with running simulation;
+    ui->buttonPlayTimer->setEnabled(simulator->isStepEnable() && !simulator->isRunning());// ^^ and isn't running
+    ui->buttonPauseTimer->setEnabled(simulator->isRunning());                       // If running
+    ui->buttonPrevStep->setEnabled(false);//simulator->currentStep() > 0);          // TODO - Not implemented in this version
+    ui->buttonNextStep->setEnabled(simulator->isStepEnable());
+    ui->ButtonReset->setEnabled(simulator->isStarted());
+    ui->sliderStep->setEnabled(false);//simulator->stepsCount() > 0);               // TODO - Not implemented in this version
+    if (simulator->isStarted()) {
+        int val = (simulator->currentStep() + 1);
+        int max = simulator->stepsCount();
+        ui->labelStepCounter->setText(QString("%1/%2").arg(val).arg(max));
+        ui->sliderStep->setMaximum(max);
+        ui->sliderStep->setValue(val);
+    } else {
+        ui->labelStepCounter->setText(QString("-/-"));
+        ui->sliderStep->setValue(0);
+        ui->sliderStep->setMaximum(0);
+    }
+    listModelRunning->setStringList(apps->getRunningApplicationsList());
 }
 
 void SimulationTab::on_autoStepToggle(bool) {
@@ -52,11 +65,20 @@ void SimulationTab::on_autoStepToggle(bool) {
 }
 
 void SimulationTab::on_pushButtonRunApplication_clicked() {
-    // TODO
+    QString appName = ui->listViewApplications->selectionModel()->selectedIndexes().first().data().toString();
+    Core::Application *app = apps->run(appName);
+    if (app != 0) {
+        simulator->runAction(app);
+    } else {
+        QMessageBox::warning(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
+                             QString(tr("Undexpected error. Application %1 didn't run").arg(appName)));
+    }
 }
 
 void SimulationTab::on_pushButtonKillApplication_clicked() {
-    // TODO
+    int selected = ui->listViewRunning->selectionModel()->selectedIndexes().first().row();
+    apps->kill(selected);
+    // TODO - register kill to undo/redo
 }
 
 void SimulationTab::on_buttonAddMPSoC_clicked() {
@@ -68,49 +90,67 @@ void SimulationTab::on_buttonAddMPSoC_clicked() {
     QHBoxLayout* layout =  ui->mpsocsLayout;
 
     View::MPSoCBox *mpsocbox = new View::MPSoCBox();
-    Core::MPSoC *mpsoc = mpsocs->add(dialog->getW(),dialog->getH(),dialog->getMaster());
+    Core::MPSoC *mpsoc = mpsocs->add(dialog->getH(),dialog->getW(),dialog->getMaster());
 
     mpsoc->setHeuristic(heuristics->getHeuristic(dialog->getHeuristic()));
 
     mpsocbox->setMPSoC(mpsoc);
 
     layout->insertWidget(layout->count() - 1, mpsocbox); // Insert before spacer
+
+    updateView();
 }
 
 void SimulationTab::on_ButtonReset_clicked() {
-    // TODO
+    if (QMessageBox::question(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
+                          QString(tr("Are you sure you want to reset simulation?")), QMessageBox::No, QMessageBox::Yes)
+            == QMessageBox::Yes)
+        simulator->reset();
 }
 
 void SimulationTab::on_buttonPrevStep_clicked() {
-    // TODO
+    simulator->stepBackward();
 }
 
 void SimulationTab::on_buttonNextStep_clicked() {
-    // TODO
+    simulator->stepFoward();
 }
 
 void SimulationTab::on_buttonPauseTimer_clicked() {
-    // TODO
+    simulator->setAutoStep(false);
 }
 
 void SimulationTab::on_buttonPlayTimer_clicked() {
-    // TODO
+    simulator->setAutoStep(true);
 }
 
 void SimulationTab::on_spinBoxTimer_valueChanged(int value) {
-    // TODO
+    simulator->setInterval(value);
 }
 
-void SimulationTab::on_listViewApplications_selectionModel_selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
+void SimulationTab::on_listViewApplications_selectionModel_selectionChanged(const QItemSelection &, const QItemSelection &) {
     updateView();
 }
 
-void SimulationTab::on_listViewRunning_selectionModel_selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
+void SimulationTab::on_listViewRunning_selectionModel_selectionChanged(const QItemSelection &, const QItemSelection &) {
     updateView();
+}
+
+void SimulationTab::fail(int e){ // change from int to Error object carrying more info
+    QMessageBox msgBox;
+    msgBox.setWindowTitle(parentWidget()->windowTitle());
+    switch (e) { // change for Enum in Error
+        case 0 :
+            msgBox.setIcon(QMessageBox::Critical);
+            msgBox.setText(tr("Error selecting core!"));
+            msgBox.setInformativeText(tr("Heuristic selected a core without free slot, can't procced with simulation.\nCheckout if Heuristic have a valid definition."));
+            msgBox.exec();
+            break;
+    }
 }
 
 void SimulationTab::on_sliderStep_valueChanged(int value) {
-    // TODO
+    // TODO - Not implemented in this version
 }
 
 } // namespace View

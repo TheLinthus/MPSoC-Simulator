@@ -42,11 +42,13 @@ void Processor::updateToolTip() {
                 QString(qenum.valueToKey(processor->getType())),
                 QString::number(processor->nOfThreads()));
     for (int i = 0; i < processor->nOfThreads(); i++) {
-        toolTip.append(QString("Thread %1: ").arg(i));
+        toolTip.append(QString("<b>Thread %1</b>: ").arg(i));
         if (processor->isIdle(i)) {
             toolTip.append(tr("Idle"));
         } else {
             toolTip.append(((Core::Application *) processor->runningNode(i)->parent())->getName());
+            toolTip.append(tr("<b> Node </b>"));
+            toolTip.append(QString::number(processor->runningNode(i)->getN()));
         }
     }
     setToolTip(toolTip);
@@ -99,12 +101,12 @@ void Processor::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidg
 
     // Master indicator
     if (processor->isMaster()) {
-        painter->setPen(QPen(Qt::white,5));
-        painter->setBrush(QBrush(Qt::blue));
+        painter->setPen(QPen(Qt::black,4));
+        painter->setBrush(QBrush(QColor::fromRgb(0xff,0xae,0x2d)));
         painter->drawEllipse(rect.topLeft() + QPoint(10,10), 18, 18);
 
         painter->setFont(QFont("Geneva", 18, QFont::Bold));
-        painter->setPen(QPen(Qt::white));
+        painter->setPen(QPen(Qt::black));
         painter->drawText(rect.topLeft() + QPointF(0,18), "M");
     }
 

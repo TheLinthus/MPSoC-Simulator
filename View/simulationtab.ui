@@ -49,7 +49,7 @@
            <x>0</x>
            <y>0</y>
            <width>514</width>
-           <height>413</height>
+           <height>408</height>
           </rect>
          </property>
          <layout class="QHBoxLayout" name="mpsocsLayout">
@@ -105,8 +105,11 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
           <property name="maximum">
-           <number>0</number>
+           <number>1</number>
           </property>
           <property name="tracking">
            <bool>true</bool>
@@ -115,7 +118,10 @@
            <enum>Qt::Horizontal</enum>
           </property>
           <property name="tickPosition">
-           <enum>QSlider::NoTicks</enum>
+           <enum>QSlider::TicksBelow</enum>
+          </property>
+          <property name="tickInterval">
+           <number>1</number>
           </property>
          </widget>
         </item>

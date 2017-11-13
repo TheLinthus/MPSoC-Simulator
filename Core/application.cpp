@@ -10,7 +10,7 @@ Application::Application(QObject *parent)
 }
 
 Application::~Application() {
-    rootNode->deleteLater();
+    delete rootNode;
     qDeleteAll(connections);
 }
 
@@ -132,14 +132,15 @@ void Application::setName(const QString &value)
     name = value;
 }
 
-Application *Application::clone(QObject *parent) {
-    Application * clone = new Application(parent);
+Application *Application::clone() {
+    Application * clone = new Application();
 
     clone->setColor(QColor(color));
-    clone->setName(QString(name));
+    clone->setName(QString(getName()));
     clone->setRootNode(rootNode->clone(clone));
-    for (int i = 0; i < connections.size(); i++) {
-        for (int j = 0; j < connections.value(i)->size(); j++) {
+
+    for (int i :  connections.keys()) {
+        for (int j : connections.value(i)->keys()) {
             AppLoad *appload = connections.value(i)->value(j);
             clone->addNodeConnection(i, j, appload->getVolume(), appload->getLoad());
         }
@@ -148,8 +149,36 @@ Application *Application::clone(QObject *parent) {
     return clone;
 }
 
+QScriptValue Application::toScriptObject(QScriptEngine *engine) {
+    QScriptValue obj = engine->newObject();
+    obj.setProperty("uid", uid);
+    return obj;
+}
+
+int Application::getUid() const
+{
+    return uid;
+}
+
+void Application::setUid(int value)
+{
+    uid = value;
+}
+
 QMap<int, QMap<int, AppLoad *> *> Application::getConnections() const {
     return connections;
+}
+
+QVector<AppNode *> Application::getAllNodes(AppNode *from) const {
+    QVector<AppNode *> nodes;
+    if (from == 0) {
+        from = rootNode;
+    }
+    nodes << from;
+    for (AppNode *child : from->getChildNodes()) {
+        nodes += getAllNodes(child);
+    }
+    return nodes;
 }
 
 QString Application::getFile() const {
@@ -162,7 +191,7 @@ void Application::setFile(const QString &value) {
 
 MasterApplication::MasterApplication()
     : Application() {
-    color = QColor(Qt::blue);
+    color = QColor::fromRgb(0xff,0xae,0x2d);
     name = (tr("Master"));
 }
 

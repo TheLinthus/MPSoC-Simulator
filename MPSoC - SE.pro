@@ -26,12 +26,13 @@ HEADERS = Core/appnode.h \
     View/newmpsocdialog.h \
     Core/heuristic.h \
     Core/heuristiccontroller.h \
-    Exception/badheuristicimplementationexception.h \
     mpsoc_se.h \
     View/simulationtab.h \
     View/applicationstab.h \
     View/heuristicstab.h \
-    View/viewappnode.h
+    View/viewappnode.h \
+    Core/simulationcontroller.h \
+    Debug/logger.h
 
 SOURCES = Core/appnode.cpp \
     Core/channel.cpp \
@@ -52,7 +53,9 @@ SOURCES = Core/appnode.cpp \
     View/simulationtab.cpp \
     View/applicationstab.cpp \
     View/heuristicstab.cpp \
-    View/viewappnode.cpp
+    View/viewappnode.cpp \
+    Core/simulationcontroller.cpp \
+    Debug/logger.cpp
 
 INCLUDEPATH = . \
     Core \
@@ -98,7 +101,10 @@ DISTFILES += \
     mpsoc.ico \
     mpsoc.rc \
     Heuristics/NearestNeighbor.js \
-    mpsoc.icns
+    mpsoc.icns \
+    .gitignore \
+    LICENSE \
+    README.md
 
 macx {
     ICON = mpsoc.icns

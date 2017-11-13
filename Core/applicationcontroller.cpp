@@ -18,7 +18,8 @@ namespace Core {
 
 Core::ApplicationController::ApplicationController(QObject *parent) :
     QObject(parent),
-    applicationsDir(QApplication::applicationDirPath()) {
+    applicationsDir(QApplication::applicationDirPath()),
+    appUIDSequence(0) {
     applicationsDir.cd(APPLICATIONSPATH);
 }
 
@@ -119,7 +120,7 @@ bool ApplicationController::saveToFile(ApplicationGroup *group) {
     groupObj["enabled"] = group->isEnabled();
 
     QJsonArray array;
-    foreach (QString item, group->getApplicationsList()) {
+    for (QString item : group->getApplicationsList()) {
         Application *app = group->get(item);
         if (app == 0) {
             qWarning() << "Error finding application" << item;
@@ -168,11 +169,21 @@ QStringList ApplicationController::getApplicationsList(const QString &group) con
         return QStringList();
     }
     QStringList list;
-    foreach (ApplicationGroup *group, applicationsGroupList) {
+    for (ApplicationGroup *group : applicationsGroupList) {
         if (group->isEnabled()) {
             list << group->getApplicationsList();
         }
     }
+    return list;
+}
+
+QStringList ApplicationController::getRunningApplicationsList() const {
+    QStringList list;
+
+    for (Application *app : runningList) {
+        list << QString("(%1) %2").arg(app->getUid()).arg(app->getName());
+    }
+
     return list;
 }
 
@@ -181,7 +192,7 @@ QStringList ApplicationController::getApplicationsGroupList() const {
 }
 
 Application *ApplicationController::getApplication(QString name) {
-    foreach (ApplicationGroup *group, applicationsGroupList) {
+    for (ApplicationGroup *group : applicationsGroupList) {
         Application *app = group->get(name);
         if (app != 0) {
             return app;
@@ -198,26 +209,34 @@ ApplicationGroup *ApplicationController::getApplicationGroup(QString name) {
     return applicationsGroupList.value(name);
 }
 
-bool ApplicationController::run(QString name) {
-    foreach (ApplicationGroup *group, applicationsGroupList) {
+Application *ApplicationController::run(QString name) {
+    for (ApplicationGroup *group : applicationsGroupList) {
         if (group->isEnabled()) {
             Application *app = group->get(name);
             if (app != 0) {
-                runningList.append(app->clone(this));
-                return true;
+                app = app->clone();
+                app->setUid(appUIDSequence++);
+                app->setColor(QColor(QColor(static_cast<Qt::GlobalColor>(((appUIDSequence + 2) % 16) + 4))));
+                runningList.append(app);
+                return app;
             }
         }
     }
-    return false;
+    return 0;
 }
 
 void ApplicationController::kill(int index) {
     runningList.at(index)->deleteLater();
 }
 
+void ApplicationController::killAll() {
+    qDeleteAll(runningList);
+    runningList.clear();
+}
+
 int ApplicationController::applicationsCount() {
     int count = 0;
-    foreach (ApplicationGroup *group, applicationsGroupList) {
+    for (ApplicationGroup *group : applicationsGroupList) {
         if (group->isEnabled()) {
             count += group->getApplicationsCount();
         }
@@ -237,7 +256,7 @@ void ApplicationController::updateAvailabilityList() {
 
     emit progressMaxUpdate(loadMax);
 
-    foreach (QString s, applicationsDir.entryList()) {
+    for (QString s : applicationsDir.entryList()) {
         emit progressUpdate(loadValue);
         QString text;
         QFile file(applicationsDir.absoluteFilePath(s));

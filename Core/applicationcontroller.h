@@ -24,6 +24,8 @@ private:
     ApplicationController(QObject* parent = 0);
     static ApplicationController* createInstance();
 
+    int appUIDSequence;
+
     QMap<QString, Core::ApplicationGroup *> applicationsGroupList;
     QList<Core::Application *> runningList;
 
@@ -43,12 +45,14 @@ public:
     bool saveToFile(ApplicationGroup *group);
     void add(ApplicationGroup *group);
     QStringList getApplicationsList(const QString &group = "") const;
+    QStringList getRunningApplicationsList() const;
     QStringList getApplicationsGroupList() const;
     Core::Application *getApplication(QString name);
     Core::Application *getRunning(int index);
     ApplicationGroup *getApplicationGroup(QString name);
-    bool run(QString name);
+    Application *run(QString name);
     void kill(int index);
+    void killAll();
     int applicationsCount();
     int runningCount();
 
