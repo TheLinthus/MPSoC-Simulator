@@ -149,8 +149,6 @@ void View::HeuristicsTab::on_pushButtonOpenHeuristicsDirectory_clicked() {
 }
 
 void View::HeuristicsTab::on_pushButtonSaveHeuristic_clicked() {
-
-
     // Validate Script
     QScriptEngine temp;
     temp.evaluate(ui->textEditScript->toPlainText());
@@ -200,7 +198,6 @@ void View::HeuristicsTab::on_pushButtonSaveHeuristic_clicked() {
         QMessageBox::critical(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
                               tr("Could not write to file %1").arg(QFileInfo(file).fileName()), QMessageBox::Ok);
     }
-
 }
 
 void View::HeuristicsTab::on_pushButtonCancelHeuristic_clicked() {
@@ -225,6 +222,7 @@ void View::HeuristicsTab::on_comboBoxHeuristics_currentIndexChanged(const QStrin
                                   tr("Are you sure? Current changes on Heuristic will be lost"),
                                   QMessageBox::No, QMessageBox::Yes)
                 == QMessageBox::No)
+            ui->comboBoxHeuristics->setCurrentText(heuristicEdit->getName());
             return;
 
     clearEditor();
