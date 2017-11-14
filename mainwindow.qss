@@ -29,17 +29,17 @@ QMenuBar {
 #widgetStack QDateEdit, #widgetStack QLineEdit {
     padding-left: 3px;
 }
-#widgetStack QDateEdit[readOnly="true"], #widgetStack QLineEdit:read-only {
+#widgetStack QDateEdit[readOnly="true"], #widgetStack QLineEdit:read-only, #widgetStack QPlainTextEdit:read-only {
     border: 0;
     background-color: #444;
     color: #fff;
 }
-#widgetStack QDateEdit:disabled, #widgetStack QLineEdit:disabled, #widegetStack checkBox:disabled {
+#widgetStack QDateEdit:disabled, #widgetStack QLineEdit:disabled, #widegetStack checkBox:disabled, #widgetStack QPlainTextEdit:disabled {
     border: 1px solid #000;
     background-color: #777;
     color: #777;
 }
-#widgetStack QDateEdit:focus, #widgetStack QLineEdit:focus, #widegetStack checkBox:focus {
+#widgetStack QDateEdit:focus, #widgetStack QLineEdit:focus, #widegetStack checkBox:focus, #widgetStack QPlainTextEdit:focus {
     border: 1px solid palette(highlight);
 }
 QPushButton:flat {

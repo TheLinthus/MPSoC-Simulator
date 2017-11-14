@@ -68,7 +68,7 @@ int Heuristic::selectCore(QPoint &p, QScriptValueList &args) {
         QScriptValue result = fun.call(QScriptValue(), args);               // Call the heuristic script function to selecting a Core
         if (engine->hasUncaughtException()) {
             int line = engine->uncaughtExceptionLineNumber();
-            this->log(QString("uncaught exception at line %1: %2").arg(QString::number(line), result.toString()));
+            this->log(QString("uncaught exception at line %1: %2").arg(QString::number(line), engine->uncaughtException().toString()));
             engine->clearExceptions();
             return 4; // Script error
         }
@@ -95,6 +95,16 @@ void Heuristic::setLogger(Debug::Logger *value) {
 void Heuristic::log(const QString &msg) {
     if (logger != 0)
         logger->log(msg);
+}
+
+QDate Heuristic::getDate() const
+{
+    return date;
+}
+
+void Heuristic::setDate(const QDate &value)
+{
+    date = value;
 }
 
 } // namespace Core

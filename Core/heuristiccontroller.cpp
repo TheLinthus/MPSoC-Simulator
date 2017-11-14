@@ -27,7 +27,7 @@ Core::HeuristicController* HeuristicController::instance() {
     return Singleton<Core::HeuristicController>::instance(Core::HeuristicController::createInstance);
 }
 
-QList<QString> HeuristicController::getHeuristicsList() const {
+QStringList HeuristicController::getHeuristicsList() const {
     return heuristicList.keys();
 }
 
@@ -70,17 +70,22 @@ void HeuristicController::updateAvailabilityList() {
 
         QScriptEngine * engine = new QScriptEngine();
 
+        Debug::Logger *logger = new Debug::Logger("Heuristics/Logs/"+s+"_log.txt");
+        QScriptValue scriptConsole = engine->newQObject(logger);
+        engine->globalObject().setProperty("console", scriptConsole); // Register console object for heuristic debug with 'console.log(msg)'
+
         engine->evaluate(text);
 
         if (engine->hasUncaughtException()) {           // If the file have a syntax error or something like
-            qCritical() << file.fileName() << " encountered an exception and could not be loaded.";
+            logger->log(QString("%1 was encontred an error at line %2 and could not be loaded: %3").arg(
+                            s, QString::number(engine->uncaughtExceptionLineNumber()), engine->uncaughtException().toString()));
             foreach(QString err, engine->uncaughtExceptionBacktrace()) {
-                qCritical() << err;
+                qWarning() << err;
             }
             continue;
         }
         if (engine->evaluate("selectCore == undefined").toBool()) { // Check if it have the required function selectCore
-            qCritical() << file.fileName() << " doesn't have selectCore function.";
+            logger->log(QString("%1 doesn't have selectCore function.").arg(s));
             continue;
         }
 
@@ -103,10 +108,12 @@ void HeuristicController::updateAvailabilityList() {
         } else {
             heuristic->setAuthor(engine->evaluate("author").toString());
         }
-
-        Debug::Logger *logger = new Debug::Logger("Heuristics/Logs/"+s+"_log.txt");
-        QScriptValue scriptConsole = engine->newQObject(logger);
-        engine->globalObject().setProperty("console", scriptConsole); // Register console object for heuristic debug with 'console.log(msg)'
+        if (engine->evaluate("(!date || date.lenght == 0)").toBool()) {
+            qWarning() << s << " doesn't have defined date";
+            heuristic->setDate(QDate::currentDate());
+        } else {
+            heuristic->setDate(engine->evaluate("date").toDateTime().date());
+        }
 
         QString name = heuristic->getName();
         if (heuristicList.contains(heuristic->getName())) {
@@ -125,7 +132,7 @@ void HeuristicController::updateAvailabilityList() {
     }
 
     emit progressUpdate(count);
-    emit updateDone();
+    emit updateDone(getHeuristicsList());
 }
 
 } // namespace Core

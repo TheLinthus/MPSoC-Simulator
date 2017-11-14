@@ -49,6 +49,7 @@ private slots:
     void loadingDone();
 
     void closeEvent(QCloseEvent *event) override;
+    void openLogFile();
 
     void on_applicationsPushButton_clicked();
     void on_simulationPushButton_clicked();

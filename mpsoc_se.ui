@@ -216,6 +216,8 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
+    <addaction name="actionLog"/>
+    <addaction name="separator"/>
     <addaction name="actionShow_Help"/>
     <addaction name="actionAbout"/>
    </widget>
@@ -371,6 +373,18 @@
    </property>
    <property name="text">
     <string>&amp;Open Directory</string>
+   </property>
+  </action>
+  <action name="actionLog">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/images/film.png</normaloff>:/icons/images/film.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Log</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Log file</string>
    </property>
   </action>
  </widget>

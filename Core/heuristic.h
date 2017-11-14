@@ -25,6 +25,8 @@ public:
     void setDescription(const QString &value);
     QString getAuthor() const;
     void setAuthor(const QString &value);
+    QDate getDate() const;
+    void setDate(const QDate &value);
 
     void setEngine(QScriptEngine *value);
     QScriptEngine* getEngine() const;
@@ -35,6 +37,7 @@ public:
 
     void setLogger(Debug::Logger *value);
     void log(const QString &msg);
+
 
 private:
     QScriptEngine *engine;
@@ -47,6 +50,7 @@ private:
     QString name;
     QString description;
     QString author;
+    QDate date;
 
 };
 

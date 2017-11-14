@@ -23,7 +23,7 @@ public:
     ~HeuristicController();
     static HeuristicController* instance();
 
-    QList<QString> getHeuristicsList() const;
+    QStringList getHeuristicsList() const;
     Core::Heuristic *getHeuristic(const QString &name);
     int count() const;
 
@@ -33,7 +33,7 @@ public slots:
 signals:
     void progressUpdate(int);
     void progressMaxUpdate(int);
-    void updateDone();
+    void updateDone(QStringList);
 };
 
 } // namespace Core

@@ -47,14 +47,17 @@ MPSoC_Simulator::MPSoC_Simulator(QWidget *parent) :
 
     connect(apps, SIGNAL(updateDone(QStringList,QStringList)), simulationTab, SLOT(updateListViewModel(QStringList)));
     connect(apps, SIGNAL(updateDone(QStringList,QStringList)), applicationsTab, SLOT(updateListViewModel(QStringList,QStringList)));
+    connect(heuristics, SIGNAL(updateDone(QStringList)), heuristicsTab, SLOT(updateListViewModel(QStringList)));
 
-    // Connect action menus with shortcuts to right buttons
+    // Connect action menus with shortcuts to right functions
     connect(ui->actionAdd_MPSoC, SIGNAL(triggered(bool)), simulationTab, SLOT(on_buttonAddMPSoC_clicked()));
     connect(ui->actionStep_Back, SIGNAL(triggered(bool)), simulationTab, SLOT(on_buttonPrevStep_clicked()));
     connect(ui->actionStep_Foward, SIGNAL(triggered(bool)), simulationTab, SLOT(on_buttonNextStep_clicked()));
     connect(ui->action_Reset_Simulation, SIGNAL(triggered(bool)), simulationTab, SLOT(on_ButtonReset_clicked()));
     connect(ui->actionAuto_Step, SIGNAL(toggled(bool)), simulationTab, SLOT(on_autoStepToggle(bool)));
     connect(ui->action_Open_Applications_Directory, SIGNAL(triggered(bool)), applicationsTab, SLOT(on_pushButtonOpenDirectory_clicked()));
+    connect(ui->action_Open_Heuristics_Directory, SIGNAL(triggered(bool)), heuristicsTab, SLOT(on_pushButtonOpenHeuristicsDirectory_clicked()));
+    connect(ui->actionLog, SIGNAL(triggered(bool)), this, SLOT(openLogFile()));
 
     // SetUp widgetStack's tabs of left panel buttons
     ui->widgetStack->addWidget(simulationTab);
@@ -140,6 +143,11 @@ void MPSoC_Simulator::closeEvent(QCloseEvent *event) {
     } else {
         event->ignore(); // Deny exit
     }
+}
+
+void MPSoC_Simulator::openLogFile() {
+    QString logFile = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first()+ "/log.txt";
+    QDesktopServices::openUrl(QUrl::fromLocalFile(logFile));
 }
 
 void MPSoC_Simulator::on_applicationsPushButton_clicked() {
