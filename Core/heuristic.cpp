@@ -62,13 +62,13 @@ bool Heuristic::isEngineEnabled() {
     return enabled;
 }
 
-int Heuristic::selectCore(QPoint &p, QScriptValueList &args) const {
+int Heuristic::selectCore(QPoint &p, QScriptValueList &args) {
     if (enabled) {
         QScriptValue fun = engine->globalObject().property("selectCore");   // Select Core Function on Heuristic Script
         QScriptValue result = fun.call(QScriptValue(), args);               // Call the heuristic script function to selecting a Core
         if (engine->hasUncaughtException()) {
             int line = engine->uncaughtExceptionLineNumber();
-            qDebug() << "uncaught exception at line" << line << ":" << result.toString();
+            this->log(QString("uncaught exception at line %1: %2").arg(QString::number(line), result.toString()));
             engine->clearExceptions();
             return 4; // Script error
         }
@@ -79,12 +79,22 @@ int Heuristic::selectCore(QPoint &p, QScriptValueList &args) const {
             p.setY(result.property("y").toInteger());
             return 1; // Ok
         } else {
-            qDebug() << result.toString();
+            this->log(QString("bad heuristic implementation: expecting an 'Object' with 'x' and 'y' got '%1'").arg(result.toString()));
             return 3; // Bad Heuristic Implementation
         }
     } else {
+        log("script is not enabled");
         return 2; // Script not enabled
     }
+}
+
+void Heuristic::setLogger(Debug::Logger *value) {
+    logger = value;
+}
+
+void Heuristic::log(const QString &msg) {
+    if (logger != 0)
+        logger->log(msg);
 }
 
 } // namespace Core

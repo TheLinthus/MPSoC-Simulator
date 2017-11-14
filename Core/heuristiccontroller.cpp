@@ -104,7 +104,8 @@ void HeuristicController::updateAvailabilityList() {
             heuristic->setAuthor(engine->evaluate("author").toString());
         }
 
-        QScriptValue scriptConsole = engine->newQObject(new Debug::Logger());
+        Debug::Logger *logger = new Debug::Logger("Heuristics/Logs/"+s+"_log.txt");
+        QScriptValue scriptConsole = engine->newQObject(logger);
         engine->globalObject().setProperty("console", scriptConsole); // Register console object for heuristic debug with 'console.log(msg)'
 
         QString name = heuristic->getName();
@@ -116,8 +117,11 @@ void HeuristicController::updateAvailabilityList() {
             } while (heuristicList.contains(name));
 
         }
+        heuristic->setLogger(logger);
         heuristic->setEngine(engine);
         heuristicList.insert(name, heuristic);
+
+        heuristic->log("Initialized");
     }
 
     emit progressUpdate(count);

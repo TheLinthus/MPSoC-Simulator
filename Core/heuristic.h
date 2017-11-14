@@ -7,6 +7,7 @@
 #include <QtScript/QScriptValue>
 #include <QtScript/QScriptValueIterator>
 #include <QtScript/QtScriptDepends>
+#include <Debug/logger.h>
 
 namespace Core {
 
@@ -30,12 +31,17 @@ public:
     void disableEngine();
     bool isEngineEnabled();
 
-    int selectCore(QPoint &p, QScriptValueList& args) const;
+    int selectCore(QPoint &p, QScriptValueList& args);
+
+    void setLogger(Debug::Logger *value);
+    void log(const QString &msg);
 
 private:
     QScriptEngine *engine;
 
     bool enabled;
+
+    Debug::Logger *logger;
 
     QString fileName;
     QString name;

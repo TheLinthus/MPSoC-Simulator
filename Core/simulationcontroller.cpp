@@ -199,6 +199,7 @@ void SimulationWorker::run() {
         }
         if (!mpsoc->getCore(point.x(),point.y())->run(node, thread)) {
             emit failed(0); // Core not empty
+            heuristic->log(QString("failed to alocate to Core(%1,%2) Thread %3: Core is not empty").arg(point.x()).arg(point.y()).arg(thread));
             return;
         }
 
