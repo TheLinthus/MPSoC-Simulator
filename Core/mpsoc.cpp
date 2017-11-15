@@ -53,7 +53,7 @@ Processor *MPSoC::getCore(const QPoint &p) const {
 }
 
 Processor* MPSoC::getCore(int x, int y) const {
-    if (x > width || y > height) {
+    if (x >= width || y >= height || x < 0 || y < 0) {
         return 0;
     }
     return processors[x][y];
@@ -143,12 +143,32 @@ void MPSoC::setHeuristic(Core::Heuristic *value) {
     heuristic = value;
 }
 
-QScriptValue MPSoC::toScriptObject() {
+QScriptValue MPSoC::toScriptValue(AppNode *node) {
     QScriptValue obj = heuristic->getEngine()->newObject();
-    QScriptValue sizeObj = heuristic->getEngine()->newObject();
-    sizeObj.setProperty("w", width);
-    sizeObj.setProperty("h", height);
-    obj.setProperty("size", sizeObj);
+
+    if (node == 0) {
+        obj.setProperty("free", true);
+        return obj;
+    }
+
+    obj.setProperty("n", node->getN());
+    obj.setProperty("cycles", node->getCycles());
+    obj.setProperty("lifespan", node->getLifespan());
+    obj.setProperty("appUID", qobject_cast<Core::Application *>(node->parent())->getUid());
+
+    return obj;
+}
+
+QScriptValue MPSoC::toScriptValue(Core::Processor *processor) {
+    if (processor == 0)
+        return QScriptValue(QScriptValue::UndefinedValue);
+    QScriptValue obj = heuristic->getEngine()->newObject();
+
+    obj.setProperty("threadsCount", processor->nOfThreads());
+    obj.setProperty("x", processor->getX());
+    obj.setProperty("y", processor->getY());
+    obj.setProperty("thread", toScriptValue(processor->runningNode()));    // gonna be a list in future versions
+
     return obj;
 }
 
@@ -164,6 +184,26 @@ QScriptValue MPSoC::toScriptObject() {
 //}
 
 void MPSoC::update() {
+}
+
+QScriptValue MPSoC::Height() {
+    return height;
+}
+
+QScriptValue MPSoC::Width() {
+    return width;
+}
+
+QScriptValue MPSoC::GetCore(QScriptValue x, QScriptValue y){
+    return toScriptValue(getCore(x.toInteger(),y.toInteger()));
+}
+
+QScriptValue MPSoC::GetMaster() {
+    return toScriptValue(getCore(master));
+}
+
+QScriptValue MPSoC::GetPatch(QScriptValue x1, QScriptValue y1, QScriptValue x2, QScriptValue y2) {
+    return heuristic->getEngine()->newArray();
 }
 
 } // namespace Core

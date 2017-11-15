@@ -28,6 +28,7 @@ public:
     void remove(MPSoC *mpsoc);
 
 signals:
+    void mpsocDestroyed(QObject*);
 
 public slots:
 };

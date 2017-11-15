@@ -55,9 +55,6 @@ public:
     bool isStepEnable();
     int currentStep();
     int stepsCount();
-    void setInterval(int ms);
-    void setAutoStep(bool enabled);
-    void reset();
 
     Core::AppNode *dequeueRunList();
 
@@ -65,6 +62,10 @@ public:
     void stepBackward();
 
 public slots:
+    void reset();
+    void setInterval(int ms);
+    void setAutoStep(bool enabled);
+
     void runAction(Core::Application *app);
     void killAction(Core::Application *app);
 

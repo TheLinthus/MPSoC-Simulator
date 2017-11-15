@@ -16,6 +16,7 @@ SimulationController::SimulationController(QObject *parent) :
     connect(&worker, SIGNAL(failed(int)), this, SLOT(fail(int)));
     connect(&timer, SIGNAL(timeout()), this, SLOT(autoStep()));
     connect(mpsocs, SIGNAL(processed(int)), this, SLOT(processingDone()));
+    connect(mpsocs, SIGNAL(mpsocDestroyed(QObject*)), this, SLOT(reset()));
 }
 
 SimulationController *SimulationController::createInstance() {

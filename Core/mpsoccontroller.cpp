@@ -23,6 +23,7 @@ Core::MPSoCController* MPSoCController::instance() {
 
 Core::MPSoC *MPSoCController::add(int h, int w, const QPoint &master) {
     mpsocList.append(new MPSoC(h, w, master, this));
+    connect(mpsocList.last(), SIGNAL(destroyed(QObject*)), this, SIGNAL(mpsocDestroyed(QObject*)));
     return mpsocList.last();
 }
 
