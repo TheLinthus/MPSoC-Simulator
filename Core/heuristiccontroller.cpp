@@ -128,6 +128,7 @@ void HeuristicController::updateAvailabilityList() {
         heuristic->setEngine(engine);
         heuristicList.insert(name, heuristic);
 
+        engine->clearExceptions();
         heuristic->log("Initialized");
     }
 

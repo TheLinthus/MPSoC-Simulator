@@ -30,7 +30,6 @@ HeuristicsTab::~HeuristicsTab()
 } // namespace View
 
 void View::HeuristicsTab::on_pushButtonNew_clicked() {
-    QMessageBox::information(0,"TODO","not implemented yet",QMessageBox::Accepted);
     QDir dir(QApplication::applicationDirPath());
     dir.cd(HEURISTICSPATH);
     QString newFile = QFileDialog::getSaveFileName(parentWidget()->parentWidget(), tr("Save new Heuristic"),
@@ -193,6 +192,7 @@ void View::HeuristicsTab::on_pushButtonSaveHeuristic_clicked() {
         file.close();
         QMessageBox::information(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
                                  tr("Heuristic file saved. The Application need to reload heuristics list now."));
+        ui->pushButtonSaveHeuristic->setEnabled(false);
         heuristics->updateAvailabilityList();
     } else {
         QMessageBox::critical(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
@@ -217,13 +217,15 @@ void View::HeuristicsTab::on_textEditDescription_textChanged() {
 }
 
 void View::HeuristicsTab::on_comboBoxHeuristics_currentIndexChanged(const QString &selection) {
-    if (ui->pushButtonSaveHeuristic->isEnabled())
+    if (ui->pushButtonSaveHeuristic->isEnabled()) {
         if (QMessageBox::question(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
                                   tr("Are you sure? Current changes on Heuristic will be lost"),
                                   QMessageBox::No, QMessageBox::Yes)
-                == QMessageBox::No)
+                == QMessageBox::No) {
             ui->comboBoxHeuristics->setCurrentText(heuristicEdit->getName());
             return;
+        }
+    }
 
     clearEditor();
     if (ui->comboBoxHeuristics->currentIndex() <= 0) {

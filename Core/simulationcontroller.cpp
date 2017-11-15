@@ -190,17 +190,25 @@ void SimulationWorker::run() {
 
         QScriptValueList args;
 
-        args << mpsoc->toScriptObject();
+        args << heuristic->getEngine()->newQObject(mpsoc);
         args << node->getN();
-        args << ((Core::Application *) node->parent())->toScriptObject(heuristic->getEngine());
+        args << heuristic->getEngine()->newQObject((Core::Application *) node->parent());
         int result = heuristic->selectCore(point, args); // Thread number not considered yet (future version)
         if (result != 1) {
             emit failed(result);
-        }
-        if (!mpsoc->getCore(point.x(),point.y())->run(node, thread)) {
-            emit failed(0); // Core not empty
-            heuristic->log(QString("failed to alocate to Core(%1,%2) Thread %3: Core is not empty").arg(point.x()).arg(point.y()).arg(thread));
-            return;
+        } else {
+            if (point.x() >= mpsoc->getWidth() || point.y() >= mpsoc->getHeight()) {
+                emit failed(5); // Selection out of index
+                heuristic->log(QString("selection out of mpsoc index range, mpsoc size = %1x%2, selection was %3x%4")
+                               .arg(mpsoc->getWidth()).arg(mpsoc->getHeight())
+                               .arg(point.x()).arg(point.y()));
+                return;
+            }
+            if (!mpsoc->getCore(point.x(),point.y())->run(node, thread)) {
+                emit failed(0); // Core not empty
+                heuristic->log(QString("failed to alocate to Core(%1,%2) Thread %3: Core is not empty").arg(point.x()).arg(point.y()).arg(thread));
+                return;
+            }
         }
 
         emit processed(i);
