@@ -15,7 +15,6 @@ SimulationController::SimulationController(QObject *parent) :
     connect(&worker, SIGNAL(processed(int)), this, SLOT(processingDone(int)));
     connect(&worker, SIGNAL(failed(int)), this, SLOT(fail(int)));
     connect(&timer, SIGNAL(timeout()), this, SLOT(autoStep()));
-    connect(mpsocs, SIGNAL(processed(int)), this, SLOT(processingDone()));
     connect(mpsocs, SIGNAL(mpsocDestroyed(QObject*)), this, SLOT(reset()));
 }
 
@@ -191,9 +190,9 @@ void SimulationWorker::run() {
 
         QScriptValueList args;
 
-        args << heuristic->getEngine()->newQObject(mpsoc);
+        args << ScriptConverter::toScriptValue(heuristic->getEngine(), mpsoc);
         args << node->getN();
-        args << heuristic->getEngine()->newQObject((Core::Application *) node->parent());
+        args << ScriptConverter::toScriptValue(heuristic->getEngine(), qobject_cast<Core::Application *>(node->parent()));
         int result = heuristic->selectCore(point, args); // Thread number not considered yet (future version)
         if (result != 1) {
             emit failed(result);

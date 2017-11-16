@@ -32,7 +32,9 @@ HEADERS = Core/appnode.h \
     View/heuristicstab.h \
     View/viewappnode.h \
     Core/simulationcontroller.h \
-    Debug/logger.h
+    Debug/logger.h \
+    Core/scriptconverter.h \
+    Debug/fail.h
 
 SOURCES = Core/appnode.cpp \
     Core/channel.cpp \
@@ -55,7 +57,9 @@ SOURCES = Core/appnode.cpp \
     View/heuristicstab.cpp \
     View/viewappnode.cpp \
     Core/simulationcontroller.cpp \
-    Debug/logger.cpp
+    Debug/logger.cpp \
+    Core/scriptconverter.cpp \
+    Debug/fail.cpp
 
 INCLUDEPATH = . \
     Core \

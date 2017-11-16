@@ -3,6 +3,8 @@
 
 #ifdef Q_OS_MAC
 #define HEURISTICSPATH "../Resources/Heuristics"
+#elif defined Q_OS_LINUX
+#define HEURISTICSPATH "Heuristics"
 #else
 #define HEURISTICSPATH "../Heuristics"
 #endif

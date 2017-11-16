@@ -40,20 +40,11 @@ private:
     QPoint master;
     Core::Heuristic *heuristic;
 
-    QScriptValue toScriptValue(Processor *processor);
-    QScriptValue toScriptValue(AppNode *node);
-
 signals:
     void changed();
 
 public slots:
     void update();
-
-    QScriptValue Height();
-    QScriptValue Width();
-    QScriptValue GetCore(QScriptValue x, QScriptValue y);
-    QScriptValue GetMaster();
-    QScriptValue GetPatch(QScriptValue x1, QScriptValue y1, QScriptValue x2, QScriptValue y2);
 };
 
 } // namespace Core

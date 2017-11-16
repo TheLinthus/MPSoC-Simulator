@@ -2,15 +2,14 @@
 #include "ui_heuristicstab.h"
 
 #ifdef Q_OS_MAC
-#define APPLICATIONSFILES "*.app *.APPL"
+#define APPLICATIONSFILES "*"
 #define HEURISTICSPATH "../Resources/Heuristics"
-#else
-#ifdef Q_OS_WIN
+#elif Q_OS_WIN
 #define APPLICATIONSFILES "*.exe"
+#define HEURISTICSPATH "../Heuristics"
 #else
 #define APPLICATIONSFILES "*"
-#endif
-#define HEURISTICSPATH "../Heuristics"
+#define HEURISTICSPATH "Heuristics"
 #endif
 
 namespace View {
@@ -113,7 +112,6 @@ void View::HeuristicsTab::on_pushButtonExternaEditorHeuristic_clicked() {
         QMessageBox::warning(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
                              tr("Default Script Editor not definied."), QMessageBox::Ok);
         QFileDialog openEditor;
-        openEditor.setParent(parentWidget()->parentWidget());
         openEditor.setLabelText(QFileDialog::DialogLabel::FileName,tr("Default Scirpt Editor"));
         openEditor.setDirectory(QStandardPaths::standardLocations(QStandardPaths::ApplicationsLocation).first());
         openEditor.setFileMode(QFileDialog::ExistingFile);

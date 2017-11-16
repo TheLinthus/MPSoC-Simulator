@@ -10,6 +10,8 @@
 
 #ifdef Q_OS_MAC
 #define APPLICATIONSPATH "../Resources/Applications"
+#elif defined Q_OS_LINUX
+#define APPLICATIONSPATH "Applications"
 #else
 #define APPLICATIONSPATH "../Applications"
 #endif

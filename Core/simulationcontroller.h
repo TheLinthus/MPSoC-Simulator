@@ -6,6 +6,7 @@
 #include <heuristiccontroller.h>
 #include <applicationcontroller.h>
 #include <mpsoccontroller.h>
+#include <scriptconverter.h>
 
 #define simulator Core::SimulationController::instance()
 
