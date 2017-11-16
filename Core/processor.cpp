@@ -40,8 +40,7 @@ int Processor::firstIdle() {
     return -1;
 }
 
-int Processor::isIdle(int i)
-{
+int Processor::isIdle(int i) {
     return cores[i] == 0;
 }
 
@@ -50,7 +49,7 @@ bool Processor::run(AppNode *node, int thread) {
         return false;
     }
     if (cores[thread] == 0) {
-        connect(node, SIGNAL(destroyed(QObject*)), this, SLOT(kill(QObject*)));
+        connect(node, SIGNAL(finished(AppNode*)), this, SLOT(kill(AppNode*)));
         cores[thread] = node;
         node->setRunning(true);
         node->setInCoreX(x);

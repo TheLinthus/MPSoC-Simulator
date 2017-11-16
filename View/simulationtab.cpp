@@ -37,6 +37,7 @@ void SimulationTab::updateListViewModel(const QStringList &list) {
 }
 
 void SimulationTab::updateView() {
+    listModelRunning->setStringList(apps->getRunningApplicationsList());
     ui->pushButtonRunApplication->setEnabled(ui->listViewApplications->selectionModel()->selectedIndexes().count() > 0 && mpsocs->count() > 0 && simulator->isRunEnabled());
     ui->pushButtonKillApplication->setEnabled(ui->listViewRunning->selectionModel()->selectedIndexes().count() > 0  && simulator->isKillEnabled());
     ui->buttonAddMPSoC->setEnabled(heuristics->count() > 0 && !simulator->isStarted()); // Must have at least 1 heuristic and can't do with running simulation;
@@ -57,7 +58,6 @@ void SimulationTab::updateView() {
         ui->sliderStep->setValue(0);
         ui->sliderStep->setMaximum(0);
     }
-    listModelRunning->setStringList(apps->getRunningApplicationsList());
 }
 
 void SimulationTab::on_autoStepToggle(bool) {
@@ -78,6 +78,7 @@ void SimulationTab::on_pushButtonRunApplication_clicked() {
 void SimulationTab::on_pushButtonKillApplication_clicked() {
     int selected = ui->listViewRunning->selectionModel()->selectedIndexes().first().row();
     apps->kill(selected);
+    updateView();
     // TODO - register kill to undo/redo
 }
 
@@ -133,7 +134,10 @@ void SimulationTab::on_listViewApplications_selectionModel_selectionChanged(cons
 }
 
 void SimulationTab::on_listViewRunning_selectionModel_selectionChanged(const QItemSelection &, const QItemSelection &) {
-    updateView();
+    ui->pushButtonKillApplication->setEnabled(
+                ui->listViewRunning->selectionModel()->selectedIndexes().count() > 0  &&
+                simulator->isKillEnabled() &&
+                apps->getRunning(ui->listViewRunning->selectionModel()->selectedIndexes().first().row())->isAlive());
 }
 
 void SimulationTab::fail(int e){ // change from int to Error object carrying more info

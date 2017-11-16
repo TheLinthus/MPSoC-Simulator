@@ -13,7 +13,8 @@ AppNode::AppNode(int n, int lifespan, QObject *parent)
     , inCoreX(-1)
     , inCoreY(-1)
     , inThread(-1)
-    , running(0)
+    , running(false)
+    , done(false)
 {
 }
 
@@ -25,7 +26,7 @@ AppNode::~AppNode() {
 }
 
 bool AppNode::isDone() {
-    return cycles == lifespan;
+    return done;
 }
 
 int AppNode::getLifespan() const {
@@ -168,12 +169,26 @@ void AppNode::setLifespan(const int lifespan) {
 }
 
 void AppNode::tick() {
-    if (cycles < lifespan) {
+    if (!done && cycles < lifespan) {
         cycles++;
         emit changed();
-        if (isDone()) {
+        if (cycles == lifespan) {
+            done = true;
             emit finished(this);
         }
+    }
+}
+
+void AppNode::kill() {
+    qDebug() << this << "was killed";
+    done = true;
+    emit finished(this);
+}
+
+void AppNode::killAll() {
+    kill();
+    for (AppNode *child : childNodes) {
+        child->killAll();
     }
 }
 

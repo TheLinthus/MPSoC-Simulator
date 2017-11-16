@@ -168,7 +168,7 @@ bool Application::isAlive() {
 
 void Application::kill() {
     alive = false;
-    rootNode->deleteLater(); // Call cascade destruction of nodes and kill them on Processors
+    rootNode->killAll();
     emit wasKilled();
 }
 

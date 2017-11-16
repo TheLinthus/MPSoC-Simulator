@@ -56,6 +56,7 @@ private:
     int inCoreX;
     int inCoreY;
     bool running;
+    bool done;
 
 signals:
     void finished(AppNode *);
@@ -63,6 +64,8 @@ signals:
 
 public slots:
     void tick();
+    void kill();
+    void killAll();
 };
 
 } // namespace Core

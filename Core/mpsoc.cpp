@@ -26,11 +26,11 @@ MPSoC::MPSoC(int h, int w, QPoint master, QObject *parent)
                 processors[i][j]->setChannel(North, processors[i][j-1]->getChannel(South));
             }
             if (i < w - 1) { // If isn't the last col, set new channel to the east
-                processors[i][j]->setChannel(East, new Channel());
+                processors[i][j]->setChannel(East, new Channel(i,j,i-1, j));
                 connect(processors[i][j]->getChannel(East), SIGNAL(loadChanged(int)), this, SLOT(update()));
             }
             if (j < h - 1) { // If isn't the last line, set new channel to the south
-                processors[i][j]->setChannel(South, new Channel());
+                processors[i][j]->setChannel(South, new Channel(i,j,i,j-1));
                 connect(processors[i][j]->getChannel(South), SIGNAL(loadChanged(int)), this, SLOT(update()));
             }
         }
@@ -135,16 +135,22 @@ QVector<Processor *> MPSoC::getBusy() const {
 }
 
 AppNode *MPSoC::popProcess() {
-    AppNode *node = processList.first();
-    if (node == 0) {
-        return 0;
-    }
-    processList.removeFirst();
+    AppNode *node;
+    do {
+        if (processList.isEmpty()) {
+            return 0;
+        }
+        node = processList.first();
+        processList.removeFirst();
+    } while (node == 0 || node->isDone());    // Auto removes: null and killed nodes
     return node;
 }
 
-void MPSoC::pushProcess(QVector<AppNode *> list){
-    processList += list;
+void MPSoC::pushProcess(QVector<AppNode *> list) {
+    for (AppNode *node : list) {
+        connect(node, SIGNAL(destroyed(QObject*)), this, SLOT(removeKilledNode(AppNode*)));
+        processList.append(node);
+    }
 }
 
 void MPSoC::clearApps() {

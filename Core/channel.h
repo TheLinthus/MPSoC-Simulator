@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDebug>
+#include <Core/appload.h>
 
 namespace Core {
 
@@ -12,37 +13,34 @@ class Channel : public QObject
 {
     Q_OBJECT
 public:
-    explicit Channel(QObject *parent = 0);
+    explicit Channel(int ax, int ay, int bx, int by, QObject *parent = 0);
 
     /**
-     * @brief add Change the payload of the channel, can have negative and positive values, to increase and decrease.
-     * @param value qreal floating number to add or remove payload
-     * @param AtB boolean direction of load indicator, if from point A to B
+     * @brief add Add more payload to the channel.
+     * @param load AppLoad pointer, with floating number to add load value
      */
-    void add(qreal value, bool AtoB);
+    void add(AppLoad *load);
     /**
      * @brief val Return the current total payload on the channel
      * @return <i>qreal</i> payload on the channel
      */
     qreal val() const;
     /**
-      * @brief valAtB Return the current payload from point A to B in the channel
-      * @return <i>qreal</i> payload from A to B
-      */
-    qreal valAtB() const;
-    /**
-      * @brief valAtB Return the current payload from point A to B in the channel
-      * @return <i>qreal</i> payload from A to B
-      */
-    qreal valBtA() const;
-    /**
      * @brief reset Reset the payload to 0 (zero)
      */
     void reset();
 
+    int getAx() const;
+    int getAy() const;
+    int getBx() const;
+    int getBy() const;
+
 private:
-    qreal loadAtB; // A floating value that may go from 0 to 100
-    qreal loadBtA;
+    QVector<AppLoad *> loads;
+    int ax,ay,bx,by;
+
+private slots:
+    void removeLoad(AppLoad *load);
 
 signals:
     void overloaded();

@@ -10,14 +10,16 @@ AppLoad::AppLoad(int volume, qreal load, QObject *parent)
 
 }
 
-int AppLoad::getVolume() const
-{
+int AppLoad::getVolume() const {
     return volume;
 }
 
-qreal AppLoad::getLoad() const
-{
+qreal AppLoad::getLoad() const {
     return load;
+}
+
+void AppLoad::remove() {
+    emit removeMe(this);
 }
 
 } // namespace Core

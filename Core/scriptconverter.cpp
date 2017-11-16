@@ -31,8 +31,10 @@ QScriptValue ScriptConverter::toScriptValue(QScriptEngine *engine, Channel *chan
         return QScriptValue(QScriptValue::UndefinedValue);
     QScriptValue obj  = engine->newObject();
 
-    obj.setProperty("loadAtB", channel->valAtB());
-    obj.setProperty("loadBtA", channel->valBtA());
+    obj.setProperty("ax", channel->getAx());
+    obj.setProperty("ay", channel->getAy());
+    obj.setProperty("bx", channel->getBx());
+    obj.setProperty("by", channel->getBy());
     obj.setProperty("load", channel->val());
 
     return obj;

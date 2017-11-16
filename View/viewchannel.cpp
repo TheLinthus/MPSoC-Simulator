@@ -42,7 +42,7 @@ void Channel::mousePressEvent(QGraphicsSceneMouseEvent *) {
 }
 
 void Channel::updateToolTip() {
-    setToolTip(QString("Channel load: %1<hr>From A to B: %2<br>From B to A: %3").arg(channel->val()).arg(channel->valAtB()).arg(channel->valBtA()));
+    setToolTip(QString("Channel load: %1").arg(channel->val()));
 }
 
 void Channel::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {

@@ -23,10 +23,14 @@ SimulationController *SimulationController::createInstance() {
 }
 
 void SimulationController::autoStep() {
-    if (isStepEnable()) {
-        this->stepFoward();
+    if (!worker.isRunning()) {
+        if (isStepEnable()) {
+            this->stepFoward();
+        } else {
+            qWarning() << "Can't step now";
+        }
     } else {
-        qWarning() << "Step skiped, processing is to slow for this tick rate";
+        qWarning() << "Step skiped, processing is to slow for this tick rate.";
     }
 }
 
@@ -63,7 +67,7 @@ bool SimulationController::isKillEnabled() {
 }
 
 bool SimulationController::isStepEnable() {
-    return !error && processingMPSoCs == 0 && mpsocs->count() > 0;
+    return !error && !worker.isRunning() && mpsocs->count() > 0;
 }
 
 int SimulationController::currentStep() {
@@ -122,6 +126,7 @@ void SimulationController::stepFoward() {
     } else {
         newStep();
     }
+    processingMPSoCs = mpsocs->count();
     worker.start();
 }
 
@@ -134,28 +139,36 @@ void SimulationController::stepBackward() {
 }
 
 void SimulationController::runAction(Application *app) {
-    if (pointer + 1 == steps.size()) {
-        newStep();
+    for (int i = 0; i < mpsocs->count(); i++) {
+       mpsocs->get(i)->run(app);
     }
-    if (steps.value(pointer, -1) == 0) {
-        steps[pointer] = 1;
-        for (int i = 0; i < mpsocs->count(); i++) {
-            mpsocs->get(i)->run(app);
-        }
-        emit notify();
-    }
-    worker.start();
+    emit notify();
+//    TODO
+//    if (pointer + 1 == steps.size()) {
+//        newStep();
+//    }
+//    if (steps.value(pointer, -1) == 0) {
+//        steps[pointer] = 1;
+//        for (int i = 0; i < mpsocs->count(); i++) {
+//            mpsocs->get(i)->run(app);
+//        }
+//        emit notify();
+//    }
+//    processingMPSoCs = mpsocs->count();
+//    worker.start();
 }
 
 void SimulationController::killAction(Application *app) {
-    if (steps.value(pointer, -1) == 0) {
-        steps[pointer] = 2;
-        emit notify();
-    }
+//    TODO
+//    if (steps.value(pointer, -1) == 0) {
+//        steps[pointer] = 2;
+//        emit notify();
+//    }
 }
 
 void SimulationController::fail(int e){
     if (e == 0) /*if (e.fatal())*/ {
+        qWarning() << "Simulation Fatal Error";
         error = true;
         timer.stop();
     }
@@ -170,14 +183,20 @@ void SimulationWorker::run() {
     Core::Heuristic *heuristic;
     Core::MPSoC *mpsoc;
     for (int i = 0; i < mpsocs->count(); i++) {
-        Core::AppNode *node = mpsocs->get(i)->popProcess();
+        mpsoc = mpsocs->get(i);
+        Core::AppNode *node = mpsoc->popProcess();
         if (node == 0) {
             emit failed(1); // Nothing to sim
+            emit processed(i);
+            continue;
+        }
+        if (mpsoc->getFree().isEmpty()) {
+            emit failed(7); // MPSoC Full
+            emit processed(i);
             continue;
         }
         Core::Application *app = qobject_cast<Core::Application *>(node->parent());
 
-        mpsoc = mpsocs->get(i);
         heuristic = mpsoc->getHeuristic();
 
         QPoint point;
@@ -200,20 +219,35 @@ void SimulationWorker::run() {
                 return;
             }
             if (mpsoc->getCore(point.x(),point.y())->run(node, thread)) {
+                connect(this, SIGNAL(started()), node, SLOT(tick()));
                 QMap<int, AppLoad *> *loads = app->getConnectionsFrom(node->getN());
                 for (int key : loads->keys()) {
                     AppNode *bNode = app->getNode(key);
                     if (bNode->isRunning()) {
                         QVector<Channel *> path = mpsoc->getPath(node->getInCoreX(), node->getInCoreY(),
                                                                   bNode->getInCoreX(), bNode->getInCoreY());
+                        AppLoad *load = loads->value(key);
+                        connect(node, SIGNAL(finished(AppNode*)), load, SLOT(remove()));
+                        connect(bNode, SIGNAL(finished(AppNode*)), load, SLOT(remove()));
                         for (Channel *channel : path) {
-                            channel->add(loads->value(key)->getLoad(), true);
+                            channel->add(load);
                         }
+                        if (load->getVolume() > node->getLifespan() + node->getCycles()) // Ensures that the node doesn't die before volume
+                            node->setLifespan(load->getVolume() + node->getCycles());
+                        if (load->getVolume() > bNode->getLifespan() + bNode->getCycles())
+                            node->setLifespan(load->getVolume() + bNode->getCycles());
                         path = mpsoc->getPath(bNode->getInCoreX(), bNode->getInCoreY(),
                                                node->getInCoreX(), node->getInCoreY());
+                        load = app->getConnectionsFrom(key)->value(node->getN());
+                        connect(node, SIGNAL(finished(AppNode*)), load, SLOT(remove()));
+                        connect(bNode, SIGNAL(finished(AppNode*)), load, SLOT(remove()));
                         for (Channel *channel : path) {
-                            channel->add(app->getConnectionsFrom(key)->value(node->getN())->getLoad(), false);
+                            channel->add(load);
                         }
+                        if (load->getVolume() > node->getLifespan() + node->getCycles()) // Ensures that the node doesn't die before volume
+                            node->setLifespan(load->getVolume() + node->getCycles());
+                        if (load->getVolume() > bNode->getLifespan() + bNode->getCycles())
+                            node->setLifespan(load->getVolume() + bNode->getCycles());
                     }
                 }
             } else {

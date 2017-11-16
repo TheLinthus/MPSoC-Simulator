@@ -16,8 +16,10 @@ public:
     qreal getLoad() const;
 
 signals:
+    void removeMe(AppLoad *);
 
 public slots:
+    void remove();
 
 private:
     int volume;
