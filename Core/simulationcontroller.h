@@ -34,7 +34,6 @@ private:
     bool started;
     int processingMPSoCs;
     QVector<int> steps; // int as placeholder, it will be changed to a historic of actions
-    QVector<Core::AppNode *> processList;
 
     QTimer timer;
     SimulationWorker worker;

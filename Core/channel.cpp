@@ -8,14 +8,17 @@ Core::Channel::Channel(QObject *parent)
 
 }
 
-void Core::Channel::add(qreal value, bool AtB) {
-    int load = AtB ? loadAtB : loadBtA;
+void Core::Channel::add(qreal value, bool AtoB) {
+    qreal load;
+    if (AtoB) load = loadAtB;
+    else load = loadBtA;
     load += value;
     if (load < 0) {
         load = 0;
-        qWarning() << "Load " << (AtB ? "AtB" : "BtA") << " less than 0";
+        qWarning() << "Load " << (AtoB ? "AtB" : "BtA") << " less than 0";
     }
-    AtB ? loadAtB : loadBtA = load;
+    if (AtoB) loadAtB = load;
+    else loadBtA = load;
     emit loadChanged(val());
     if (val() > 100) {
         emit overloaded();

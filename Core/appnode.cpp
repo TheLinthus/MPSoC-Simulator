@@ -10,6 +10,10 @@ AppNode::AppNode(int n, int lifespan, QObject *parent)
     , siblingNodes()
     , parentNode(0)
     , QObject(parent)
+    , inCoreX(-1)
+    , inCoreY(-1)
+    , inThread(-1)
+    , running(0)
 {
 }
 
@@ -119,6 +123,44 @@ AppNode *AppNode::clone(QObject *parent) {
     }
 
     return clone;
+}
+
+int AppNode::getInThread() const {
+    return inThread;
+}
+
+void AppNode::setInThread(int value) {
+    inThread = value;
+}
+
+int AppNode::getInCoreX() const
+{
+    return inCoreX;
+}
+
+void AppNode::setInCoreX(int value)
+{
+    inCoreX = value;
+}
+
+int AppNode::getInCoreY() const
+{
+    return inCoreY;
+}
+
+void AppNode::setInCoreY(int value)
+{
+    inCoreY = value;
+}
+
+bool AppNode::isRunning() const
+{
+    return running;
+}
+
+void AppNode::setRunning(bool value)
+{
+    running = value;
 }
 
 void AppNode::setLifespan(const int lifespan) {

@@ -71,31 +71,30 @@ QSize MPSoC::getSize() const {
     return QSize(width, height);
 }
 
-QVector<Channel *> MPSoC::getPatch(const QPoint &a, const QPoint &b) const {
-    return getPatch(a.x(), a.y(), b.x(), b.y());
+QVector<Channel *> MPSoC::getPath(const QPoint &a, const QPoint &b) const {
+    return getPath(a.x(), a.y(), b.x(), b.y());
 }
 
-QVector<Channel *> MPSoC::getPatch(int x1, int y1, int x2, int y2) const {
+QVector<Channel *> MPSoC::getPath(int x1, int y1, int x2, int y2) const {
     if (x1 > width || y1 > height || x2 > width || y2 > height) {
         return QVector<Channel *>();    // If out of bound return empety list
     }
-    int lenght = abs(x1 - x2) + abs(y1 - y2);
-    QVector<Channel *> patch(lenght);
+    QVector<Channel *> path;
 
     int math = x1 < x2 ? +1 : -1;
     Direction dir = x1 < x2 ? East : West ;
     while (x1 != x2) {
-        patch.append(processors[x1][y1]->getChannel(dir));
+        path.append(processors[x1][y1]->getChannel(dir));
         x1 += math;
     }
     math = y1 < y2 ? +1 : -1;
     dir = y1 < y2 ? South : North;
     while (y1 != y2) {
-        patch.append(processors[x1][y1]->getChannel(dir));
+        path.append(processors[x1][y1]->getChannel(dir));
         y1 += math;
     }
 
-    return patch;
+    return path;
 }
 
 QVector<Processor *> MPSoC::getFree() const {
@@ -133,6 +132,33 @@ QVector<Processor *> MPSoC::getBusy() const {
     }
 
     return list;
+}
+
+AppNode *MPSoC::popProcess() {
+    AppNode *node = processList.first();
+    if (node == 0) {
+        return 0;
+    }
+    processList.removeFirst();
+    return node;
+}
+
+void MPSoC::pushProcess(QVector<AppNode *> list){
+    processList += list;
+}
+
+void MPSoC::clearApps() {
+    qDeleteAll(runningApps);
+    runningApps.clear();
+}
+
+void MPSoC::run(Application *app) {
+    runningApps.append(app->clone());
+    processList += runningApps.last()->getAllNodes();
+}
+
+Application *MPSoC::getApp(int i) const {
+    return runningApps.value(i);
 }
 
 Core::Heuristic *MPSoC::getHeuristic() const {

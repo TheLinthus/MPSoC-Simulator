@@ -5,7 +5,8 @@ namespace Core {
 Application::Application(QObject *parent)
     : QObject(parent),
       file(""),
-      rootNode(0)
+      rootNode(0),
+      alive(true)
 {
 }
 
@@ -135,9 +136,13 @@ void Application::setName(const QString &value)
 Application *Application::clone() {
     Application * clone = new Application();
 
+    connect(this, SIGNAL(destroyed(QObject*)), clone, SLOT(deleteLater()));
+    connect(this, SIGNAL(wasKilled()), clone, SLOT(kill()));
+
     clone->setColor(QColor(color));
     clone->setName(QString(getName()));
     clone->setRootNode(rootNode->clone(clone));
+    clone->setUid(uid);
 
     for (int i :  connections.keys()) {
         for (int j : connections.value(i)->keys()) {
@@ -149,20 +154,22 @@ Application *Application::clone() {
     return clone;
 }
 
-QScriptValue Application::toScriptObject(QScriptEngine *engine) {
-    QScriptValue obj = engine->newObject();
-    obj.setProperty("uid", uid);
-    return obj;
-}
-
-int Application::getUid() const
-{
+int Application::getUid() const {
     return uid;
 }
 
-void Application::setUid(int value)
-{
+void Application::setUid(int value) {
     uid = value;
+}
+
+bool Application::isAlive() {
+    return alive;
+}
+
+void Application::kill() {
+    alive = false;
+    rootNode->deleteLater(); // Call cascade destruction of nodes and kill them on Processors
+    emit wasKilled();
 }
 
 QMap<int, QMap<int, AppLoad *> *> Application::getConnections() const {

@@ -27,7 +27,7 @@ private:
     int appUIDSequence;
 
     QMap<QString, Core::ApplicationGroup *> applicationsGroupList;
-    QList<Core::Application *> runningList;
+    QVector<Core::Application *> runningList;
 
     QDir applicationsDir;
 
@@ -52,7 +52,7 @@ public:
     ApplicationGroup *getApplicationGroup(QString name);
     Application *run(QString name);
     void kill(int index);
-    void killAll();
+    void clearRunning();
     int applicationsCount();
     int runningCount();
 

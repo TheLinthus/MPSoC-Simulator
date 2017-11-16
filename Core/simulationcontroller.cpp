@@ -89,21 +89,16 @@ void SimulationController::setAutoStep(bool enabled) {
 
 void SimulationController::reset() {
     steps.clear();
-    processList.clear();
     started = false;
     error = false;
     pointer = -1;
     processingMPSoCs = 0;
     timer.stop();
-    apps->killAll();
-    emit notify();
-}
-
-Core::AppNode* SimulationController::dequeueRunList() {
-    if (!processList.isEmpty()) {
-        return processList.takeFirst();
+    apps->clearRunning();
+    for (int i = 0; i < mpsocs->count(); i++) {
+        mpsocs->get(i)->clearApps();
     }
-    return 0;
+    emit notify();
 }
 
 void SimulationController::newStep() {
@@ -127,9 +122,7 @@ void SimulationController::stepFoward() {
     } else {
         newStep();
     }
-    if (!processList.isEmpty()) {
-        worker.start();
-    }
+    worker.start();
 }
 
 void SimulationController::stepBackward() {
@@ -146,12 +139,12 @@ void SimulationController::runAction(Application *app) {
     }
     if (steps.value(pointer, -1) == 0) {
         steps[pointer] = 1;
-        processList += app->getAllNodes();
+        for (int i = 0; i < mpsocs->count(); i++) {
+            mpsocs->get(i)->run(app);
+        }
         emit notify();
     }
-    if (!processList.isEmpty()) {
-        worker.start();
-    }
+    worker.start();
 }
 
 void SimulationController::killAction(Application *app) {
@@ -176,12 +169,14 @@ void SimulationController::fail(int e){
 void SimulationWorker::run() {
     Core::Heuristic *heuristic;
     Core::MPSoC *mpsoc;
-    Core::AppNode *node = simulator->dequeueRunList();
-    if (node == 0) {
-        emit failed(1); // Nothing to sim
-        return;
-    }
     for (int i = 0; i < mpsocs->count(); i++) {
+        Core::AppNode *node = mpsocs->get(i)->popProcess();
+        if (node == 0) {
+            emit failed(1); // Nothing to sim
+            continue;
+        }
+        Core::Application *app = qobject_cast<Core::Application *>(node->parent());
+
         mpsoc = mpsocs->get(i);
         heuristic = mpsoc->getHeuristic();
 
@@ -192,7 +187,7 @@ void SimulationWorker::run() {
 
         args << ScriptConverter::toScriptValue(heuristic->getEngine(), mpsoc);
         args << node->getN();
-        args << ScriptConverter::toScriptValue(heuristic->getEngine(), qobject_cast<Core::Application *>(node->parent()));
+        args << ScriptConverter::toScriptValue(heuristic->getEngine(), app);
         int result = heuristic->selectCore(point, args); // Thread number not considered yet (future version)
         if (result != 1) {
             emit failed(result);
@@ -204,7 +199,24 @@ void SimulationWorker::run() {
                                .arg(point.x()).arg(point.y()));
                 return;
             }
-            if (!mpsoc->getCore(point.x(),point.y())->run(node, thread)) {
+            if (mpsoc->getCore(point.x(),point.y())->run(node, thread)) {
+                QMap<int, AppLoad *> *loads = app->getConnectionsFrom(node->getN());
+                for (int key : loads->keys()) {
+                    AppNode *bNode = app->getNode(key);
+                    if (bNode->isRunning()) {
+                        QVector<Channel *> path = mpsoc->getPath(node->getInCoreX(), node->getInCoreY(),
+                                                                  bNode->getInCoreX(), bNode->getInCoreY());
+                        for (Channel *channel : path) {
+                            channel->add(loads->value(key)->getLoad(), true);
+                        }
+                        path = mpsoc->getPath(bNode->getInCoreX(), bNode->getInCoreY(),
+                                               node->getInCoreX(), node->getInCoreY());
+                        for (Channel *channel : path) {
+                            channel->add(app->getConnectionsFrom(key)->value(node->getN())->getLoad(), false);
+                        }
+                    }
+                }
+            } else {
                 emit failed(0); // Core not empty
                 heuristic->log(QString("failed to alocate to Core(%1,%2) Thread %3: Core is not empty").arg(point.x()).arg(point.y()).arg(thread));
                 return;

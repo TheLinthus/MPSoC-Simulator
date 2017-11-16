@@ -19,7 +19,7 @@ public:
      * @param value qreal floating number to add or remove payload
      * @param AtB boolean direction of load indicator, if from point A to B
      */
-    void add(qreal value, bool AtB);
+    void add(qreal value, bool AtoB);
     /**
      * @brief val Return the current total payload on the channel
      * @return <i>qreal</i> payload on the channel

@@ -23,10 +23,16 @@ public:
     int getHeight() const;
     int getWidth() const;
     QSize getSize() const;
-    QVector<Channel *> getPatch(const QPoint &a, const QPoint &b) const;
-    QVector<Channel *> getPatch(int x1, int y1, int x2, int y2) const;
+    QVector<Channel *> getPath(const QPoint &a, const QPoint &b) const;
+    QVector<Channel *> getPath(int x1, int y1, int x2, int y2) const;
     QVector<Processor *> getFree() const;
     QVector<Processor *> getBusy() const;
+
+    AppNode *popProcess();
+    void pushProcess(QVector<AppNode *> list);
+    void clearApps();
+    void run(Application *app);
+    Application *getApp(int i) const;
 
     Core::Heuristic *getHeuristic() const;
     void setHeuristic(Core::Heuristic *value);
@@ -39,6 +45,8 @@ private:
     QVector<QVector <Processor *>> processors;
     QPoint master;
     Core::Heuristic *heuristic;
+    QVector<Core::AppNode *> processList;
+    QVector<Core::Application *> runningApps;
 
 signals:
     void changed();

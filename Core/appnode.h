@@ -35,6 +35,15 @@ public:
 
     AppNode *clone(QObject *parent);
 
+    int getInThread() const;
+    void setInThread(int value);
+    int getInCoreX() const;
+    void setInCoreX(int value);
+    int getInCoreY() const;
+    void setInCoreY(int value);
+    bool isRunning() const;
+    void setRunning(bool value);
+
 private:
     int cycles;
     int n;
@@ -43,6 +52,10 @@ private:
     AppNode *parentNode;
     QList<AppNode *> siblingNodes;
     QList<AppNode *> childNodes;
+    int inThread;
+    int inCoreX;
+    int inCoreY;
+    bool running;
 
 signals:
     void finished(AppNode *);

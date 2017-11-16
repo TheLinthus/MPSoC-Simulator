@@ -52,6 +52,10 @@ bool Processor::run(AppNode *node, int thread) {
     if (cores[thread] == 0) {
         connect(node, SIGNAL(destroyed(QObject*)), this, SLOT(kill(QObject*)));
         cores[thread] = node;
+        node->setRunning(true);
+        node->setInCoreX(x);
+        node->setInCoreY(y);
+        node->setInThread(thread);
         emit changed();
         return true;
     }

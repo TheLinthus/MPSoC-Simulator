@@ -228,10 +228,10 @@ Application *ApplicationController::run(QString name) {
 }
 
 void ApplicationController::kill(int index) {
-    runningList.at(index)->deleteLater();
+    runningList.at(index)->kill();
 }
 
-void ApplicationController::killAll() {
+void ApplicationController::clearRunning() {
     qDeleteAll(runningList);
     runningList.clear();
 }

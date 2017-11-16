@@ -48,15 +48,14 @@ public:
     void setName(const QString &value);
     QString getFile() const;
     void setFile(const QString &value);
+    int getUid() const;
+    void setUid(int value);
+    bool isAlive();
 
     Application *clone();
 
-    QScriptValue toScriptObject(QScriptEngine *engine);
-
-    int getUid() const;
-    void setUid(int value);
-
 protected:
+    bool alive;
     QColor color;
     QString name;
     QString file;
@@ -67,8 +66,10 @@ private:
     int uid;
 
 signals:
+    void wasKilled();
 
 public slots:
+    void kill();
 };
 
 class MasterApplication : public Application
