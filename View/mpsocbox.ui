@@ -97,16 +97,6 @@
      </property>
     </widget>
    </item>
-   <item>
-    <widget class="QLabel" name="graphLabel">
-     <property name="text">
-      <string>TextLabel</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGraphicsView" name="graphGV"/>
-   </item>
   </layout>
  </widget>
  <resources>

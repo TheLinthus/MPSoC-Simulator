@@ -14,6 +14,7 @@ SimulationController::SimulationController(QObject *parent) :
     timer.setInterval(500);
     connect(&worker, SIGNAL(processed(int)), this, SLOT(processingDone(int)));
     connect(&worker, SIGNAL(failed(int)), this, SLOT(fail(int)));
+    connect(&worker, SIGNAL(finished()), this, SLOT(workerFinished()));
     connect(&timer, SIGNAL(timeout()), this, SLOT(autoStep()));
     connect(mpsocs, SIGNAL(mpsocDestroyed(QObject*)), this, SLOT(reset()));
 }
@@ -103,6 +104,7 @@ void SimulationController::reset() {
         mpsocs->get(i)->clearApps();
     }
     emit notify();
+    emit reseted();
 }
 
 void SimulationController::newStep() {
@@ -110,6 +112,10 @@ void SimulationController::newStep() {
 
     pointer++;
     steps.append(0);
+}
+
+void SimulationController::workerFinished() {
+    emit step();
 }
 
 void SimulationController::processingDone(int index) {
@@ -184,14 +190,14 @@ void SimulationWorker::run() {
     Core::MPSoC *mpsoc;
     for (int i = 0; i < mpsocs->count(); i++) {
         mpsoc = mpsocs->get(i);
-        Core::AppNode *node = mpsoc->popProcess();
-        if (node == 0) {
-            emit failed(1); // Nothing to sim
+        if (mpsoc->getFree().isEmpty()) {
+            emit failed(7); // MPSoC Full
             emit processed(i);
             continue;
         }
-        if (mpsoc->getFree().isEmpty()) {
-            emit failed(7); // MPSoC Full
+        Core::AppNode *node = mpsoc->popProcess();
+        if (node == 0) {
+            emit failed(1); // Nothing to sim
             emit processed(i);
             continue;
         }

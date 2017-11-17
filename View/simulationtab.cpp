@@ -96,6 +96,8 @@ void SimulationTab::on_buttonAddMPSoC_clicked() {
     mpsoc->setHeuristic(heuristics->getHeuristic(dialog->getHeuristic()));
 
     mpsocbox->setMPSoC(mpsoc);
+    connect(simulator, SIGNAL(step()), mpsocbox, SLOT(updateChart()));
+    connect(simulator, SIGNAL(reseted()), mpsocbox, SLOT(clearChart()));
 
     layout->insertWidget(layout->count() - 1, mpsocbox); // Insert before spacer
 

@@ -40,6 +40,7 @@ private:
     void newStep();
 
 private slots:
+    void workerFinished();
     void processingDone(int index);
     void autoStep();
     void fail(int e);
@@ -70,6 +71,8 @@ public slots:
     void killAction(Core::Application *app);
 
 signals:
+    void step();
+    void reseted();
     void calculating(bool);
     void notify();
     void failed(int);

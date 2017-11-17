@@ -10,11 +10,49 @@ MPSoCBox::MPSoCBox(QWidget *parent) :
     , mpsoc(0)
     , heuristicName(QString("Null"))
     , ui(new Ui::MPSoCBox)
+    , max(new QtCharts::QLineSeries())
+    , average(new QtCharts::QLineSeries())
+    , axisX(new QtCharts::QValueAxis())
+    , axisY(new QtCharts::QValueAxis())
+    , chart(new QtCharts::QChart())
+    , stepCount(0)
 {
     ui->setupUi(this);
     mpsocScene = new QGraphicsScene(this);
     ui->mpsocGV->setScene(mpsocScene);
     ui->mpsocGV->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
+
+    QPen pen;
+    pen.setWidth(3);
+    pen.setColor(Qt::red);
+    max->setPen(pen);
+    pen.setColor(Qt::cyan);
+    average->setPen(pen);
+
+    max->append(0,0);
+    max->setName(tr("Max."));
+    average->append(0,0);
+    average->setName(tr("Avrg."));
+
+    axisY->setRange(0,120);
+    axisY->setTickCount(7);
+    axisX->setRange(0,1);
+    axisX->setTickCount(2);
+    axisX->setLabelFormat("%d");
+
+    chart->setTitle(tr("Channel Allocation"));
+    chart->legend()->setAlignment(Qt::AlignRight);
+    chart->addSeries(max);
+    chart->addSeries(average);
+    chart->setAxisY(axisY, max);
+    chart->setAxisX(axisX, max);
+    chart->setAxisY(axisY, average);
+    chart->setAxisX(axisX, average);
+
+    QtCharts::QChartView *chartView = new QtCharts::QChartView(chart);
+    chartView->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
+
+    this->layout()->addWidget(chartView);
 }
 
 MPSoCBox::~MPSoCBox() {
@@ -58,6 +96,50 @@ void View::MPSoCBox::setMPSoC(Core::MPSoC *value) {
     ui->titleLabel->setText(title.arg(QString::number(gridWidth), QString::number(gridHeight), heuristicName));
 
     drawnMPSoC();
+}
+
+void View::MPSoCBox::updateChart() {
+    qreal maxLoad = 0;
+    qreal averageLoad = 0;
+    qreal temp;
+    stepCount++;
+    int count = 0;
+    for (int i = 0; i < mpsoc->getWidth(); i++) {
+        for (int j = 0; j < mpsoc->getHeight(); j++) {
+            if (mpsoc->getCore(i,j)->getChannel(Core::Direction::South) != 0) {
+                temp = mpsoc->getCore(i,j)->getChannel(Core::Direction::South)->val();
+                maxLoad = qMax(temp, maxLoad);
+                averageLoad += temp;
+                count++;
+            }
+            if (mpsoc->getCore(i,j)->getChannel(Core::Direction::East) != 0) {
+                temp = mpsoc->getCore(i,j)->getChannel(Core::Direction::East)->val();
+                maxLoad = qMax(temp, maxLoad);
+                averageLoad += temp;
+                count++;
+            }
+        }
+    }
+    averageLoad /= count;
+
+    axisX->setRange(0, stepCount + 1);
+    if (stepCount < 5)
+        axisX->setTickCount(stepCount + 2);
+    else
+        axisX->setTickCount(5);
+
+    max->append(stepCount, qMin(maxLoad, 120.0));
+    average->append(stepCount, qMin(averageLoad, 120.0));
+}
+
+void View::MPSoCBox::clearChart() {
+    stepCount = 0;
+    max->clear();
+    average->clear();
+    axisY->setRange(0,120);
+    axisY->setTickCount(7);
+    axisX->setRange(0,1);
+    axisX->setTickCount(2);
 }
 
 void View::MPSoCBox::drawnMPSoC() {

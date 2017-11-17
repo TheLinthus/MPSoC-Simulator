@@ -6,11 +6,11 @@
 #include <QtCore>
 #include <QtGui>
 #include <QDebug>
+#include <QtCharts>
 #include <View/viewprocessor.h>
 #include <View/viewchannel.h>
 #include <Core/mpsoccontroller.h>
 #include <Core/heuristiccontroller.h>
-#include <QDebug>
 
 namespace View {
 
@@ -32,6 +32,8 @@ public:
 
 public slots:
     void setMPSoC(Core::MPSoC *value);
+    void updateChart();
+    void clearChart();
 
 private slots:
     void on_closeButton_clicked();
@@ -50,6 +52,12 @@ private:
 
     Core::MPSoC *mpsoc;
 
+    int stepCount;
+    QtCharts::QLineSeries *average;
+    QtCharts::QLineSeries *max;
+    QtCharts::QChart *chart;
+    QtCharts::QValueAxis *axisY;
+    QtCharts::QValueAxis *axisX;
     QGraphicsScene *mpsocScene;
     Ui::MPSoCBox *ui;
 };

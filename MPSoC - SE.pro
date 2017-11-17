@@ -3,7 +3,7 @@
 
 CONFIG += qt
 
-QT       += script core gui
+QT += script core gui charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
