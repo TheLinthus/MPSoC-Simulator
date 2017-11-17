@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>439</width>
-    <height>160</height>
+    <width>492</width>
+    <height>235</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Add New MPSoC</string>
@@ -31,6 +37,9 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <layout class="QFormLayout" name="formLayout">
+        <property name="fieldGrowthPolicy">
+         <enum>QFormLayout::ExpandingFieldsGrow</enum>
+        </property>
         <item row="0" column="0">
          <widget class="QLabel" name="label">
           <property name="whatsThis">
@@ -165,6 +174,12 @@
         </item>
         <item row="2" column="1">
          <widget class="QComboBox" name="comboBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="whatsThis">
            <string>The Heuristic for task allocation determination</string>
           </property>
@@ -185,7 +200,11 @@
          </widget>
         </item>
         <item row="4" column="0" colspan="2">
-         <layout class="QGridLayout" name="gridLayout"/>
+         <layout class="QGridLayout" name="gridLayout">
+          <property name="horizontalSpacing">
+           <number>2</number>
+          </property>
+         </layout>
         </item>
        </layout>
       </item>
