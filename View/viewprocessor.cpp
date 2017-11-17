@@ -7,9 +7,18 @@ Processor::Processor(int x, int y, Core::Processor* m)
     , y(y*200)
     , over(false)
     , processor(m)
+    , hoverEffect(new QGraphicsDropShadowEffect())
 {
     setAcceptHoverEvents(true);
     connect(processor, SIGNAL(changed()), this, SLOT(change()));
+
+    setZValue(1);
+
+    hoverEffect->setBlurRadius(25);
+    hoverEffect->setColor(QColor(Qt::white));
+    hoverEffect->setOffset(0,0);
+    hoverEffect->setEnabled(false);
+    setGraphicsEffect(hoverEffect);
 
     updateToolTip();
 }
@@ -19,19 +28,13 @@ QRectF Processor::boundingRect() const {
 }
 
 void Processor::hoverEnterEvent(QGraphicsSceneHoverEvent *) {
-    if (hoverEffect != 0) {
-        hoverEffect = new QGraphicsDropShadowEffect();
-        hoverEffect->setBlurRadius(25);
-        hoverEffect->setColor(QColor(Qt::white));
-        hoverEffect->setOffset(0,0);
-        setGraphicsEffect(hoverEffect);
-    }
+    hoverEffect->setEnabled(true);
     over = true;
 }
 
 void Processor::hoverLeaveEvent(QGraphicsSceneHoverEvent *) {
     over = false;
-    hoverEffect->deleteLater();
+    hoverEffect->setEnabled(false);
 }
 
 void Processor::updateToolTip() {

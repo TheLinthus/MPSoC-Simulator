@@ -4,9 +4,16 @@ namespace View {
 
 AppNode::AppNode(int n, Core::AppNode *appNode) :
     n(n),
-    appNode(appNode)
+    appNode(appNode),
+    hoverEffect(new QGraphicsDropShadowEffect())
 {
     setAcceptHoverEvents(true);
+
+    hoverEffect->setBlurRadius(25);
+    hoverEffect->setColor(QColor(Qt::white));
+    hoverEffect->setOffset(0,0);
+    hoverEffect->setEnabled(false);
+    setGraphicsEffect(hoverEffect);
 }
 
 int AppNode::getN() const {
@@ -42,19 +49,13 @@ void AppNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 }
 
 void AppNode::hoverEnterEvent(QGraphicsSceneHoverEvent *) {
-    if (hoverEffect != 0) {
-        hoverEffect = new QGraphicsDropShadowEffect();
-        hoverEffect->setBlurRadius(25);
-        hoverEffect->setColor(QColor(Qt::white));
-        hoverEffect->setOffset(0,0);
-        setGraphicsEffect(hoverEffect);
-    }
+    hoverEffect->setEnabled(true);
     over = true;
 }
 
 void AppNode::hoverLeaveEvent(QGraphicsSceneHoverEvent *) {
     over = false;
-    hoverEffect->deleteLater();
+    hoverEffect->setEnabled(false);
 }
 
 } // namespace View

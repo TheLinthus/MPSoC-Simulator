@@ -10,9 +10,18 @@ Channel::Channel(int x, int y, bool v, Core::Channel *c)
     , vertical(v)
     , over(false)
     , channel(c)
+    , hoverEffect(new QGraphicsDropShadowEffect())
 {
     setAcceptHoverEvents(true);
     connect(channel, SIGNAL(loadChanged(int)), this, SLOT(change()));
+
+    setZValue(0);
+
+    hoverEffect->setBlurRadius(25);
+    hoverEffect->setColor(QColor(Qt::white));
+    hoverEffect->setOffset(0,0);
+    hoverEffect->setEnabled(false);
+    setGraphicsEffect(hoverEffect);
 
     updateToolTip();
 }
@@ -22,19 +31,13 @@ QRectF Channel::boundingRect() const {
 }
 
 void Channel::hoverEnterEvent(QGraphicsSceneHoverEvent *) {
-    if (hoverEffect != 0) {
-        hoverEffect = new QGraphicsDropShadowEffect();
-        hoverEffect->setBlurRadius(25);
-        hoverEffect->setColor(QColor(Qt::white));
-        hoverEffect->setOffset(0,0);
-        setGraphicsEffect(hoverEffect);
-    }
+    hoverEffect->setEnabled(true);
     over = true;
 }
 
 void Channel::hoverLeaveEvent(QGraphicsSceneHoverEvent *) {
     over = false;
-    hoverEffect->deleteLater();
+    hoverEffect->setEnabled(false);
 }
 
 void Channel::mousePressEvent(QGraphicsSceneMouseEvent *) {
@@ -64,13 +67,20 @@ void Channel::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget
 
     int g, b;
 
-    if (channel->val() >= 100) {
+    qreal val = channel->val();
+
+    if (val > 100) {
+        painter->setBrush(QBrush(QColor(255,186,0)));
+        painter->drawRect(rect.adjusted(-6,-6,6,6));
+    }
+
+    if (val >= 100) {
         g = b = 0;
-    } else if (channel->val() <= 50) {
+    } else if (val <= 50) {
         g = 255;
-        b = (50 - channel->val()) * 5.1;
+        b = (50 - val) * 5.1;
     } else {
-        g = 255 - (channel->val() - 50) * 5.1;
+        g = 255 - (val - 50) * 5.1;
         b = 0;
     }
     painter->setBrush(QBrush(QColor(255,g,b))); // Do branco ao amarelo e ao vermelho, percentual da carga no canal

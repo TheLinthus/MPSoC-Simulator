@@ -41,7 +41,6 @@ MPSoCBox::MPSoCBox(QWidget *parent) :
     axisX->setLabelFormat("%d");
 
     chart->setTitle(tr("Channel Allocation"));
-    chart->legend()->setAlignment(Qt::AlignRight);
     chart->addSeries(max);
     chart->addSeries(average);
     chart->setAxisY(axisY, max);
