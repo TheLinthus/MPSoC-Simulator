@@ -78,11 +78,11 @@ AppNode *AppNode::find(const int n) {
     return 0;
 }
 
-QList<AppNode *> AppNode::getSiblingNodes() const {
+QVector<AppNode *> AppNode::getSiblingNodes() const {
     return siblingNodes;
 }
 
-QList<AppNode *> AppNode::getChildNodes() const {
+QVector<AppNode *> AppNode::getChildNodes() const {
     return childNodes;
 }
 

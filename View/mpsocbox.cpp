@@ -47,6 +47,8 @@ MPSoCBox::MPSoCBox(QWidget *parent) :
     chart->setAxisX(axisX, max);
     chart->setAxisY(axisY, average);
     chart->setAxisX(axisX, average);
+    chart->setMargins(QMargins(5,5,15,5));
+    chart->legend()->setScale(0.8);
 
     QtCharts::QChartView *chartView = new QtCharts::QChartView(chart);
     chartView->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);

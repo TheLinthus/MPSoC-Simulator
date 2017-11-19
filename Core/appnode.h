@@ -26,8 +26,8 @@ public:
     void addChildNode(AppNode *node);
     AppNode *getParentNode() const;
     AppNode *find(const int n);
-    QList<AppNode *> getSiblingNodes() const;
-    QList<AppNode *> getChildNodes() const;
+    QVector<AppNode *> getSiblingNodes() const;
+    QVector<AppNode *> getChildNodes() const;
 
     int getWidth() const;
     int getHeight() const;
@@ -50,8 +50,8 @@ private:
     int lifespan;
 
     AppNode *parentNode;
-    QList<AppNode *> siblingNodes;
-    QList<AppNode *> childNodes;
+    QVector<AppNode *> siblingNodes;
+    QVector<AppNode *> childNodes;
     int inThread;
     int inCoreX;
     int inCoreY;
