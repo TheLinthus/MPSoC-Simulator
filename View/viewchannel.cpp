@@ -2,12 +2,13 @@
 
 namespace View {
 
-Channel::Channel(int x, int y, bool v, Core::Channel *c)
-    : x((v ? 10 : 102) + (x * 200))
-    , y((v ? 102 : 10) + (y * 200))
-    , w(v ? 25 : 96)
-    , h(v ? 96 : 25)
-    , vertical(v)
+Channel::Channel(Core::Channel *c, bool vertical, bool out)
+    : vertical(vertical)
+    , out(out)
+    , x((vertical ? (out ? 10 : 65) : 102) + qMin(c->getAx(), c->getBx()) * 200)
+    , y((vertical ? 102 : (out ? 10 : 65)) + qMin(c->getAy(), c->getBy()) * 200)
+    , w(vertical ? 25 : 96)
+    , h(vertical ? 96 : 25)
     , over(false)
     , channel(c)
     , hoverEffect(new QGraphicsDropShadowEffect())
@@ -45,7 +46,9 @@ void Channel::mousePressEvent(QGraphicsSceneMouseEvent *) {
 }
 
 void Channel::updateToolTip() {
-    setToolTip(QString("Channel load: %1").arg(channel->val()));
+    QString toolTip("(%1, %2) to (%3, %4)<br>Channel load: %5");
+    toolTip = toolTip.arg(channel->getAx()).arg(channel->getAy()).arg(channel->getBx()).arg(channel->getBy()).arg(channel->val());
+    setToolTip(toolTip);
 }
 
 void Channel::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
@@ -83,8 +86,38 @@ void Channel::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget
         g = 255 - (val - 50) * 5.1;
         b = 0;
     }
-    painter->setBrush(QBrush(QColor(255,g,b))); // Do branco ao amarelo e ao vermelho, percentual da carga no canal
+    painter->setBrush(QBrush(QColor(255,g,b)));
     painter->drawPath(path);
+
+    int color = 255 - (g / 2) - (b / 2);
+    painter->setBrush(QBrush(QColor(color,color,color)));
+
+    QPolygonF arrow;
+    QPainterPath arrows;
+
+    arrow << QPointF(10.0, 12.5);
+    arrow << QPointF(30.0, 2.5);
+    arrow << QPointF(40.0, 2.5);
+    arrow << QPointF(20.0, 12.5);
+    arrow << QPointF(40.0, 22.5);
+    arrow << QPointF(30.0, 22.5);
+
+    arrow.translate(-48.0,-12.5);
+    arrows.addPolygon(arrow);
+    arrow.translate(40,0);
+    arrows.addPolygon(arrow);
+
+    painter->translate(x,y);
+    if (vertical) {
+        painter->rotate(90);
+        painter->translate(0,-25);
+    }
+    painter->translate(48,12.5);
+    if (out) {
+        painter->scale(-1,-1);
+    }
+
+    painter->drawPath(arrows);
 }
 
 void Channel::change() {

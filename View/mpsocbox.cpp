@@ -99,6 +99,7 @@ void View::MPSoCBox::setMPSoC(Core::MPSoC *value) {
     drawnMPSoC();
 }
 
+// Move this to a thread
 void View::MPSoCBox::updateChart() {
     qreal maxLoad = 0;
     qreal averageLoad = 0;
@@ -107,14 +108,22 @@ void View::MPSoCBox::updateChart() {
     int count = 0;
     for (int i = 0; i < mpsoc->getWidth(); i++) {
         for (int j = 0; j < mpsoc->getHeight(); j++) {
-            if (mpsoc->getCore(i,j)->getChannel(Core::Direction::South) != 0) {
-                temp = mpsoc->getCore(i,j)->getChannel(Core::Direction::South)->val();
+            if (mpsoc->getCore(i,j)->getChannel(Core::DataDirection::In, Core::Direction::South) != 0) {
+                temp = mpsoc->getCore(i,j)->getChannel(Core::DataDirection::In, Core::Direction::South)->val();
+                maxLoad = qMax(temp, maxLoad);
+                averageLoad += temp;
+                count++;
+                temp = mpsoc->getCore(i,j)->getChannel(Core::DataDirection::Out, Core::Direction::South)->val();
                 maxLoad = qMax(temp, maxLoad);
                 averageLoad += temp;
                 count++;
             }
-            if (mpsoc->getCore(i,j)->getChannel(Core::Direction::East) != 0) {
-                temp = mpsoc->getCore(i,j)->getChannel(Core::Direction::East)->val();
+            if (mpsoc->getCore(i,j)->getChannel(Core::DataDirection::In, Core::Direction::East) != 0) {
+                temp = mpsoc->getCore(i,j)->getChannel(Core::DataDirection::In, Core::Direction::East)->val();
+                maxLoad = qMax(temp, maxLoad);
+                averageLoad += temp;
+                count++;
+                temp = mpsoc->getCore(i,j)->getChannel(Core::DataDirection::Out, Core::Direction::East)->val();
                 maxLoad = qMax(temp, maxLoad);
                 averageLoad += temp;
                 count++;
@@ -156,12 +165,20 @@ void View::MPSoCBox::drawnMPSoC() {
             Core::Processor * cp = mpsoc->getCore(i,j);
             View::Processor * vp = new View::Processor(i,j,cp);
             mpsocScene->addItem(vp);
-            if (Core::Channel * cc = mpsoc->getCore(i,j)->getChannel(Core::South)) {
-                View::Channel * vc = new View::Channel(i,j,true,cc);
+            if (Core::Channel * cc = mpsoc->getCore(i,j)->getChannel(Core::In, Core::North)) {
+                View::Channel * vc = new View::Channel(cc, true, true);
                 mpsocScene->addItem(vc);
             }
-            if (Core::Channel * cc = mpsoc->getCore(i,j)->getChannel(Core::East)) {
-                View::Channel * vc = new View::Channel(i,j,false,cc);
+            if (Core::Channel * cc = mpsoc->getCore(i,j)->getChannel(Core::In, Core::South)) {
+                View::Channel * vc = new View::Channel(cc, true, false);
+                mpsocScene->addItem(vc);
+            }
+            if (Core::Channel * cc = mpsoc->getCore(i,j)->getChannel(Core::In, Core::West)) {
+                View::Channel * vc = new View::Channel(cc, false, true);
+                mpsocScene->addItem(vc);
+            }
+            if (Core::Channel * cc = mpsoc->getCore(i,j)->getChannel(Core::In, Core::East)) {
+                View::Channel * vc = new View::Channel(cc, false, false);
                 mpsocScene->addItem(vc);
             }
         }

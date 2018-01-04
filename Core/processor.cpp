@@ -4,10 +4,14 @@ namespace Core {
 
 Processor::Processor(int x, int y, Type type, int threads, QObject *parent)
     : QObject(parent)
-    , north(0)
-    , west(0)
-    , south(0)
-    , east(0)
+    , inNorth(0)
+    , inWest(0)
+    , inSouth(0)
+    , inEast(0)
+    , outNorth(0)
+    , outWest(0)
+    , outSouth(0)
+    , outEast(0)
     , threads(threads)
     , cores(threads)
     , x(x)
@@ -19,16 +23,6 @@ Processor::Processor(int x, int y, Type type, int threads, QObject *parent)
         connect(this, SIGNAL(destroyed(QObject*)), masterApplication, SLOT(deleteLater()));
         masterApplication->setRootNode(0,-1);
         cores[0] = masterApplication->getNode(0);
-    }
-}
-
-Channel *Processor::getChannel(Direction direction) {
-    switch (direction) {
-        case North : return north;
-        case West : return west;
-        case South : return south;
-        case East : return east;
-        default : return 0;
     }
 }
 
@@ -111,13 +105,24 @@ void Processor::kill(int thread) {
     }
 }
 
-void Processor::setChannel(Direction direction, Channel *channel)
+void Processor::setChannel(DataDirection inout, Direction direction, Channel *channel)
 {
     switch (direction) {
-        case North : north = channel; break;
-        case West : west = channel; break;
-        case South : south = channel; break;
-        case East : east = channel; break;
+        case North : if (inout == In) inNorth = channel; else outNorth = channel; break;
+        case West : if (inout == In) inWest = channel; else outWest = channel; break;
+        case South : if (inout == In) inSouth = channel; else outSouth = channel; break;
+        case East : if (inout == In) inEast = channel; else outEast = channel; break;
+    }
+}
+
+Channel *Processor::getChannel(DataDirection inout, Direction direction)
+{
+    switch (direction) {
+        case North : return inout == In ? inNorth : outNorth;
+        case West : return inout == In ? inWest : outWest;
+        case South : return inout == In ? inSouth : outSouth;
+        case East : return inout == In ? inEast : outEast;
+        default : return 0;
     }
 }
 

@@ -15,7 +15,7 @@ class Channel : public QGraphicsObject {
     Q_OBJECT
 
 public:
-    Channel(int x, int y, bool v, Core::Channel* c);
+    Channel(Core::Channel* c, bool vertical, bool out);
 
     QRectF boundingRect() const override;
 
@@ -26,6 +26,7 @@ public slots:
 
 private:
     bool vertical;
+    bool out;
     int x, y, w, h;
     bool over;
 

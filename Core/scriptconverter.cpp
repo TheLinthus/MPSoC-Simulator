@@ -54,10 +54,26 @@ QScriptValue ScriptConverter::toScriptValue(QScriptEngine *engine, Core::Process
     }
     obj.setProperty("threads", threads);
 
-    obj.setProperty("south", toScriptValue(engine, processor->getChannel(South)));
-    obj.setProperty("north", toScriptValue(engine, processor->getChannel(North)));
-    obj.setProperty("west", toScriptValue(engine, processor->getChannel(West)));
-    obj.setProperty("east", toScriptValue(engine, processor->getChannel(East)));
+    QScriptValue north = engine->newObject();
+    north.setProperty("in", toScriptValue(engine, processor->getChannel(In, North)));
+    north.setProperty("out", toScriptValue(engine, processor->getChannel(Out, North)));
+
+    QScriptValue south = engine->newObject();
+    south.setProperty("in", toScriptValue(engine, processor->getChannel(In, South)));
+    south.setProperty("out", toScriptValue(engine, processor->getChannel(Out, South)));
+
+    QScriptValue west = engine->newObject();
+    west.setProperty("in", toScriptValue(engine, processor->getChannel(In, West)));
+    west.setProperty("out", toScriptValue(engine, processor->getChannel(Out, West)));
+
+    QScriptValue east = engine->newObject();
+    east.setProperty("in", toScriptValue(engine, processor->getChannel(In, East)));
+    east.setProperty("out", toScriptValue(engine, processor->getChannel(Out, East)));
+
+    obj.setProperty("north", north);
+    obj.setProperty("south", south);
+    obj.setProperty("west", west);
+    obj.setProperty("east", east);
 
     return obj;
 }

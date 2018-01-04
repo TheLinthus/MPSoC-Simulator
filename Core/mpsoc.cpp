@@ -20,18 +20,24 @@ MPSoC::MPSoC(int h, int w, QPoint master, QObject *parent)
             }
             connect(processors[i][j], SIGNAL(changed()), this, SLOT(update()));
             if (i > 0) { // If isn't 1st col, set west channel form west core
-                processors[i][j]->setChannel(West, processors[i-1][j]->getChannel(East));
+                processors[i][j]->setChannel(In, West, processors[i-1][j]->getChannel(Out, East));
+                processors[i][j]->setChannel(Out, West, processors[i-1][j]->getChannel(In, East));
             }
             if (j > 0) { // If isn't 1st line, set noth channel form north core
-                processors[i][j]->setChannel(North, processors[i][j-1]->getChannel(South));
+                processors[i][j]->setChannel(In, North, processors[i][j-1]->getChannel(Out, South));
+                processors[i][j]->setChannel(Out, North, processors[i][j-1]->getChannel(In, South));
             }
             if (i < w - 1) { // If isn't the last col, set new channel to the east
-                processors[i][j]->setChannel(East, new Channel(i,j,i-1, j));
-                connect(processors[i][j]->getChannel(East), SIGNAL(loadChanged(int)), this, SLOT(update()));
+                processors[i][j]->setChannel(Out, East, new Channel(i,j,i+1,j));
+                processors[i][j]->setChannel(In, East, new Channel(i+1,j,i,j));
+                connect(processors[i][j]->getChannel(In, East), SIGNAL(loadChanged(int)), this, SLOT(update()));
+                connect(processors[i][j]->getChannel(Out, East), SIGNAL(loadChanged(int)), this, SLOT(update()));
             }
             if (j < h - 1) { // If isn't the last line, set new channel to the south
-                processors[i][j]->setChannel(South, new Channel(i,j,i,j-1));
-                connect(processors[i][j]->getChannel(South), SIGNAL(loadChanged(int)), this, SLOT(update()));
+                processors[i][j]->setChannel(Out, South, new Channel(i,j,i,j+1));
+                processors[i][j]->setChannel(In, South, new Channel(i,j+1,i,j));
+                connect(processors[i][j]->getChannel(In, South), SIGNAL(loadChanged(int)), this, SLOT(update()));
+                connect(processors[i][j]->getChannel(Out, South), SIGNAL(loadChanged(int)), this, SLOT(update()));
             }
         }
     }
@@ -84,13 +90,13 @@ QVector<Channel *> MPSoC::getPath(int x1, int y1, int x2, int y2) const {
     int math = x1 < x2 ? +1 : -1;
     Direction dir = x1 < x2 ? East : West ;
     while (x1 != x2) {
-        path.append(processors[x1][y1]->getChannel(dir));
+        path.append(processors[x1][y1]->getChannel(Out, dir));
         x1 += math;
     }
     math = y1 < y2 ? +1 : -1;
     dir = y1 < y2 ? South : North;
     while (y1 != y2) {
-        path.append(processors[x1][y1]->getChannel(dir));
+        path.append(processors[x1][y1]->getChannel(Out, dir));
         y1 += math;
     }
 

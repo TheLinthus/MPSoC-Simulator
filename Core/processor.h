@@ -18,8 +18,8 @@ public:
 
     explicit Processor(int x, int y, Type type = Slave, int threads = 1, QObject *parent = 0);
 
-    void setChannel(Direction direction, Channel *channel);
-    Channel *getChannel(Direction direction);
+    void setChannel(DataDirection inout, Direction direction, Channel *channel);
+    Channel *getChannel(DataDirection inout, Direction direction);
     int firstIdle();
     int isIdle(int i = 0);
     bool run(AppNode *node, int thread = 0);
@@ -33,10 +33,14 @@ public:
     int getThreadOf(const AppNode *appNode);
 
 private:
-    Channel* north;
-    Channel* west;
-    Channel* south;
-    Channel* east;
+    Channel* inNorth;
+    Channel* inWest;
+    Channel* inSouth;
+    Channel* inEast;
+    Channel* outNorth;
+    Channel* outWest;
+    Channel* outSouth;
+    Channel* outEast;
     QVector<AppNode*> cores;
     int threads;
     Type type;

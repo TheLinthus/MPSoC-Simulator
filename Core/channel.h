@@ -8,6 +8,7 @@
 namespace Core {
 
 enum Direction {North,West,South,East};
+enum DataDirection {In, Out};
 
 class Channel : public QObject
 {
