@@ -47,6 +47,8 @@ private slots:
     void fail(int e);
     void on_sliderStep_valueChanged(int value);
 
+    void on_listViewApplications_activated(const QModelIndex &index);
+
 private:
     Ui::SimulationTab *ui;
 

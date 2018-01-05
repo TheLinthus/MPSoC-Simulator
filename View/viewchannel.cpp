@@ -5,8 +5,8 @@ namespace View {
 Channel::Channel(Core::Channel *c, bool vertical, bool out)
     : vertical(vertical)
     , out(out)
-    , x((vertical ? (out ? 10 : 65) : 102) + qMin(c->getAx(), c->getBx()) * 200)
-    , y((vertical ? 102 : (out ? 10 : 65)) + qMin(c->getAy(), c->getBy()) * 200)
+    , x((vertical ? (out ? 10 : 40) : 102) + qMin(c->getAx(), c->getBx()) * 200)
+    , y((vertical ? 102 : (out ? 10 : 40)) + qMin(c->getAy(), c->getBy()) * 200)
     , w(vertical ? 25 : 96)
     , h(vertical ? 96 : 25)
     , over(false)
@@ -96,15 +96,18 @@ void Channel::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget
     QPainterPath arrows;
 
     arrow << QPointF(10.0, 12.5);
+    arrow << QPointF(25.0, 2.5);
     arrow << QPointF(30.0, 2.5);
-    arrow << QPointF(40.0, 2.5);
-    arrow << QPointF(20.0, 12.5);
-    arrow << QPointF(40.0, 22.5);
+    arrow << QPointF(22.5, 10.0);
+    arrow << QPointF(40.0, 10.0);
+    arrow << QPointF(40.0, 15.0);
+    arrow << QPointF(22.5, 15.0);
     arrow << QPointF(30.0, 22.5);
+    arrow << QPointF(25.0, 22.5);
 
     arrow.translate(-48.0,-12.5);
     arrows.addPolygon(arrow);
-    arrow.translate(40,0);
+    arrow.translate(45,0);
     arrows.addPolygon(arrow);
 
     painter->translate(x,y);

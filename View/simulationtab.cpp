@@ -160,3 +160,17 @@ void SimulationTab::on_sliderStep_valueChanged(int value) {
 }
 
 } // namespace View
+
+void View::SimulationTab::on_listViewApplications_activated(const QModelIndex &index)
+{
+    if (  ui->pushButtonRunApplication->isEnabled()) {
+        QString appName = index.data().toString();
+        Core::Application *app = apps->run(appName);
+        if (app != 0) {
+            simulator->runAction(app);
+        } else {
+            QMessageBox::warning(parentWidget()->parentWidget(), parentWidget()->windowTitle(),
+                                 QString(tr("Undexpected error. Application %1 didn't run").arg(appName)));
+        }
+    }
+}
