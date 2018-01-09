@@ -196,22 +196,22 @@ void View::MPSoCBox::drawnMPSoC() {
     channelVariation.setColorAt(0.45, Qt::yellow);
     channelVariation.setColorAt(0.9, Qt::red);
     channelVariation.setColorAt(1, Qt::red);
-    mpsocScene->addRect(gridWidth*200-25,-10,30,30, QPen(QColor(255,127,0),8));
+    mpsocScene->addRect(gridWidth*200-25,-10,30,(gridHeight*200-80)*0.1, QPen(QColor(255,127,0),10));
     mpsocScene->addRect(gridWidth*200-25,-10,30,gridHeight*200-50, labelPen, QBrush(channelVariation));
     mpsocScene->addText(QString(tr("Channel Load")), labelFont)
             ->setPos(gridWidth*200-35,-50);
     mpsocScene->addLine(gridWidth*200+5,-10,gridWidth*200+15,-10, labelPen);
     mpsocScene->addText(QString(tr("Overload")), labelFont)
-            ->setPos(gridWidth*200+15, -27.5);
+            ->setPos(gridWidth*200+25, -27.5);
     mpsocScene->addLine(gridWidth*200+5,(gridHeight*200-80)*0.1-10,gridWidth*200+15,(gridHeight*200-80)*0.1-10, labelPen);
     mpsocScene->addText(QString("100%"), labelFont)
-            ->setPos(gridWidth*200+25, 0);
+            ->setPos(gridWidth*200+25, (gridHeight*200-80)*0.1-25);
     mpsocScene->addLine(gridWidth*200+5,(gridHeight*200-40)*0.55,gridWidth*200+15,(gridHeight*200-40)*0.55, labelPen);
     mpsocScene->addText(QString("50%"), labelFont)
-            ->setPos(gridWidth*200+15, (gridHeight*200-80)*0.55);
+            ->setPos(gridWidth*200+25, (gridHeight*200-80)*0.55);
     mpsocScene->addLine(gridWidth*200+5,gridHeight*200-60,gridWidth*200+15,gridHeight*200-60, labelPen);
     mpsocScene->addText(QString("0%"), labelFont)
-            ->setPos(gridWidth*200+15, gridHeight*200-80);
+            ->setPos(gridWidth*200+25, gridHeight*200-80);
 }
 
 void View::MPSoCBox::fitInView() {
