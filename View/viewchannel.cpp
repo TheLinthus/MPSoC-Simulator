@@ -46,7 +46,7 @@ void Channel::mousePressEvent(QGraphicsSceneMouseEvent *) {
 }
 
 void Channel::updateToolTip() {
-    QString toolTip("(%1, %2) to (%3, %4)<br>Channel load: %5");
+    QString toolTip("(%1, %2) to (%3, %4)<br>Channel load: %5%");
     toolTip = toolTip.arg(channel->getAx()).arg(channel->getAy()).arg(channel->getBx()).arg(channel->getBy()).arg(channel->val());
     setToolTip(toolTip);
 }

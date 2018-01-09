@@ -50,6 +50,9 @@ MPSoCBox::MPSoCBox(QWidget *parent) :
     chart->setMargins(QMargins(5,5,15,5));
     chart->legend()->setScale(0.8);
 
+    chart->setBackgroundRoundness(0);
+    chart->layout()->setContentsMargins(0,0,0,0);
+
     QtCharts::QChartView *chartView = new QtCharts::QChartView(chart);
     chartView->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
 
@@ -154,12 +157,13 @@ void View::MPSoCBox::clearChart() {
 
 void View::MPSoCBox::drawnMPSoC() {
     mpsocScene->clear();
+    mpsocScene->setBackgroundBrush(QBrush(QColor(0xEF,0xEB,0xE7), Qt::SolidPattern));
 
-    mpsocScene->setSceneRect(-50,-50,gridWidth*200,gridHeight*200);
+    // Drawn Grid MPSoC on the scene;
+    mpsocScene->setSceneRect(-50,-50,gridWidth*200+200,gridHeight*200);
 
     mpsocScene->addRect(-50,-50,gridWidth*200,gridHeight*200,QPen(QColor(32,32,32),5), QBrush(QColor(64,64,64)));
 
-    // Desenha MPSoC na scene;
     for (int i = 0; i < gridWidth; i++) {
         for (int j = 0; j < gridHeight; j++) {
             Core::Processor * cp = mpsoc->getCore(i,j);
@@ -183,6 +187,31 @@ void View::MPSoCBox::drawnMPSoC() {
             }
         }
     }
+
+    // Drawn allocation label
+    QLinearGradient channelVariation(20,gridHeight*200-50,20,0);
+    QFont labelFont("Sans Serif", 18);
+    QPen labelPen(QColor(32,32,32),2);
+    channelVariation.setColorAt(0, Qt::white);
+    channelVariation.setColorAt(0.45, Qt::yellow);
+    channelVariation.setColorAt(0.9, Qt::red);
+    channelVariation.setColorAt(1, Qt::red);
+    mpsocScene->addRect(gridWidth*200-25,-10,30,30, QPen(QColor(255,127,0),8));
+    mpsocScene->addRect(gridWidth*200-25,-10,30,gridHeight*200-50, labelPen, QBrush(channelVariation));
+    mpsocScene->addText(QString(tr("Channel Load")), labelFont)
+            ->setPos(gridWidth*200-35,-50);
+    mpsocScene->addLine(gridWidth*200+5,-10,gridWidth*200+15,-10, labelPen);
+    mpsocScene->addText(QString(tr("Overload")), labelFont)
+            ->setPos(gridWidth*200+15, -27.5);
+    mpsocScene->addLine(gridWidth*200+5,(gridHeight*200-80)*0.1-10,gridWidth*200+15,(gridHeight*200-80)*0.1-10, labelPen);
+    mpsocScene->addText(QString("100%"), labelFont)
+            ->setPos(gridWidth*200+25, 0);
+    mpsocScene->addLine(gridWidth*200+5,(gridHeight*200-40)*0.55,gridWidth*200+15,(gridHeight*200-40)*0.55, labelPen);
+    mpsocScene->addText(QString("50%"), labelFont)
+            ->setPos(gridWidth*200+15, (gridHeight*200-80)*0.55);
+    mpsocScene->addLine(gridWidth*200+5,gridHeight*200-60,gridWidth*200+15,gridHeight*200-60, labelPen);
+    mpsocScene->addText(QString("0%"), labelFont)
+            ->setPos(gridWidth*200+15, gridHeight*200-80);
 }
 
 void View::MPSoCBox::fitInView() {
