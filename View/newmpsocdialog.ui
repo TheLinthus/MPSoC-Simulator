@@ -223,6 +223,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>xSpinBox</tabstop>
+  <tabstop>ySpinBox</tabstop>
+  <tabstop>comboBox</tabstop>
+  <tabstop>xHorizontalSlider</tabstop>
+  <tabstop>yHorizontalSlider</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
