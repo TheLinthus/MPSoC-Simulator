@@ -55,6 +55,9 @@ private slots:
     void on_simulationPushButton_clicked();
     void on_heuristicsPushButton_clicked();
 
+    void hideMenu();
+    void showMenu();
+    void animationDone();
 private:
     QThread *thread;
     QTimer *timer;
@@ -68,6 +71,8 @@ private:
     View::SimulationTab *simulationTab;
     View::ApplicationsTab *applicationsTab;
     View::HeuristicsTab *heuristicsTab;
+
+    QPropertyAnimation *animation;
 };
 
 #endif // MAINWINDOW_H

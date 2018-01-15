@@ -14,6 +14,13 @@ MPSoC_Simulator::MPSoC_Simulator(QWidget *parent) :
     // SetUp GUI
     ui->setupUi(this);
 
+    animation = new QPropertyAnimation(ui->leftPanel, "maximumWidth");
+    animation->setDuration(500);
+
+    connect(animation, SIGNAL(finished()), this, SLOT(animationDone()));
+    connect(simulator, SIGNAL(start()), this, SLOT(hideMenu()));
+    connect(simulator, SIGNAL(reseted()), this, SLOT(showMenu()));
+
     restoreGeometry(settings.value("mainWindowGeometry").toByteArray());    // Restore window size/position from last size/position
     restoreState(settings.value("mainWindowState").toByteArray());          // Restore window state from last window state
 
@@ -148,6 +155,27 @@ void MPSoC_Simulator::closeEvent(QCloseEvent *event) {
 void MPSoC_Simulator::openLogFile() {
     QString logFile = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first()+ "/log.txt";
     QDesktopServices::openUrl(QUrl::fromLocalFile(logFile));
+}
+
+void MPSoC_Simulator::hideMenu() {
+    animation->setStartValue(220);
+    animation->setEndValue(0);
+    animation->start();
+    qDebug() << "hidding...";
+}
+
+void MPSoC_Simulator::showMenu() {
+    ui->leftPanel->show();
+    animation->setStartValue(0);
+    animation->setEndValue(220);
+    animation->start();
+    qDebug() << "showing...";
+}
+
+void MPSoC_Simulator::animationDone() {
+    if (ui->leftPanel->maximumWidth() == 0) {
+        ui->leftPanel->hide();
+    }
 }
 
 void MPSoC_Simulator::on_applicationsPushButton_clicked() {

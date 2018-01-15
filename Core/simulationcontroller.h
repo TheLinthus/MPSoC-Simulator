@@ -73,6 +73,7 @@ public slots:
 signals:
     void step();
     void reseted();
+    void start();
     void calculating(bool);
     void notify();
     void failed(int);

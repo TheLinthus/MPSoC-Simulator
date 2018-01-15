@@ -108,7 +108,10 @@ void SimulationController::reset() {
 }
 
 void SimulationController::newStep() {
-    started = true;
+    if (!started) {
+        started = true;
+        emit start();
+    }
 
     pointer++;
     steps.append(0);
