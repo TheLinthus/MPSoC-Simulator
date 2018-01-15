@@ -283,6 +283,9 @@
    </property>
   </action>
   <action name="actionAdd_MPSoC">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/icons/images/add-1.png</normaloff>:/icons/images/add-1.png</iconset>
@@ -325,6 +328,9 @@
    </property>
   </action>
   <action name="actionStep_Foward">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/icons/images/skip.png</normaloff>:/icons/images/skip.png</iconset>
@@ -339,6 +345,9 @@
   <action name="actionAuto_Step">
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">

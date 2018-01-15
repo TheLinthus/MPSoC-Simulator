@@ -66,6 +66,9 @@ MPSoC_Simulator::MPSoC_Simulator(QWidget *parent) :
     connect(ui->action_Open_Heuristics_Directory, SIGNAL(triggered(bool)), heuristicsTab, SLOT(on_pushButtonOpenHeuristicsDirectory_clicked()));
     connect(ui->actionLog, SIGNAL(triggered(bool)), this, SLOT(openLogFile()));
 
+    // Updating Action Menu
+    connect(simulationTab, SIGNAL(viewUpdated()), this, SLOT(updateActionMenu()));
+
     // SetUp widgetStack's tabs of left panel buttons
     ui->widgetStack->addWidget(simulationTab);
     ui->widgetStack->addWidget(applicationsTab);
@@ -81,6 +84,7 @@ MPSoC_Simulator::MPSoC_Simulator(QWidget *parent) :
 
     connect(worker, SIGNAL(finished()), this, SLOT(loadingDone()));                             // Notify main window
     connect(worker, SIGNAL(finished()), simulationTab, SLOT(updateView()));                     // Notify widget to enable buttons
+    connect(worker, SIGNAL(finished()), this, SLOT(updateActionMenu()));                        // Notify to enable action Menu
     connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));                           // Auto delete worker after job done
     connect(worker, SIGNAL(status(QString,int)), statusBar(), SLOT(showMessage(QString,int)));  // Show messages from worker to Status Bar
 
@@ -176,6 +180,15 @@ void MPSoC_Simulator::animationDone() {
     if (ui->leftPanel->maximumWidth() == 0) {
         ui->leftPanel->hide();
     }
+}
+
+void MPSoC_Simulator::updateActionMenu() {
+    ui->actionAdd_MPSoC->setEnabled(heuristics->count() > 0 && !simulator->isStarted());
+    ui->action_Reset_Simulation->setEnabled(simulator->isStarted());
+    ui->actionStep_Foward->setEnabled(simulator->isStepEnable());
+    ui->actionStep_Back->setEnabled(false);//simulator->currentStep() > 0);          // TODO - Not implemented in this version
+    ui->actionAuto_Step->setEnabled(simulator->isStepEnable());
+    ui->actionAuto_Step->setChecked(simulator->isRunning());
 }
 
 void MPSoC_Simulator::on_applicationsPushButton_clicked() {

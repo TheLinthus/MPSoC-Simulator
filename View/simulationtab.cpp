@@ -58,6 +58,8 @@ void SimulationTab::updateView() {
         ui->sliderStep->setValue(0);
         ui->sliderStep->setMaximum(0);
     }
+
+    emit viewUpdated();
 }
 
 void SimulationTab::on_autoStepToggle(bool) {

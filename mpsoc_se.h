@@ -58,6 +58,7 @@ private slots:
     void hideMenu();
     void showMenu();
     void animationDone();
+    void updateActionMenu();
 private:
     QThread *thread;
     QTimer *timer;

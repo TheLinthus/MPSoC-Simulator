@@ -43,6 +43,9 @@ public slots:
     void on_listViewApplications_selectionModel_selectionChanged(const QItemSelection &, const QItemSelection &);
     void on_listViewRunning_selectionModel_selectionChanged(const QItemSelection &, const QItemSelection &);
 
+signals:
+    void viewUpdated();
+
 private slots:
     void fail(int e);
     void on_sliderStep_valueChanged(int value);
