@@ -141,7 +141,7 @@ QVector<Processor *> MPSoC::getBusy() const {
 }
 
 AppNode *MPSoC::popProcess() {
-    AppNode *node;
+    AppNode *node = 0;
     do {
         if (processList.isEmpty()) {
             return 0;
@@ -162,6 +162,7 @@ void MPSoC::pushProcess(QVector<AppNode *> list) {
 void MPSoC::clearApps() {
     qDeleteAll(runningApps);
     runningApps.clear();
+    processList.clear();
 }
 
 void MPSoC::run(Application *app) {
