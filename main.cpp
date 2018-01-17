@@ -35,7 +35,7 @@ void logger(QtMsgType type, const QMessageLogContext &context, const QString &ms
         out << outStr;
         endl(out);
     } else {
-        fprintf(stderr, "Could not open file (%s): %s", file.fileName(), file.errorString());
+        fprintf(stderr, "Could not open file (%s): %s", file.fileName().toStdString().c_str(), file.errorString().toStdString().c_str());
     }
     file.close();
 }
