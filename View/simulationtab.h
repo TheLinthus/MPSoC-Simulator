@@ -56,7 +56,7 @@ private:
     Ui::SimulationTab *ui;
 
     QStringListModel *listModelApplications;
-    QStringListModel *listModelRunning;
+    QStandardItemModel *listModelRunning;
 };
 
 

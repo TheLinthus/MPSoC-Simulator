@@ -7,7 +7,7 @@ SimulationTab::SimulationTab(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::SimulationTab),
     listModelApplications(new QStringListModel()),
-    listModelRunning(new QStringListModel())
+    listModelRunning(new QStandardItemModel())
 {
     ui->setupUi(this);
 
@@ -37,7 +37,18 @@ void SimulationTab::updateListViewModel(const QStringList &list) {
 }
 
 void SimulationTab::updateView() {
-    listModelRunning->setStringList(apps->getRunningApplicationsList());
+    listModelRunning->clear();
+    QStringList strlist = apps->getRunningApplicationsList();
+    QList<QStandardItem *> list;
+    for (int i = 0; i < strlist.count(); i++) {
+        QPixmap icon(24,24);
+        icon.fill(apps->getRunning(i)->getColor());
+
+        QStandardItem *item = new QStandardItem(QIcon(icon), strlist[i]);
+        list.append(item);
+    }
+    listModelRunning->appendColumn(list);
+    ui->listViewRunning->update();
     ui->pushButtonRunApplication->setEnabled(ui->listViewApplications->selectionModel()->selectedIndexes().count() > 0 && mpsocs->count() > 0 && simulator->isRunEnabled());
     ui->pushButtonKillApplication->setEnabled(ui->listViewRunning->selectionModel()->selectedIndexes().count() > 0  && simulator->isKillEnabled());
     ui->buttonAddMPSoC->setEnabled(heuristics->count() > 0 && !simulator->isStarted()); // Must have at least 1 heuristic and can't do with running simulation;

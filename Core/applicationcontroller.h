@@ -13,6 +13,7 @@
 #include <Core/application.h>
 
 #define apps Core::ApplicationController::instance()
+#define COLORS_COUNT 18
 
 namespace Core {
 
@@ -35,6 +36,27 @@ private:
 
     enum ApplicationFileVersion {
         Basic
+    };
+    
+    QColor defaultColors[COLORS_COUNT] = {
+        QColor(255, 0, 0, 255),
+        QColor(0, 255, 0, 255),
+        QColor(0, 0, 255, 255),
+        QColor(255, 255, 0, 255),
+        QColor(255, 0, 255, 255),
+        QColor(64, 255, 255, 255),
+        QColor(255, 154, 0, 255),
+        QColor(0, 255, 154, 255),
+        QColor(123, 0, 191, 255),
+        QColor(224, 96, 123, 255),
+        QColor(191, 255, 0, 255),
+        QColor(0, 191, 255, 255),
+        QColor(123, 0, 15, 255),
+        QColor(0, 155, 0, 255),
+        QColor(0, 0, 123, 255),
+        QColor(96, 63, 0, 255),
+        QColor(63, 0, 63, 255),
+        QColor(31, 96, 63, 255)
     };
 
 public:
